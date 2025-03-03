@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>Etherna.Sdk.Tools.Video</RootNamespace>
 
     <Authors>Etherna SA</Authors>
@@ -11,6 +10,7 @@
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
     <RepositoryUrl>https://github.com/Etherna/etherna-sdk-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bee.Net.Client" Version="0.4.0-alpha.110" />
+    <PackageReference Include="Bee.Net.Client" Version="0.4.0-alpha.128" />
     <PackageReference Include="GitVersion.MsBuild" Version="6.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -35,7 +35,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.7" />
+    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.8" />
   </ItemGroup>
 
   <ItemGroup>
