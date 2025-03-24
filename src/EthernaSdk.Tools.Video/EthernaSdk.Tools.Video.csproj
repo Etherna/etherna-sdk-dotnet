@@ -35,7 +35,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.8" />
+    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.9" />
   </ItemGroup>
 
   <ItemGroup>
