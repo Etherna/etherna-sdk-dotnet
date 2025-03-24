@@ -202,9 +202,9 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         Task<FileResponse> GetFeedAsync(
             string owner,
             string topic,
-            int? at = null,
-            int? after = null,
-            string? type = null,
+            DateTimeOffset? at = null,
+            ulong? after = null,
+            SwarmFeedType type = SwarmFeedType.Sequence,
             CancellationToken cancellationToken = default);
 
         /// <summary>Get file or index document from a collection of files</summary>
