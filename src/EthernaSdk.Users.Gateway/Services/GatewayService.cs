@@ -50,11 +50,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             {
                 foreach (var chunk in chunks)
                 {
-                    using var memoryStream = new MemoryStream(chunk.GetSpanAndData());
+                    using var memoryStream = new MemoryStream(chunk.GetFullPayloadToByteArray());
                     
                     await ethernaGatewayClient.UploadChunkAsync(
-                        batchId,
                         memoryStream,
+                        batchId,
                         swarmPin).ConfigureAwait(false);
                 }
                 return;
@@ -214,7 +214,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         public async Task UploadChunkAsync(
             PostageBatchId batchId,
-            SwarmChunk chunk,
+            SwarmCac chunk,
             bool fundPinning = false,
             TagId? tagId = null)
         {
@@ -225,9 +225,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
             
             using var dataStream = new MemoryStream(chunk.Data.ToArray());
             await ethernaGatewayClient.BeeClient.UploadChunkAsync(
-                batchId,
                 dataStream,
-                swarmPin: fundPinning,
+                batchId,
+                pinChunk: fundPinning,
                 tagId: tagId).ConfigureAwait(false);
         }
         
@@ -238,8 +238,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
             ethernaGatewayClient.UploadDirectoryAsync(
                 batchId,
                 directoryPath,
-                swarmDeferredUpload: true,
-                swarmPin: pinResource);
+                pinDirectory: pinResource);
 
         public Task<SwarmHash> UploadFileAsync(
             PostageBatchId batchId,
@@ -252,8 +251,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 content,
                 name: name,
                 contentType: contentType,
-                swarmDeferredUpload: true,
-                swarmPin: pinResource);
+                pinFile: pinResource);
 
         // Helpers.
         private async Task WaitForBatchUsableAsync(PostageBatchId batchId)

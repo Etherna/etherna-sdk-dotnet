@@ -82,7 +82,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         Task UploadChunkAsync(
             PostageBatchId batchId,
-            SwarmChunk chunk,
+            SwarmCac chunk,
             bool fundPinning = false,
             TagId? tagId = null);
         

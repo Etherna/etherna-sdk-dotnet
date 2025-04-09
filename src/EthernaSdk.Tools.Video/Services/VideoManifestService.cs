@@ -13,6 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.BeeNet;
+using Etherna.BeeNet.Hashing;
 using Etherna.BeeNet.Hashing.Pipeline;
 using Etherna.BeeNet.Hashing.Postage;
 using Etherna.BeeNet.Hashing.Signer;
@@ -181,7 +182,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         }));
             }
 
-            return (await mantarayManifest.GetHashAsync().ConfigureAwait(false)).Hash;
+            return (await mantarayManifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
         }
 
         public async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(SwarmHash manifestHash)
