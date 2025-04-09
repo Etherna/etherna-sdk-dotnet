@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bee.Net.Client" Version="0.4.0-alpha.197" />
+    <PackageReference Include="Bee.Net.Client" Version="0.4.0-alpha.198" />
     <PackageReference Include="GitVersion.MsBuild" Version="6.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -35,7 +35,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.9" />
+    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.10" />
   </ItemGroup>
 
   <ItemGroup>
