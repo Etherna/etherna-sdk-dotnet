@@ -25,17 +25,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bee.Net.Client" Version="0.4.0-alpha.198" />
-    <PackageReference Include="GitVersion.MsBuild" Version="6.2.0">
+    <PackageReference Include="Bee.Net.Client" Version="0.4.0-alpha.233" />
+    <PackageReference Include="GitVersion.MsBuild" Version="6.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="M3U8Parser" Version="1.0.5" />
+    <PackageReference Include="M3U8Parser" Version="2.0.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.10" />
+    <PackageReference Include="UniversalFiles.Swarm" Version="0.4.0-alpha.12" />
   </ItemGroup>
 
   <ItemGroup>

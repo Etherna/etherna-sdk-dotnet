@@ -14,6 +14,7 @@
 
 using Etherna.BeeNet.Hashing.Postage;
 using Etherna.BeeNet.Models;
+using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Tools.Video.Models;
 using System.Threading.Tasks;
 
@@ -27,6 +28,8 @@ namespace Etherna.Sdk.Tools.Video.Services
             bool createDirectory = true,
             IPostageStampIssuer? postageStampIssuer = null);
 
-        Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(SwarmHash manifestHash);
+        Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+            SwarmHash manifestHash,
+            IReadOnlyChunkStore chunkStore);
     }
 }

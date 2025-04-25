@@ -13,10 +13,10 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.BeeNet.Models;
+using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Tools.Video.Models;
 using M3U8Parser;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Tools.Video.Services
@@ -28,14 +28,14 @@ namespace Etherna.Sdk.Tools.Video.Services
             FileBase masterFile,
             SwarmAddress? masterSwarmAddress,
             MasterPlaylist masterPlaylist,
-            IDictionary<SwarmHash, SwarmChunk>? chunksCache = null);
+            IReadOnlyChunkStore chunkStore);
 
         Task<HlsVideoVariant> ParseVideoVariantFromHlsStreamPlaylistFileAsync(
             FileBase streamPlaylistFile,
             SwarmAddress? streamPlaylistSwarmAddress,
             int height,
             int width,
-            IDictionary<SwarmHash, SwarmChunk>? chunksCache = null);
+            IReadOnlyChunkStore chunkStore);
         
         Task<MasterPlaylist?> TryParseHlsMasterPlaylistFromFileAsync(FileBase hlsPlaylist);
     }

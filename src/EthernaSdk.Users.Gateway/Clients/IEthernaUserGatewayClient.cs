@@ -135,7 +135,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
         Task<Stream> GetChunkAsync(
             SwarmHash hash,
-            int maxRetryAttempts = 10,
             CancellationToken cancellationToken = default);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>

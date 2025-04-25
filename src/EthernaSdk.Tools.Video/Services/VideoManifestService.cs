@@ -32,9 +32,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Tools.Video.Services
 {
-    public class VideoManifestService(
-        IBeeClient beeClient,
-        IChunkService chunkService)
+    public class VideoManifestService(IChunkService chunkService)
         : IVideoManifestService
     {
         // Consts.
@@ -185,10 +183,19 @@ namespace Etherna.Sdk.Tools.Video.Services
             return (await mantarayManifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
         }
 
-        public async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(SwarmHash manifestHash)
+        public async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+            SwarmHash manifestHash,
+            IReadOnlyChunkStore chunkStore)
         {
-            using var rootManifestStream = (await beeClient.GetFileAsync(manifestHash).ConfigureAwait(false)).Stream;
-            var rootManifestJsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(rootManifestStream).ConfigureAwait(false);
+            JsonElement rootManifestJsonElement;
+            var rootManifestStream = await chunkService.GetFileStreamFromAddressAsync(
+                manifestHash,
+                ManifestPathResolver.BrowserResolver,
+                chunkStore).ConfigureAwait(false);
+            await using (rootManifestStream.ConfigureAwait(false))
+            {
+                rootManifestJsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(rootManifestStream).ConfigureAwait(false);
+            }
 
             // Find version.
             var versionStr = rootManifestJsonElement.TryGetProperty("v", out var jsonVersion) ?
@@ -199,8 +206,8 @@ namespace Etherna.Sdk.Tools.Video.Services
             // Deserialize document.
             var (videoManifest, errors) = version.Major switch
             {
-                1 => await ManifestSerializer.TryDeserializeManifest1Async(rootManifestJsonElement, beeClient).ConfigureAwait(false),
-                2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestHash, rootManifestJsonElement, beeClient).ConfigureAwait(false),
+                1 => await ManifestSerializer.TryDeserializeManifest1Async(rootManifestJsonElement, chunkStore).ConfigureAwait(false),
+                2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestHash, rootManifestJsonElement, chunkService, chunkStore).ConfigureAwait(false),
                 _ => (null, [new ValidationError(ValidationErrorType.JsonConvert, "Invalid version")])
             };
 

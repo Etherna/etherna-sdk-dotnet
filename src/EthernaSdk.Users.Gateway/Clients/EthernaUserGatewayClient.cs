@@ -156,11 +156,9 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         public Task<Stream> GetChunkAsync(
             SwarmHash hash,
-            int maxRetryAttempts = 10,
             CancellationToken cancellationToken = default) =>
             BeeClient.GetChunkStreamAsync(
                 hash: hash,
-                maxRetryAttempts: maxRetryAttempts,
                 cancellationToken: cancellationToken);
 
         public async Task<UserCredit> GetCurrentUserCreditAsync(
@@ -197,13 +195,12 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             return new PostageBatch(
                 batchDto.Id,
                 BzzBalance.FromPlurLong(batchDto.Value ?? 0),
-                batchDto.BlockNumber ?? 0,
+                (ulong)(batchDto.BlockNumber ?? 0),
                 batchDto.Depth,
                 batchDto.Exists ?? false,
                 batchDto.ImmutableFlag ?? false,
                 batchDto.Usable,
                 batchDto.Label,
-                null,
                 TimeSpan.FromSeconds(batchDto.BatchTTL ?? 0),
                 (uint)(batchDto.Utilization ?? 0));
         }

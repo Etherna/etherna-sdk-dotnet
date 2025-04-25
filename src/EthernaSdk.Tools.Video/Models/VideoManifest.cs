@@ -81,7 +81,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                    Duration.Equals(other.Duration) &&
                    string.Equals(Title, other.Title, StringComparison.Ordinal) &&
                    string.Equals(OwnerEthAddress, other.OwnerEthAddress, StringComparison.Ordinal) &&
-                   EqualityComparer<VideoManifestPersonalData>.Default.Equals(PersonalData, other.PersonalData)&&
+                   EqualityComparer<VideoManifestPersonalData>.Default.Equals(PersonalData, other.PersonalData) &&
                    string.Equals(PersonalDataRaw, other.PersonalDataRaw, StringComparison.Ordinal) &&
                    Thumbnail.Equals(other.Thumbnail) &&
                    EqualityComparer<DateTimeOffset?>.Default.Equals(UpdatedAt, other.UpdatedAt) &&

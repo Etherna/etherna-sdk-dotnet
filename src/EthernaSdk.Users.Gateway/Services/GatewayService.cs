@@ -83,7 +83,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
             {
                 // Create batch.
                 onWaitingBatchCreation?.Invoke();
-                var batchId = await ethernaGatewayClient.BeeClient.BuyPostageBatchAsync(
+                var (batchId, _) = await ethernaGatewayClient.BeeClient.BuyPostageBatchAsync(
                     amount,
                     batchDepth,
                     label).ConfigureAwait(false);
@@ -201,9 +201,6 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 return (await ethernaGatewayClient.BeeClient.GetPostageBatchAsync(batchId).ConfigureAwait(false)).IsUsable;
             return (await ethernaGatewayClient.GetPostageBatchAsync(batchId).ConfigureAwait(false)).IsUsable;
         }
-
-        public async Task<SwarmHash> ResolveSwarmAddressToHashAsync(SwarmAddress address) =>
-            (await ethernaGatewayClient.BeeClient.ResolveAddressToChunkReferenceAsync(address).ConfigureAwait(false)).Hash;
 
         public Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash, PostageBatchId batchId)
         {

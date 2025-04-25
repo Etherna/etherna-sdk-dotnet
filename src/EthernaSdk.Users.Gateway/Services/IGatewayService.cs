@@ -75,8 +75,6 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// </summary>
         /// <param name="batchId">batch id</param>
         Task<bool> IsBatchUsableAsync(PostageBatchId batchId);
-
-        Task<SwarmHash> ResolveSwarmAddressToHashAsync(SwarmAddress address);
         
         Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash, PostageBatchId batchId);
 

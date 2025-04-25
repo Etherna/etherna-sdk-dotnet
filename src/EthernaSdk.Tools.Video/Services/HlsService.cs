@@ -12,8 +12,8 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
 using Etherna.BeeNet.Models;
+using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.UniversalFiles;
 using M3U8Parser;
@@ -26,7 +26,6 @@ using System.Threading.Tasks;
 namespace Etherna.Sdk.Tools.Video.Services
 {
     public class HlsService(
-        IBeeClient beeClient,
         IUFileProvider uFileProvider)
         : IHlsService
     {
@@ -35,12 +34,10 @@ namespace Etherna.Sdk.Tools.Video.Services
             FileBase masterFile,
             SwarmAddress? masterSwarmAddress,
             MasterPlaylist masterPlaylist,
-            IDictionary<SwarmHash, SwarmChunk>? chunksCache = null)
+            IReadOnlyChunkStore chunkStore)
         {
             ArgumentNullException.ThrowIfNull(masterFile, nameof(masterFile));
             ArgumentNullException.ThrowIfNull(masterPlaylist, nameof(masterPlaylist));
-            
-            chunksCache ??= new Dictionary<SwarmHash, SwarmChunk>();
 
             // Get master playlist directory.
             var masterFileDirectory = Path.GetDirectoryName(masterFile.UUri.OriginalUri);
@@ -67,9 +64,9 @@ namespace Etherna.Sdk.Tools.Video.Services
                 if (masterSwarmAddress is not null)
                 {
                     streamSwarmAddress = SwarmAddress.FromString(masterFileDirectory.TrimEnd(SwarmAddress.Separator) + SwarmAddress.Separator + streamInfo.Uri);
-                    var streamSwarmChunkRef = await beeClient.ResolveAddressToChunkReferenceAsync(
+                    var streamSwarmChunkRef = await SwarmChunkReference.ResolveFromAddress(
                         streamSwarmAddress.Value,
-                        chunksCache).ConfigureAwait(false);
+                        chunkStore).ConfigureAwait(false);
                     streamPlaylistFile.SwarmHash = streamSwarmChunkRef.Hash;
                 }
                 
@@ -79,7 +76,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                     streamSwarmAddress,
                     (int)streamInfo.Resolution.Height,
                     (int)streamInfo.Resolution.Width,
-                    chunksCache).ConfigureAwait(false);
+                    chunkStore).ConfigureAwait(false);
                 
                 variants.Add(variant);
             }
@@ -96,11 +93,9 @@ namespace Etherna.Sdk.Tools.Video.Services
             SwarmAddress? streamPlaylistSwarmAddress,
             int height,
             int width,
-            IDictionary<SwarmHash, SwarmChunk>? chunksCache = null)
+            IReadOnlyChunkStore chunkStore)
         {
             ArgumentNullException.ThrowIfNull(streamPlaylistFile, nameof(streamPlaylistFile));
-
-            chunksCache ??= new Dictionary<SwarmHash, SwarmChunk>();
 
             // Get stream playlist directory.
             var streamPlaylistDirectory = Path.GetDirectoryName(streamPlaylistFile.UUri.OriginalUri);
@@ -130,9 +125,9 @@ namespace Etherna.Sdk.Tools.Video.Services
                 {
                     var segmentSwarmAddress = SwarmAddress.FromString(
                         streamPlaylistDirectory.TrimEnd(SwarmAddress.Separator) + SwarmAddress.Separator + segment.Uri);
-                    var segmentSwarmChunkRef = await beeClient.ResolveAddressToChunkReferenceAsync(
+                    var segmentSwarmChunkRef = await SwarmChunkReference.ResolveFromAddress(
                             segmentSwarmAddress,
-                            chunksCache).ConfigureAwait(false);
+                            chunkStore).ConfigureAwait(false);
                     segmentFile.SwarmHash = segmentSwarmChunkRef.Hash;
                 }
 

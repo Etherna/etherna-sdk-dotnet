@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="Etherna.Authentication.Native" Version="0.4.0-alpha.35" />
-    <PackageReference Include="GitVersion.MsBuild" Version="6.2.0">
+    <PackageReference Include="GitVersion.MsBuild" Version="6.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -15,13 +15,12 @@
 using Etherna.BeeNet;
 using Etherna.BeeNet.Exceptions;
 using Etherna.BeeNet.Models;
+using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Index.GenClients;
 using Etherna.Sdk.Tools.Video.Models;
-using Etherna.Sdk.Tools.Video.Services;
 using Etherna.Sdk.Users.Index.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -147,6 +146,8 @@ namespace Etherna.Sdk.Users.Index.Clients
 
         public async Task<PaginatedResult<VideoPreview>> GetLastPublishedVideosAsync(int? page = null, int? take = null, CancellationToken cancellationToken = default)
         {
+            var chunkStore = new BeeClientChunkStore(beeClient);
+            
             // Get API result.
             var result = await generatedVideosClient.Latest3Async(page, take, cancellationToken).ConfigureAwait(false);
 
@@ -176,7 +177,7 @@ namespace Etherna.Sdk.Users.Index.Clients
                         var swarmUri = new SwarmUri(thumbSourceDto.Path, UriKind.RelativeOrAbsolute);
 
                         var thumbAddress = swarmUri.ToSwarmAddress(v.Hash!);
-                        var thumbChunkRef = await beeClient.ResolveAddressToChunkReferenceAsync(thumbAddress).ConfigureAwait(false);
+                        var thumbChunkRef = await SwarmChunkReference.ResolveFromAddress(thumbAddress, chunkStore).ConfigureAwait(false);
                         
                         var thumbSource = new VideoManifestImageSource(
                             fileName,
