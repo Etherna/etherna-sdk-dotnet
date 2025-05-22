@@ -516,18 +516,18 @@ namespace Etherna.Sdk.Tools.Video.Services
         
         // Helpers.
         private static void AddFileToManifestHelper(
-            MantarayManifest manifest,
+            WritableMantarayManifest manifest,
             string path,
             SwarmHash fileHash) =>
             manifest.Add(path, ManifestEntry.NewFile(fileHash, new Dictionary<string, string>()));
         
         private static void AddRootFileToManifestHelper(
-            MantarayManifest manifest,
+            WritableMantarayManifest manifest,
             string rootFileName,
             SwarmHash rootFileHash)
         {
             manifest.Add(
-                MantarayManifest.RootPath,
+                MantarayManifestBase.RootPath,
                 ManifestEntry.NewDirectory(
                     new Dictionary<string, string>
                     {
@@ -537,9 +537,9 @@ namespace Etherna.Sdk.Tools.Video.Services
             AddFileToManifestHelper(manifest, rootFileName, rootFileHash);
         }
 
-        private static MantarayManifest BuildNewManifestHelper(IChunkStore chunkStore)
+        private static WritableMantarayManifest BuildNewManifestHelper(IChunkStore chunkStore)
         {
-            var manifest = new MantarayManifest(
+            var manifest = new WritableMantarayManifest(
                 readOnlyPipeline => HasherPipelineBuilder.BuildNewHasherPipeline(
                     chunkStore,
                     new FakePostageStamper(),

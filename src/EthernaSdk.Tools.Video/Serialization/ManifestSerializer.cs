@@ -160,7 +160,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             {
                 var captionSwarmUri = new SwarmUri(captionDto.Path, UriKind.RelativeOrAbsolute);
                 var captionSwarmAddress = captionSwarmUri.ToSwarmAddress(manifestHash);
-                var captionChunkReference = await SwarmChunkReference.ResolveFromAddress(
+                var captionChunkReference = await SwarmChunkReference.ResolveFromAddressAsync(
                     captionSwarmAddress,
                     chunkStore).ConfigureAwait(false);
                 var captionFileName = captionDto.Path.Split(SwarmAddress.Separator).Last();
@@ -192,7 +192,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 var swarmUri = new SwarmUri(thumbnailSourceDto.Path, UriKind.RelativeOrAbsolute);
 
                 var thumbnailAddress = swarmUri.ToSwarmAddress(manifestHash);
-                var thumbnailChunkRef = await SwarmChunkReference.ResolveFromAddress(
+                var thumbnailChunkRef = await SwarmChunkReference.ResolveFromAddressAsync(
                     thumbnailAddress,
                     chunkStore).ConfigureAwait(false);
                 
@@ -213,7 +213,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 
                 var videoSourceSwarmUri = new SwarmUri(videoSourceDto.Path, UriKind.RelativeOrAbsolute);
                 var videoSourceSwarmAddress = videoSourceSwarmUri.ToSwarmAddress(manifestHash);
-                var videoSourceChunkRef = await SwarmChunkReference.ResolveFromAddress(
+                var videoSourceChunkRef = await SwarmChunkReference.ResolveFromAddressAsync(
                     videoSourceSwarmAddress,
                     chunkStore).ConfigureAwait(false);
                 
@@ -260,7 +260,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                             
                             additionalFiles.Add(new VideoManifestVideoSourceAdditionalFile(
                                 segmentRelativePath,
-                                (await SwarmChunkReference.ResolveFromAddress(
+                                (await SwarmChunkReference.ResolveFromAddressAsync(
                                     segmentSwarmAddress,
                                     chunkStore).ConfigureAwait(false)).Hash));
                         }

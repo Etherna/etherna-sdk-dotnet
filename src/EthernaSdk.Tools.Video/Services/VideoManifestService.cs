@@ -79,7 +79,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                     new FakeSigner(),
                     postageStampIssuer,
                     new MemoryStampStore());
-            var mantarayManifest = new MantarayManifest(
+            var mantarayManifest = new WritableMantarayManifest(
                 readOnly => HasherPipelineBuilder.BuildNewHasherPipeline(
                     chunkStore,
                     postageStamper,
@@ -92,7 +92,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             
             //add default (preview)
             mantarayManifest.Add(
-                MantarayManifest.RootPath,
+                MantarayManifestBase.RootPath,
                 ManifestEntry.NewDirectory(
                     new Dictionary<string, string>
                     {
