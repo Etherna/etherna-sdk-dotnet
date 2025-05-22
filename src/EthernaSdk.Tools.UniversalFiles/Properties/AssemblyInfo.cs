@@ -12,12 +12,6 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-namespace Etherna.Sdk.Users.Gateway.Options
-{
-    public class GatewayServiceOptions
-    {
-        // Properties.
-        public bool IsDryRun { get; set; }
-        public bool UseBeeApi { get; set; }
-    }
-}
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("EthernaSdk.Tools.UniversalFiles.Tests")]

@@ -12,12 +12,20 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-namespace Etherna.Sdk.Users.Gateway.Options
+using System.Threading.Tasks;
+
+namespace Etherna.Sdk.Tools.UniversalFiles
 {
-    public class GatewayServiceOptions
+    public interface IUFileProvider
     {
-        // Properties.
-        public bool IsDryRun { get; set; }
-        public bool UseBeeApi { get; set; }
+        BasicUFile BuildNewUFile(BasicUUri uuri);
+
+        UFile BuildNewUFile(UUri uuri);
+
+        Task<BasicUFile> ToLocalUFileAsync(
+            UFile inputUFile,
+            UUriKind allowedUriKinds = UUriKind.All,
+            string? baseDirectory = null,
+            BasicUUri? outputUUri = null);
     }
 }
