@@ -13,7 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.BeeNet.Models;
-using Etherna.UniversalFiles;
+using Etherna.Sdk.Tools.UniversalFiles;
 using System;
 using System.IO;
 using System.Threading.Tasks;
