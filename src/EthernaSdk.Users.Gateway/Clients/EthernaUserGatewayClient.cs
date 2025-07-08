@@ -282,13 +282,13 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         }
 
         public Task<SwarmHash> UploadBytesAsync(
-            PostageBatchId batchId,
             Stream content,
+            PostageBatchId batchId,
             bool swarmPin = false,
             CancellationToken cancellationToken = default) =>
             BeeClient.UploadBytesAsync(
-                batchId,
                 content,
+                batchId,
                 swarmPin: swarmPin,
                 cancellationToken: cancellationToken);
 
@@ -308,13 +308,13 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 cancellationToken: cancellationToken);
         
         public Task<SwarmHash> UploadDirectoryAsync(
-            PostageBatchId batchId,
             string directoryPath,
+            PostageBatchId batchId,
             bool pinDirectory = false,
             CancellationToken cancellationToken = default) =>
             BeeClient.UploadDirectoryAsync(
-                batchId,
                 directoryPath,
+                batchId,
                 swarmPin: pinDirectory,
                 cancellationToken: cancellationToken);
 
@@ -330,15 +330,15 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 cancellationToken: cancellationToken);
 
         public Task<SwarmHash> UploadFileAsync(
-            PostageBatchId batchId,
             Stream content,
+            PostageBatchId batchId,
             string? name = null,
             string? contentType = null,
             bool pinFile = false,
             CancellationToken cancellationToken = default) =>
             BeeClient.UploadFileAsync(
-                batchId,
                 content,
+                batchId,
                 name: name,
                 contentType: contentType,
                 swarmPin: pinFile,

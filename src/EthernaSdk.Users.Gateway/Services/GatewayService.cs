@@ -233,8 +233,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
             string directoryPath,
             bool pinResource) =>
             ethernaGatewayClient.UploadDirectoryAsync(
-                batchId,
                 directoryPath,
+                batchId,
                 pinDirectory: pinResource);
 
         public Task<SwarmHash> UploadFileAsync(
@@ -244,8 +244,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
             string? contentType,
             bool pinResource) =>
             ethernaGatewayClient.UploadFileAsync(
-                batchId,
                 content,
+                batchId,
                 name: name,
                 contentType: contentType,
                 pinFile: pinResource);

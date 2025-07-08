@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.BeeNet.Models;
 using Etherna.Sdk.Credit.GenClients;
 using Etherna.Sdk.Internal.Models;
 using System;
@@ -30,7 +31,7 @@ namespace Etherna.Sdk.Internal.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaCreditApiException">A server side error occurred.</exception>
         Task<UserCredit> GetUserCreditAsync(
-            string userAddress,
+            EthAddress userAddress,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Etherna.Sdk.Internal.Clients
         /// <returns>Logs list from query</returns>
         /// <exception cref="EthernaCreditApiException">A server side error occurred.</exception>
         Task<IEnumerable<UserOpLog>> GetUserOpLogsAsync(
-            string userAddress,
+            EthAddress userAddress,
             DateTimeOffset? fromDate = null,
             DateTimeOffset? toDate = null,
             CancellationToken cancellationToken = default);
@@ -58,8 +59,8 @@ namespace Etherna.Sdk.Internal.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaCreditApiException">A server side error occurred.</exception>
         Task UpdateUserBalanceAsync(
-            string userAddress,
-            double amount,
+            EthAddress userAddress,
+            XDaiBalance amount,
             string reason,
             bool? isApplied = null,
             CancellationToken cancellationToken = default);

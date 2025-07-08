@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.BeeNet.Models;
 using Etherna.Sdk.Credit.GenClients;
 using Etherna.Sdk.Internal.Models;
 using System;
@@ -38,23 +39,24 @@ namespace Etherna.Sdk.Internal.Clients
 
         // Methods.
         public async Task<UserCredit> GetUserCreditAsync(
-            string userAddress,
+            EthAddress userAddress,
             CancellationToken cancellationToken = default) =>
-            new(await generatedClient.CreditAsync(userAddress, cancellationToken).ConfigureAwait(false));
+            new(await generatedClient.CreditAsync(userAddress.ToString(), cancellationToken).ConfigureAwait(false));
 
         public async Task<IEnumerable<UserOpLog>> GetUserOpLogsAsync(
-            string userAddress,
+            EthAddress userAddress,
             DateTimeOffset? fromDate = null,
             DateTimeOffset? toDate = null,
             CancellationToken cancellationToken = default) =>
-            (await generatedClient.OplogsAsync(userAddress, fromDate, toDate, cancellationToken).ConfigureAwait(false)).Select(op => new UserOpLog(op));
+            (await generatedClient.OplogsAsync(userAddress.ToString(), fromDate, toDate, cancellationToken).ConfigureAwait(false))
+                .Select(op => new UserOpLog(op));
 
         public Task UpdateUserBalanceAsync(
-            string userAddress,
-            double amount,
+            EthAddress userAddress,
+            XDaiBalance amount,
             string reason,
             bool? isApplied = null,
             CancellationToken cancellationToken = default) =>
-            generatedClient.BalanceAsync(userAddress, amount, reason, isApplied, cancellationToken);
+            generatedClient.BalanceAsync(userAddress.ToString(), (double)amount.ToDecimal(), reason, isApplied, cancellationToken);
     }
 }
