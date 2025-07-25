@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.BeeNet.Models;
 using Etherna.Sdk.Internal.Models;
 using Etherna.Sdk.Sso.GenClients;
 using System;
@@ -35,9 +36,9 @@ namespace Etherna.Sdk.Internal.Clients
         }
 
         // Methods.
-        public async Task<UserContactInfo> ContactsAsync(
-            string userAddress,
+        public async Task<UserContactInfo> GetUserContactsAsync(
+            EthAddress userAddress,
             CancellationToken cancellationToken = default) =>
-            new(await generatedClient.ContactsAsync(userAddress, cancellationToken).ConfigureAwait(false));
+            new(await generatedClient.ContactsAsync(userAddress.ToString(), cancellationToken).ConfigureAwait(false));
     }
 }

@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.BeeNet.Models;
 using Etherna.Sdk.Internal.Models;
 using Etherna.Sdk.Sso.GenClients;
 using System.Threading;
@@ -28,6 +29,6 @@ namespace Etherna.Sdk.Internal.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>User contact information</returns>
         /// <exception cref="EthernaSsoApiException">A server side error occurred.</exception>
-        Task<UserContactInfo> ContactsAsync(string userAddress, CancellationToken cancellationToken = default);
+        Task<UserContactInfo> GetUserContactsAsync(EthAddress userAddress, CancellationToken cancellationToken = default);
     }
 }
