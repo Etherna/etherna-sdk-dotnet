@@ -18,7 +18,7 @@ using System.Numerics;
 namespace Etherna.Sdk.Tools.Tokens.Dtos
 {
     [FunctionOutput]
-    public class Slot0OutputDto
+    internal sealed class Slot0OutputDto
     {
         [Parameter("uint160", "sqrtPriceX96", 1)]
         public BigInteger SqrtPriceX96 { get; set; }
