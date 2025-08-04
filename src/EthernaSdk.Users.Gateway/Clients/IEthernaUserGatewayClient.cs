@@ -44,17 +44,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             DateTimeOffset? freePinEndOfLife = null,
             CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Announce chunks upload to help pin the root hash on the same node owning the postage batch
-        /// </summary>
-        /// <param name="rootHash">The swarm resource hash</param>
-        /// <param name="batchId">ID of Postage Batch that is used to upload data with</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        Task AnnounceChunksUploadAsync(
-            SwarmHash rootHash,
-            PostageBatchId batchId,
-            CancellationToken cancellationToken = default);
-
         /// <param name="resourceHashes">The swarm resource hashes list</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
