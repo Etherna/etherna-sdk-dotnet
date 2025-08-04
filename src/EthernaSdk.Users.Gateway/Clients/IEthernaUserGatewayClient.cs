@@ -59,7 +59,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <returns>A temporary postage batch reference Id</returns>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<string> BuyPostageBatchAsync(
-            BzzBalance amount,
+            BzzValue amount,
             int depth,
             string? label = null,
             CancellationToken cancellationToken = default);
@@ -217,7 +217,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task TopUpPostageBatchAsync(
             PostageBatchId batchId,
-            BzzBalance amount,
+            BzzValue amount,
             CancellationToken cancellationToken = default);
 
         /// <summary>Find feed update</summary>

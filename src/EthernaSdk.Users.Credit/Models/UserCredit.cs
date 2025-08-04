@@ -27,7 +27,7 @@ namespace Etherna.Sdk.Users.Credit.Models
         }
 
         // Properties.
-        public XDaiBalance Balance { get; }
+        public XDaiValue Balance { get; }
         public bool IsUnlimited { get; }
     }
 }

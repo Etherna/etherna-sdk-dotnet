@@ -27,7 +27,7 @@ namespace Etherna.Sdk.Users.Gateway.Models
         }
 
         // Properties.
-        public XDaiBalance Balance { get; }
+        public XDaiValue Balance { get; }
         public bool IsUnlimited { get; }
     }
 }

@@ -60,7 +60,7 @@ namespace Etherna.Sdk.Internal.Clients
         /// <exception cref="EthernaCreditApiException">A server side error occurred.</exception>
         Task UpdateUserBalanceAsync(
             EthAddress userAddress,
-            XDaiBalance amount,
+            XDaiValue amount,
             string reason,
             bool? isApplied = null,
             CancellationToken cancellationToken = default);

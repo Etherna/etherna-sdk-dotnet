@@ -37,7 +37,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="onWaitingBatchUsable">event callback</param>
         /// <param name="onBatchUsable">event callback</param>
         Task<PostageBatchId> CreatePostageBatchAsync(
-            BzzBalance amount,
+            BzzValue amount,
             int batchDepth,
             string? label,
             Action? onWaitingBatchCreation = null,
@@ -66,7 +66,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <summary>
         /// Get the current price.
         /// </summary>
-        Task<BzzBalance> GetChainPriceAsync();
+        Task<BzzValue> GetChainPriceAsync();
 
         Task<PostageBatch> GetPostageBatchInfoAsync(PostageBatchId batchId);
 

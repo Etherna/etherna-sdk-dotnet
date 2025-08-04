@@ -64,7 +64,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         }
 
         public async Task<PostageBatchId> CreatePostageBatchAsync(
-            BzzBalance amount,
+            BzzValue amount,
             int batchDepth,
             string? label,
             Action? onWaitingBatchCreation = null,
@@ -181,7 +181,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
             return ethernaGatewayClient.FundResourcePinningAsync(hash);
         }
 
-        public async Task<BzzBalance> GetChainPriceAsync()
+        public async Task<BzzValue> GetChainPriceAsync()
         {
             if (options.UseBeeApi)
                 return (await ethernaGatewayClient.BeeClient.GetChainStateAsync().ConfigureAwait(false)).CurrentPrice;

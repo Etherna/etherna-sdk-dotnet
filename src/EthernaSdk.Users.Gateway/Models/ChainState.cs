@@ -23,17 +23,17 @@ namespace Etherna.Sdk.Users.Gateway.Models
         internal ChainState(ChainStateDto chainState)
         {
             Block = chainState.Block;
-            CurrentPrice = BzzBalance.FromPlurLong(chainState.CurrentPrice);
+            CurrentPrice = BzzValue.FromPlurLong(chainState.CurrentPrice);
             SourceNodeId = chainState.SourceNodeId;
             TimeStamp = chainState.TimeStamp;
-            TotalAmount = BzzBalance.FromPlurLong(chainState.TotalAmount);
+            TotalAmount = BzzValue.FromPlurLong(chainState.TotalAmount);
         }
         
         // Properties.
         public long Block { get; }
-        public BzzBalance CurrentPrice { get; }
+        public BzzValue CurrentPrice { get; }
         public string SourceNodeId { get; }
         public System.DateTimeOffset TimeStamp { get; }
-        public BzzBalance TotalAmount { get; }
+        public BzzValue TotalAmount { get; }
     }
 }

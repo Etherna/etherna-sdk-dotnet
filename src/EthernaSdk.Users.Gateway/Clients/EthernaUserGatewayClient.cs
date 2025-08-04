@@ -72,7 +72,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             .ToDictionary(pair => new SwarmHash(pair.Key), pair => pair.Value);
 
         public Task<string> BuyPostageBatchAsync(
-            BzzBalance amount,
+            BzzValue amount,
             int depth,
             string? label = null,
             CancellationToken cancellationToken = default) =>
@@ -188,7 +188,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 batchId.ToString(), cancellationToken).ConfigureAwait(false);
             return new PostageBatch(
                 batchDto.Id,
-                BzzBalance.FromPlurLong(batchDto.Value ?? 0),
+                BzzValue.FromPlurLong(batchDto.Value ?? 0),
                 (ulong)(batchDto.BlockNumber ?? 0),
                 batchDto.Depth,
                 batchDto.Exists ?? false,
@@ -238,7 +238,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         public Task TopUpPostageBatchAsync(
             PostageBatchId batchId,
-            BzzBalance amount,
+            BzzValue amount,
             CancellationToken cancellationToken = default) =>
             generatedPostageClient.TopupAsync(batchId.ToString(), amount.ToPlurLong(), cancellationToken);
 

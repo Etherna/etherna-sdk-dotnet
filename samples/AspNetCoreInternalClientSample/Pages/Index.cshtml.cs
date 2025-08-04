@@ -20,23 +20,13 @@ using System.Threading.Tasks;
 
 namespace AspNetCoreInternalClientSample.Pages;
 
-public class IndexModel : PageModel
+public class IndexModel(
+    IConfiguration configuration,
+    IEthernaInternalCreditClient creditClient)
+    : PageModel
 {
-    // Fields.
-    private readonly IConfiguration configuration;
-    private readonly IEthernaInternalCreditClient creditClient;
-
-    // Constructor.
-    public IndexModel(
-        IConfiguration configuration,
-        IEthernaInternalCreditClient creditClient)
-    {
-        this.configuration = configuration;
-        this.creditClient = creditClient;
-    }
-
     // Properties.
-    public XDaiBalance CreditBalance { get; set; }
+    public XDaiValue CreditBalance { get; set; }
     public bool IsUnlimitedCredit { get; set; }
 
     // Methods.

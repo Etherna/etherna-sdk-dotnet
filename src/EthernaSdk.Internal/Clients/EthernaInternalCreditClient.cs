@@ -53,7 +53,7 @@ namespace Etherna.Sdk.Internal.Clients
 
         public Task UpdateUserBalanceAsync(
             EthAddress userAddress,
-            XDaiBalance amount,
+            XDaiValue amount,
             string reason,
             bool? isApplied = null,
             CancellationToken cancellationToken = default) =>

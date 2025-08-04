@@ -31,7 +31,7 @@ namespace Etherna.Sdk.Users.Credit.Models
             UserAddress = opLog.UserAddress;
         }
         
-        public XDaiBalance Amount { get; }
+        public XDaiValue Amount { get; }
         public string Author { get; }
         public DateTimeOffset CreationDateTime { get; }
         public bool? IsApplied { get; }
