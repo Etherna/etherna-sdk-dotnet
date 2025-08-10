@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Tools.Tokens.Services
 {
-    public class UniswapService(Web3 web3) : IUniswapService
+    public class UniswapService(Web3 ethMainWeb3) : IUniswapService
     {
         // Consts.
         private const int BzzDecimals = 16;
@@ -51,7 +51,7 @@ namespace Etherna.Sdk.Tools.Tokens.Services
             int token0Decimals,
             int token1Decimals)
         {
-            var contract = web3.Eth.GetContract(UniswapV3Abi, poolAddress);
+            var contract = ethMainWeb3.Eth.GetContract(UniswapV3Abi, poolAddress);
             var slot0Function = contract.GetFunction("slot0");
             var slot0Result = await slot0Function.CallDeserializingToObjectAsync<Slot0OutputDto>().ConfigureAwait(false);
         
