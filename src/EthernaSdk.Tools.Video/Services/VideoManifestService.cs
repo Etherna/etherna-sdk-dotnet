@@ -41,7 +41,7 @@ namespace Etherna.Sdk.Tools.Video.Services
         private const string PreviewManifestFileName = "preview";
 
         // Methods.
-        public async Task<SwarmHash> CreateVideoManifestChunksAsync(
+        public async Task<SwarmReference> CreateVideoManifestChunksAsync(
             VideoManifest manifest,
             string chunksDirectory,
             bool createDirectory = true,
@@ -125,7 +125,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 mantarayManifest.Add(
                     videoSource.Uri.ToString(),
                     ManifestEntry.NewFile(
-                        videoSource.Metadata.ContentSwarmHash,
+                        videoSource.Metadata.ContentSwarmReference,
                         new Dictionary<string, string>
                         {
                             [ManifestEntry.ContentTypeKey] = videoSource.Metadata.MimeContentType,
@@ -138,7 +138,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                     mantarayManifest.Add(
                         additionalFile.Uri.ToString(),
                         ManifestEntry.NewFile(
-                            additionalFile.File.SwarmHash,
+                            additionalFile.File.SwarmReference,
                             new Dictionary<string, string>
                             {
                                 [ManifestEntry.ContentTypeKey] = additionalFile.File.MimeContentType,
@@ -154,7 +154,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 mantarayManifest.Add(
                     thumbnailSource.Uri.ToString(),
                     ManifestEntry.NewFile(
-                        thumbnailSource.Metadata.ContentSwarmHash,
+                        thumbnailSource.Metadata.ContentSwarmReference,
                         new Dictionary<string, string>
                         {
                             [ManifestEntry.ContentTypeKey] = thumbnailSource.Metadata.MimeContentType,
@@ -169,7 +169,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 mantarayManifest.Add(
                     captionSource.Uri.ToString(),
                     ManifestEntry.NewFile(
-                        captionSource.Source.ContentSwarmHash,
+                        captionSource.Source.ContentSwarmReference,
                         new Dictionary<string, string>
                         {
                             [ManifestEntry.ContentTypeKey] = captionSource.Source.MimeContentType,
@@ -177,7 +177,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         }));
             }
 
-            return (await mantarayManifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
+            return await mantarayManifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false);
         }
 
         public async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(

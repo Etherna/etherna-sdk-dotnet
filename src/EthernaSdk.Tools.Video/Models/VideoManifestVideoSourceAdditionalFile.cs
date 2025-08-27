@@ -20,7 +20,7 @@ namespace Etherna.Sdk.Tools.Video.Models
 {
     public class VideoManifestVideoSourceAdditionalFile(
         string sourceRelativePath,
-        SwarmHash swarmHash)
+        SwarmReference swarmReference)
     {
         // Properties.
         /// <summary>
@@ -42,7 +42,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         /// <summary>
         /// Absolute swarm hash. Used to link internal mantaray path to resource.
         /// </summary>
-        public SwarmHash SwarmHash { get; } = swarmHash;
+        public SwarmReference SwarmReference { get; } = swarmReference;
         
         // Methods.
         public override bool Equals(object? obj)
@@ -53,13 +53,13 @@ namespace Etherna.Sdk.Tools.Video.Models
                    string.Equals(FileName, other.FileName, StringComparison.Ordinal) &&
                    string.Equals(MimeContentType, other.MimeContentType, StringComparison.Ordinal) &&
                    string.Equals(SourceRelativePath, other.SourceRelativePath, StringComparison.Ordinal) &&
-                   SwarmHash.Equals(other.SwarmHash);
+                   SwarmReference.Equals(other.SwarmReference);
         }
 
         public override int GetHashCode() =>
             string.GetHashCode(FileName, StringComparison.Ordinal) ^
             string.GetHashCode(MimeContentType, StringComparison.Ordinal) ^
             string.GetHashCode(SourceRelativePath, StringComparison.Ordinal) ^
-            SwarmHash.GetHashCode();
+            SwarmReference.GetHashCode();
     }
 }

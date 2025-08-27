@@ -147,13 +147,13 @@ namespace Etherna.Sdk.Users.Gateway.Services
             return ethernaGatewayClient.BeeClient.CreateTagAsync(hash, batchId);
         }
 
-        public Task DefundResourcePinningAsync(SwarmHash hash)
+        public Task DefundResourcePinningAsync(SwarmReference reference)
         {
             if (options.IsDryRun)
                 return Task.CompletedTask;
             if (options.UseBeeApi)
-                return ethernaGatewayClient.BeeClient.DeletePinAsync(hash);
-            return ethernaGatewayClient.DefundResourcePinningAsync(hash);
+                return ethernaGatewayClient.BeeClient.DeletePinAsync(reference);
+            return ethernaGatewayClient.DefundResourcePinningAsync(reference);
         }
 
         public Task DeleteTagAsync(TagId tagId, PostageBatchId batchId)
@@ -172,13 +172,13 @@ namespace Etherna.Sdk.Users.Gateway.Services
             return ethernaGatewayClient.FundResourceDownloadAsync(hash);
         }
 
-        public Task FundResourcePinningAsync(SwarmHash hash)
+        public Task FundResourcePinningAsync(SwarmReference reference)
         {
             if (options.IsDryRun)
                 return Task.CompletedTask;
             if (options.UseBeeApi)
-                return ethernaGatewayClient.BeeClient.CreatePinAsync(hash);
-            return ethernaGatewayClient.FundResourcePinningAsync(hash);
+                return ethernaGatewayClient.BeeClient.CreatePinAsync(reference);
+            return ethernaGatewayClient.FundResourcePinningAsync(reference);
         }
 
         public async Task<BzzValue> GetChainPriceAsync()

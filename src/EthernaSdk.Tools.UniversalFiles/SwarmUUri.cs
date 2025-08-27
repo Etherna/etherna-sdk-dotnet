@@ -29,7 +29,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         public static UUriKind GetUriKind(string uri)
         {
             ArgumentNullException.ThrowIfNull(uri, nameof(uri));
-            return SwarmHash.IsValidHash(uri.Split(SwarmAddress.Separator)[0])
+            return SwarmReference.IsValidReference(uri.Split(SwarmAddress.Separator)[0])
                 ? UUriKind.OnlineAbsolute
                 : UUriKind.OnlineRelative;
         }

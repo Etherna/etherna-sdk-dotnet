@@ -27,13 +27,13 @@ namespace Etherna.Sdk.Tools.Video.Models
         string? quality,
         long totalSourceSize,
         VideoManifestVideoSourceAdditionalFile[] additionalFiles,
-        SwarmHash directContentHash)
+        SwarmReference directContentReference)
     {
         // Properties.
         /// <summary>
         /// Content direct swarm hash. Used to link internal mantaray path to resource.
         /// </summary>
-        public SwarmHash ContentSwarmHash { get; } = directContentHash;
+        public SwarmReference ContentSwarmReference { get; } = directContentReference;
         
         /// <summary>
         /// The file name, used to set the download file name in mantaray
@@ -82,7 +82,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             if (ReferenceEquals(this, obj)) return true;
             if (obj is not VideoManifestVideoSource other) return false;
             return GetType() == other.GetType() &&
-                   ContentSwarmHash.Equals(other.ContentSwarmHash) &&
+                   ContentSwarmReference.Equals(other.ContentSwarmReference) &&
                    string.Equals(FileName, other.FileName, StringComparison.Ordinal) &&
                    string.Equals(MimeContentType, other.MimeContentType, StringComparison.Ordinal) &&
                    string.Equals(Quality, other.Quality, StringComparison.Ordinal) &&
@@ -93,7 +93,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         }
 
         public override int GetHashCode() =>
-            ContentSwarmHash.GetHashCode() ^
+            ContentSwarmReference.GetHashCode() ^
             string.GetHashCode(FileName, StringComparison.Ordinal) ^
             string.GetHashCode(MimeContentType, StringComparison.Ordinal) ^
             string.GetHashCode(Quality, StringComparison.Ordinal) ^

@@ -27,10 +27,12 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <summary>
         /// Force new validation of video manifest.
         /// </summary>
-        /// <param name="manifestHash">Hash manifest</param>
+        /// <param name="manifestReference">Hash manifest</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task AdminForceNewValidationByManifestHashAsync(SwarmHash manifestHash, CancellationToken cancellationToken = default);
+        Task AdminForceNewValidationByManifestReferenceAsync(
+            SwarmReference manifestReference,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Force new validation of video manifests.
@@ -54,7 +56,10 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="commentText">Comment text</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<Comment> CreateCommentAsync(string videoId, string commentText, CancellationToken cancellationToken = default);
+        Task<Comment> CreateCommentAsync(
+            string videoId,
+            string commentText,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete a comment owned by current user.
@@ -74,15 +79,19 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="videoIds">The list of video id</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<IEnumerable<VideoValidationStatus>> GetBulkVideoValidationStatusByIdsAsync(IEnumerable<string> videoIds, CancellationToken cancellationToken = default);
+        Task<IEnumerable<VideoValidationStatus>> GetBulkVideoValidationStatusByIdsAsync(
+            IEnumerable<string> videoIds,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get bulk validation info by multiple manifest hashes.
         /// </summary>
-        /// <param name="manifestHashes">The list of video manifest hashes</param>
+        /// <param name="manifestReferences">The list of video manifest hashes</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<IEnumerable<VideoValidationStatus>> GetBulkVideoValidationStatusByManifestsAsync(IEnumerable<SwarmHash> manifestHashes, CancellationToken cancellationToken = default);
+        Task<IEnumerable<VideoValidationStatus>> GetBulkVideoValidationStatusByManifestsAsync(
+            IEnumerable<SwarmReference> manifestReferences,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get current user info
@@ -99,7 +108,10 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Current page on list</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<PaginatedResult<VideoPreview>> GetLastPublishedVideosAsync(int? page = null, int? take = null, CancellationToken cancellationToken = default);
+        Task<PaginatedResult<VideoPreview>> GetLastPublishedVideosAsync(
+            int? page = null,
+            int? take = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get a complete list of users.
@@ -109,7 +121,10 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Current page on list</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<PaginatedResult<IndexUserInfo>> GetRegisteredUsersAsync(int? page = null, int? take = null, CancellationToken cancellationToken = default);
+        Task<PaginatedResult<IndexUserInfo>> GetRegisteredUsersAsync(
+            int? page = null,
+            int? take = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get list of configuration parameters.
@@ -138,10 +153,12 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <summary>
         /// Get video info by manifest hash.
         /// </summary>
-        /// <param name="manifestHash">The video manifest hash</param>
+        /// <param name="manifestReference">The video manifest hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<IndexedVideo> GetVideoByManifestAsync(SwarmHash manifestHash, CancellationToken cancellationToken = default);
+        Task<IndexedVideo> GetVideoByManifestAsync(
+            SwarmReference manifestReference,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get paginated video comments by id
@@ -152,7 +169,11 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Current page on list</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<PaginatedResult<Comment>> GetVideoCommentsAsync(string videoId, int? page = null, int? take = null, CancellationToken cancellationToken = default);
+        Task<PaginatedResult<Comment>> GetVideoCommentsAsync(
+            string videoId,
+            int? page = null,
+            int? take = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get list of videos uploaded by an user.
@@ -176,15 +197,19 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="videoId">Video id</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<IEnumerable<VideoValidationStatus>> GetVideoValidationStatusByIdAsync(string videoId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<VideoValidationStatus>> GetVideoValidationStatusByIdAsync(
+            string videoId,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get validation info by manifest hash.
         /// </summary>
-        /// <param name="manifestHash">The video hash</param>
+        /// <param name="manifestReference">The video hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<VideoValidationStatus> GetVideoValidationStatusByManifestAsync(SwarmHash manifestHash, CancellationToken cancellationToken = default);
+        Task<VideoValidationStatus> GetVideoValidationStatusByManifestAsync(
+            SwarmReference manifestReference,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Moderate comment as unsuitable for the index
@@ -213,21 +238,27 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <summary>
         /// Create a new video with current user.
         /// </summary>
-        /// <param name="manifestHash">Manifest hash of the new video</param>
+        /// <param name="manifestReference">Manifest hash of the new video</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>New video id</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<string> PublishNewVideoAsync(SwarmHash manifestHash, CancellationToken cancellationToken = default);
+        Task<string> PublishNewVideoAsync(
+            SwarmReference manifestReference,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Report a video content with current user.
         /// </summary>
         /// <param name="videoId">Video id</param>
-        /// <param name="manifestHash">Hash manifest</param>
+        /// <param name="manifestReference">Hash manifest</param>
         /// <param name="description">Report description</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task ReportUnsuitableVideoAsync(string videoId, SwarmHash manifestHash, string description, CancellationToken cancellationToken = default);
+        Task ReportUnsuitableVideoAsync(
+            string videoId,
+            SwarmReference manifestReference,
+            string description,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Search videos.
@@ -238,7 +269,11 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Videos</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task<PaginatedResult<VideoPreview>> SearchVideosAsync(string? query = null, int? page = null, int? take = null, CancellationToken cancellationToken = default);
+        Task<PaginatedResult<VideoPreview>> SearchVideosAsync(
+            string? query = null,
+            int? page = null,
+            int? take = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Edit a video comment with current author user.
@@ -247,16 +282,22 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="newCommentText">Comment text</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task UpdateOwnedVideoCommentAsync(string commentId, string newCommentText, CancellationToken cancellationToken = default);
+        Task UpdateOwnedVideoCommentAsync(
+            string commentId,
+            string newCommentText,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update video manifest.
         /// </summary>
         /// <param name="videoId">The video id</param>
-        /// <param name="newManifestHash">The new video manifest hash</param>
+        /// <param name="newManifestReference">The new video manifest hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task UpdateVideoManifestAsync(string videoId, SwarmHash newManifestHash, CancellationToken cancellationToken = default);
+        Task UpdateVideoManifestAsync(
+            string videoId,
+            SwarmReference newManifestReference,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Vote a video content with current user.
@@ -265,6 +306,9 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <param name="value">Vote value</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        Task VotesVideoAsync(string id, VoteValue value, CancellationToken cancellationToken = default);
+        Task VotesVideoAsync(
+            string id,
+            VoteValue value,
+            CancellationToken cancellationToken = default);
     }
 }

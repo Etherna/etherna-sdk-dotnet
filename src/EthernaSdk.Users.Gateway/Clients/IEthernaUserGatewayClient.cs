@@ -35,12 +35,12 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <summary>
         /// Admins can set a free pin period for a resource
         /// </summary>
-        /// <param name="hash">The swarm resource hash</param>
+        /// <param name="reference">The swarm resource hash</param>
         /// <param name="freePinEndOfLife">End of free period. Null for disable</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task AdminSetFreeResourcePinningAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             DateTimeOffset? freePinEndOfLife = null,
             CancellationToken cancellationToken = default);
 
@@ -76,11 +76,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             SwarmHash hash,
             CancellationToken cancellationToken = default);
 
-        /// <param name="hash">The swarm resource hash</param>
+        /// <param name="reference">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<bool> DefundResourcePinningAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="batchId">Postage batch Id</param>
@@ -99,11 +99,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             SwarmHash hash,
             CancellationToken cancellationToken = default);
 
-        /// <param name="hash">The swarm resource hash</param>
+        /// <param name="reference">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task FundResourcePinningAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
         
         /// <summary>Get referenced data</summary>
@@ -152,7 +152,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<IEnumerable<SwarmHash>> GetPinFundedResourcesAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<SwarmReference>> GetPinFundedResourcesAsync(CancellationToken cancellationToken = default);
 
         /// <param name="batchId">Postage batch Id</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -168,11 +168,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             string? labelContainsFilter = null,
             CancellationToken cancellationToken = default);
 
-        /// <param name="hash">The swarm resource hash</param>
+        /// <param name="reference">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<ResourcePinStatus> GetResourcePinStatusAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="hash">The swarm resource hash</param>
@@ -182,11 +182,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             SwarmHash hash,
             CancellationToken cancellationToken = default);
 
-        /// <param name="hash">The swarm resource hash</param>
+        /// <param name="reference">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<IEnumerable<string>> GetUsersFundingResourcePinningAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>

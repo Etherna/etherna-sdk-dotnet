@@ -20,15 +20,15 @@ namespace Etherna.Sdk.Users.Index.Models
 {
     public class VideoValidationStatus(
         IEnumerable<VideoValidationErrorDetail> errorDetails,
-        SwarmHash hash,
+        SwarmReference reference,
         bool? isValid,
         DateTimeOffset? validationTime,
         string videoId)
     {
         // Properties.
         public IEnumerable<VideoValidationErrorDetail> ErrorDetails { get; } = errorDetails;
-        public SwarmHash Hash { get; } = hash;
         public bool? IsValid { get; } = isValid;
+        public SwarmReference Reference { get; } = reference;
         public DateTimeOffset? ValidationTime { get; } = validationTime;
         public string VideoId { get; } = videoId;
     }

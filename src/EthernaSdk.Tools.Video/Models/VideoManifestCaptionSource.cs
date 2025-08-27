@@ -23,10 +23,10 @@ namespace Etherna.Sdk.Tools.Video.Models
         string label,
         string languageCode,
         string fileName,
-        SwarmHash directContentHash)
+        SwarmReference directContentReference)
     {
         // Properties.
-        public SwarmHash ContentSwarmHash { get; } = directContentHash;
+        public SwarmReference ContentSwarmReference { get; } = directContentReference;
         public string FileName { get; } = fileName;
         public string Label { get; } = label;
         public string LanguageCode { get; } = languageCode;
@@ -38,7 +38,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             if (ReferenceEquals(this, obj)) return true;
             if (obj is not VideoManifestCaptionSource other) return false;
             return GetType() == other.GetType() &&
-                   ContentSwarmHash.Equals(other.ContentSwarmHash) &&
+                   ContentSwarmReference.Equals(other.ContentSwarmReference) &&
                    string.Equals(FileName, other.FileName, StringComparison.Ordinal) &&
                    string.Equals(Label, other.Label, StringComparison.Ordinal) &&
                    string.Equals(LanguageCode, other.LanguageCode, StringComparison.Ordinal) &&
@@ -46,7 +46,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         }
         
         public override int GetHashCode() =>
-            ContentSwarmHash.GetHashCode() ^
+            ContentSwarmReference.GetHashCode() ^
             string.GetHashCode(FileName, StringComparison.Ordinal) ^
             string.GetHashCode(Label, StringComparison.Ordinal) ^
             string.GetHashCode(LanguageCode, StringComparison.Ordinal) ^

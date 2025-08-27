@@ -27,7 +27,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
             // Setup.
             var videoSource = new Manifest1VideoSourceDto
             {
-                Reference = SwarmHash.Zero.ToString()
+                Reference = SwarmReference.Zero.ToString()
             };
             
             // Action.

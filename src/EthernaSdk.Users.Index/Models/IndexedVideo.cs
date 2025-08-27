@@ -23,7 +23,7 @@ namespace Etherna.Sdk.Users.Index.Models
         DateTimeOffset creationDateTime,
         VoteValue? currentVoteValue,
         string? description,
-        SwarmHash? lastValidManifestHash,
+        SwarmReference? lastValidManifestReference,
         string ownerAddress,
         VideoManifestPersonalData? personalData,
         string? title,
@@ -35,7 +35,7 @@ namespace Etherna.Sdk.Users.Index.Models
         public DateTimeOffset CreationDateTime { get; } = creationDateTime;
         public VoteValue? CurrentVoteValue { get; } = currentVoteValue;
         public string? Description { get; } = description;
-        public SwarmHash? LastValidManifestHash { get; } = lastValidManifestHash;
+        public SwarmReference? LastValidManifestReference { get; } = lastValidManifestReference;
         public string OwnerAddress { get; } = ownerAddress;
         public VideoManifestPersonalData? PersonalData { get; } = personalData;
         public string? Title { get; } = title;

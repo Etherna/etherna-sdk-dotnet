@@ -28,8 +28,8 @@ namespace Etherna.Sdk.Tools.Video.Models
             string label,
             string languageCode,
             UFile universalFile,
-            SwarmHash? swarmHash)
-            : base(byteSize, fileName, universalFile, swarmHash)
+            SwarmReference? swarmReference)
+            : base(byteSize, fileName, universalFile, swarmReference)
         {
             Label = label;
             LanguageCode = languageCode;
@@ -40,7 +40,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             BasicUFile uFile,
             string label,
             string langaugeCode,
-            SwarmHash? swarmHash = null)
+            SwarmReference? swarmReference = null)
         {
             ArgumentNullException.ThrowIfNull(uFile, nameof(uFile));
 
@@ -55,7 +55,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                 label,
                 langaugeCode,
                 uFile,
-                swarmHash);
+                swarmReference);
         }
         
         // Properties.

@@ -50,8 +50,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <summary>
         /// Delete pin.
         /// </summary>
-        /// <param name="hash">Resource hash</param>
-        Task DefundResourcePinningAsync(SwarmHash hash);
+        /// <param name="reference">Resource hash</param>
+        Task DefundResourcePinningAsync(SwarmReference reference);
 
         Task DeleteTagAsync(TagId tagId, PostageBatchId batchId);
 
@@ -61,7 +61,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="hash">Resource hash</param>
         Task FundResourceDownloadAsync(SwarmHash hash);
 
-        Task FundResourcePinningAsync(SwarmHash hash);
+        Task FundResourcePinningAsync(SwarmReference reference);
 
         /// <summary>
         /// Get the current price.

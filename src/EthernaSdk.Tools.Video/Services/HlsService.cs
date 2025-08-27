@@ -64,10 +64,9 @@ namespace Etherna.Sdk.Tools.Video.Services
                 if (masterSwarmAddress is not null)
                 {
                     streamSwarmAddress = SwarmAddress.FromString(masterFileDirectory.TrimEnd(SwarmAddress.Separator) + SwarmAddress.Separator + streamInfo.Uri);
-                    var streamSwarmChunkRef = await SwarmReference.ResolveFromAddressAsync(
+                    streamPlaylistFile.SwarmReference = await SwarmReference.ResolveFromAddressAsync(
                         streamSwarmAddress.Value,
                         chunkStore).ConfigureAwait(false);
-                    streamPlaylistFile.SwarmHash = streamSwarmChunkRef.Hash;
                 }
                 
                 // Parse stream playlist.
@@ -125,10 +124,9 @@ namespace Etherna.Sdk.Tools.Video.Services
                 {
                     var segmentSwarmAddress = SwarmAddress.FromString(
                         streamPlaylistDirectory.TrimEnd(SwarmAddress.Separator) + SwarmAddress.Separator + segment.Uri);
-                    var segmentSwarmChunkRef = await SwarmReference.ResolveFromAddressAsync(
+                    segmentFile.SwarmReference = await SwarmReference.ResolveFromAddressAsync(
                             segmentSwarmAddress,
                             chunkStore).ConfigureAwait(false);
-                    segmentFile.SwarmHash = segmentSwarmChunkRef.Hash;
                 }
 
                 segmentFiles.Add(segmentFile);

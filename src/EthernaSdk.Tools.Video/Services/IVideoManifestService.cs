@@ -22,7 +22,7 @@ namespace Etherna.Sdk.Tools.Video.Services
 {
     public interface IVideoManifestService
     {
-        Task<SwarmHash> CreateVideoManifestChunksAsync(
+        Task<SwarmReference> CreateVideoManifestChunksAsync(
             VideoManifest manifest,
             string chunksDirectory,
             bool createDirectory = true,

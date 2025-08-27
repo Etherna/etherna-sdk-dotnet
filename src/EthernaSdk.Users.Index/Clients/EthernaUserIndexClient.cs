@@ -32,7 +32,8 @@ namespace Etherna.Sdk.Users.Index.Clients
     public class EthernaUserIndexClient(
         Uri baseUrl,
         IBeeClient beeClient,
-        HttpClient httpClient) : IEthernaUserIndexClient
+        HttpClient httpClient)
+        : IEthernaUserIndexClient
     {
         // Fields.
         private readonly CommentsClient generatedCommentsClient = new(baseUrl.AbsoluteUri, httpClient);
@@ -43,10 +44,10 @@ namespace Etherna.Sdk.Users.Index.Clients
         private readonly VideosClient generatedVideosClient = new(baseUrl.AbsoluteUri, httpClient);
 
         // Methods.
-        public Task AdminForceNewValidationByManifestHashAsync(
-            SwarmHash manifestHash,
+        public Task AdminForceNewValidationByManifestReferenceAsync(
+            SwarmReference manifestReference,
             CancellationToken cancellationToken = default) =>
-            generatedSystemClient.ManifestAsync(manifestHash.ToString(), cancellationToken);
+            generatedSystemClient.ManifestAsync(manifestReference.ToString(), cancellationToken);
 
         public Task AdminForceNewValidationByVideoIdAsync(
             string videoId,
@@ -106,20 +107,20 @@ namespace Etherna.Sdk.Users.Index.Clients
                 errorDetails: s.ErrorDetails.Select(e => new VideoValidationErrorDetail(
                     errorMessage: e.ErrorMessage,
                     errorType: Enum.Parse<VideoValidationErrorDetail.ErrorTypes>(e.ErrorType.ToString()))),
-                hash: s.Hash,
+                reference: s.Hash,
                 isValid: s.IsValid,
                 validationTime: s.ValidationTime,
                 videoId: s.VideoId));
 
         public async Task<IEnumerable<VideoValidationStatus>> GetBulkVideoValidationStatusByManifestsAsync(
-            IEnumerable<SwarmHash> manifestHashes,
+            IEnumerable<SwarmReference> manifestReferences,
             CancellationToken cancellationToken = default) =>
             (await generatedVideosClient.BulkValidationPut2Async(
-                manifestHashes.Select(h => h.ToString()), cancellationToken).ConfigureAwait(false)).Select(s => new VideoValidationStatus(
+                manifestReferences.Select(h => h.ToString()), cancellationToken).ConfigureAwait(false)).Select(s => new VideoValidationStatus(
                     errorDetails: s.ErrorDetails.Select(e => new VideoValidationErrorDetail(
                         errorMessage: e.ErrorMessage,
                         errorType: Enum.Parse<VideoValidationErrorDetail.ErrorTypes>(e.ErrorType.ToString()))),
-                    hash: s.Hash,
+                    reference: s.Hash,
                     isValid: s.IsValid,
                     validationTime: s.ValidationTime,
                     videoId: s.VideoId));
@@ -189,8 +190,8 @@ namespace Etherna.Sdk.Users.Index.Clients
                     }
                 
                     videoPreviews.Add(new VideoPreview(
-                        hash: v.Hash is not null ?
-                            v.Hash : (SwarmHash?)null,
+                        reference: v.Hash is not null ?
+                            v.Hash : (SwarmReference?)null,
                         id: v.Id,
                         createdAt: v.CreatedAt,
                         duration: v.Duration,
@@ -251,10 +252,10 @@ namespace Etherna.Sdk.Users.Index.Clients
         }
 
         public async Task<IndexedVideo> GetVideoByManifestAsync(
-            SwarmHash manifestHash,
+            SwarmReference manifestReference,
             CancellationToken cancellationToken = default)
         {
-            var response = await generatedVideosClient.Manifest2Async(manifestHash.ToString(), cancellationToken).ConfigureAwait(false);
+            var response = await generatedVideosClient.Manifest2Async(manifestReference.ToString(), cancellationToken).ConfigureAwait(false);
             return BuildIndexedVideo(response);
         }
 
@@ -311,22 +312,23 @@ namespace Etherna.Sdk.Users.Index.Clients
                 errorDetails: s.ErrorDetails.Select(e => new VideoValidationErrorDetail(
                     errorMessage: e.ErrorMessage,
                     errorType: Enum.Parse<VideoValidationErrorDetail.ErrorTypes>(e.ErrorType.ToString()))),
-                hash: s.Hash,
+                reference: s.Hash,
                 isValid: s.IsValid,
                 validationTime: s.ValidationTime,
                 videoId: s.VideoId));
 
-        public async Task<VideoValidationStatus> GetVideoValidationStatusByManifestAsync(SwarmHash manifestHash,
+        public async Task<VideoValidationStatus> GetVideoValidationStatusByManifestAsync(
+            SwarmReference manifestReference,
             CancellationToken cancellationToken = default)
         {
             var response = await generatedVideosClient.ValidationGet2Async(
-                manifestHash.ToString(),
+                manifestReference.ToString(),
                 cancellationToken).ConfigureAwait(false);
             return new VideoValidationStatus(
                 errorDetails: response.ErrorDetails.Select(e => new VideoValidationErrorDetail(
                     errorMessage: e.ErrorMessage,
                     errorType: Enum.Parse<VideoValidationErrorDetail.ErrorTypes>(e.ErrorType.ToString()))),
-                hash: response.Hash,
+                reference: response.Hash,
                 isValid: response.IsValid,
                 validationTime: response.ValidationTime,
                 videoId: response.VideoId);
@@ -341,11 +343,11 @@ namespace Etherna.Sdk.Users.Index.Clients
         public Task OwnerRemoveVideoAsync(string videoId, CancellationToken cancellationToken = default) =>
             generatedVideosClient.VideosDeleteAsync(videoId, cancellationToken);
 
-        public Task<string> PublishNewVideoAsync(SwarmHash manifestHash, CancellationToken cancellationToken = default) =>
-            generatedVideosClient.VideosPostAsync(new VideoCreateInput { ManifestHash = manifestHash.ToString() }, cancellationToken);
+        public Task<string> PublishNewVideoAsync(SwarmReference manifestReference, CancellationToken cancellationToken = default) =>
+            generatedVideosClient.VideosPostAsync(new VideoCreateInput { ManifestHash = manifestReference.ToString() }, cancellationToken);
 
-        public Task ReportUnsuitableVideoAsync(string videoId, SwarmHash manifestHash, string description, CancellationToken cancellationToken = default) =>
-            generatedVideosClient.ReportsAsync(videoId, manifestHash.ToString(), description, cancellationToken);
+        public Task ReportUnsuitableVideoAsync(string videoId, SwarmReference manifestReference, string description, CancellationToken cancellationToken = default) =>
+            generatedVideosClient.ReportsAsync(videoId, manifestReference.ToString(), description, cancellationToken);
 
         public Task<PaginatedResult<VideoPreview>> SearchVideosAsync(string? query = null, int? page = null, int? take = null,
             CancellationToken cancellationToken = default)
@@ -356,8 +358,8 @@ namespace Etherna.Sdk.Users.Index.Clients
         public Task UpdateOwnedVideoCommentAsync(string commentId, string newCommentText, CancellationToken cancellationToken = default) =>
             generatedVideosClient.CommentsPutAsync(commentId, newCommentText, cancellationToken);
 
-        public Task UpdateVideoManifestAsync(string videoId, SwarmHash newManifestHash, CancellationToken cancellationToken = default) =>
-            generatedVideosClient.Update2Async(videoId, newManifestHash.ToString(), cancellationToken);
+        public Task UpdateVideoManifestAsync(string videoId, SwarmReference newManifestReference, CancellationToken cancellationToken = default) =>
+            generatedVideosClient.Update2Async(videoId, newManifestReference.ToString(), cancellationToken);
 
         public Task VotesVideoAsync(string id, VoteValue value, CancellationToken cancellationToken = default) =>
             generatedVideosClient.VotesAsync(id, Enum.Parse<Value>(value.ToString()), cancellationToken);
@@ -368,9 +370,9 @@ namespace Etherna.Sdk.Users.Index.Clients
             ArgumentNullException.ThrowIfNull(videoDto, nameof(videoDto));
 
             // Build published video manifest.
-            SwarmHash? lastValidManifestHash = null;
+            SwarmReference? lastValidManifestReference = null;
             if (videoDto.LastValidManifest is not null)
-                lastValidManifestHash = SwarmHash.FromString(videoDto.LastValidManifest.Hash);
+                lastValidManifestReference = SwarmReference.FromString(videoDto.LastValidManifest.Hash);
             
             // Build indexed video.
             VideoManifestPersonalData.TryDeserialize(videoDto.LastValidManifest?.PersonalData, out var personalData);
@@ -380,7 +382,7 @@ namespace Etherna.Sdk.Users.Index.Clients
                 currentVoteValue: videoDto.CurrentVoteValue.HasValue ?
                     Enum.Parse<VoteValue>(videoDto.CurrentVoteValue.Value.ToString()) : null,
                 description: videoDto.LastValidManifest?.Description,
-                lastValidManifestHash: lastValidManifestHash,
+                lastValidManifestReference: lastValidManifestReference,
                 ownerAddress: videoDto.OwnerAddress,
                 personalData: personalData,
                 title: videoDto.LastValidManifest?.Title,

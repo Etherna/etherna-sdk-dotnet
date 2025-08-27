@@ -24,7 +24,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         long byteSize,
         string fileName,
         UFile universalFile,
-        SwarmHash? swarmHash)
+        SwarmReference? swarmReference)
     {
         // Static builders.
         public static async Task<FileBase> BuildFromUFileAsync(UFile uFile)
@@ -41,7 +41,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         // Properties.
         public long ByteSize { get; } = byteSize;
         public string FileName { get; } = fileName;
-        public SwarmHash? SwarmHash { get; set; } = swarmHash;
+        public SwarmReference? SwarmReference { get; set; } = swarmReference;
         public UUri UUri => universalFile.FileUri;
         
         // Methods.

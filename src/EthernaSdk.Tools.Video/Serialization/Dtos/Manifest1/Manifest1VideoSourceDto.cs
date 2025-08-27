@@ -48,7 +48,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
             if (string.IsNullOrWhiteSpace(Quality))
                 errors.Add(new ValidationError(ValidationErrorType.InvalidVideoSource, "Video source has empty quality"));
 
-            if (!SwarmHash.IsValidHash(Reference))
+            if (!SwarmReference.IsValidReference(Reference))
                 errors.Add(new ValidationError(ValidationErrorType.InvalidVideoSource, "Invalid reference"));
 
             return errors.ToArray();

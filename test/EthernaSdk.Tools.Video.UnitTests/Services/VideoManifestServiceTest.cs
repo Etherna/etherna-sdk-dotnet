@@ -34,10 +34,10 @@ namespace Etherna.Sdk.Tools.Video.Services
     {
         // Classes.
         public class ParseManifestTestElement(
-            Func<IChunkStore, Task<SwarmHash>> uploadContentsAsync,
+            Func<IChunkStore, Task<SwarmReference>> uploadContentsAsync,
             PublishedVideoManifest expectedManifest)
         {
-            public Func<IChunkStore, Task<SwarmHash>> UploadContentsAsync { get; } = uploadContentsAsync;
+            public Func<IChunkStore, Task<SwarmReference>> UploadContentsAsync { get; } = uploadContentsAsync;
             public PublishedVideoManifest ExpectedManifest { get; } = expectedManifest;
         }
 
@@ -439,7 +439,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         quality: null,
                         totalSourceSize: 0,
                         additionalFiles: [],
-                        directContentHash: SwarmHash.Zero),
+                        directContentReference: SwarmReference.Zero),
                     new VideoManifestVideoSource(
                         sourceRelativePath: "720p/playlist.m3u8",
                         videoType: VideoType.Hls,
@@ -447,10 +447,10 @@ namespace Etherna.Sdk.Tools.Video.Services
                         totalSourceSize: 45678,
                         additionalFiles:
                         [
-                            new("1.ts", SwarmHash.Zero),
-                            new("2.ts", SwarmHash.Zero)
+                            new("1.ts", SwarmReference.Zero),
+                            new("2.ts", SwarmReference.Zero)
                         ],
-                        directContentHash: SwarmHash.Zero)
+                        directContentReference: SwarmReference.Zero)
                 ],
                 thumbnail: new VideoManifestImage(
                     aspectRatio: 0.123f,
@@ -460,7 +460,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                             fileName: "720.png",
                             imageType: ImageType.Png,
                             width: 720,
-                            directContentHash: SwarmHash.Zero)
+                            directContentReference: SwarmReference.Zero)
                     ]),
                 captionSources:
                 [
@@ -468,7 +468,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         "eng",
                         "en-uk",
                         "0.ts",
-                        SwarmHash.Zero)
+                        SwarmReference.Zero)
                 ],
                 updatedAt: new DateTimeOffset(2024, 07, 12, 12, 01, 08, TimeSpan.Zero));
             var chunkDirectory = Directory.CreateTempSubdirectory();
@@ -518,13 +518,13 @@ namespace Etherna.Sdk.Tools.Video.Services
         private static void AddFileToManifestHelper(
             WritableMantarayManifest manifest,
             string path,
-            SwarmHash fileHash) =>
-            manifest.Add(path, ManifestEntry.NewFile(fileHash, new Dictionary<string, string>()));
+            SwarmReference fileReference) =>
+            manifest.Add(path, ManifestEntry.NewFile(fileReference, new Dictionary<string, string>()));
         
         private static void AddRootFileToManifestHelper(
             WritableMantarayManifest manifest,
             string rootFileName,
-            SwarmHash rootFileHash)
+            SwarmReference rootFileReference)
         {
             manifest.Add(
                 MantarayManifestBase.RootPath,
@@ -534,7 +534,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         [ManifestEntry.WebsiteIndexDocPathKey] = rootFileName,
                     }));
 
-            AddFileToManifestHelper(manifest, rootFileName, rootFileHash);
+            AddFileToManifestHelper(manifest, rootFileName, rootFileReference);
         }
 
         private static WritableMantarayManifest BuildNewManifestHelper(IChunkStore chunkStore)
@@ -549,7 +549,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             return manifest;
         }
         
-        private static async Task<SwarmHash> UploadStringFileHelper(
+        private static async Task<SwarmReference> UploadStringFileHelper(
             string strValue,
             IChunkStore chunkStore)
         {
@@ -561,7 +561,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 0,
                 null);
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(strValue));
-            return (await fileHasherPipeline.HashDataAsync(stream).ConfigureAwait(false)).Hash;
+            return await fileHasherPipeline.HashDataAsync(stream).ConfigureAwait(false);
         }
     }
 }
