@@ -67,7 +67,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             List<VideoManifestVideoSource> videoSources = [];
             foreach (var videoSourceDto in manifestDto.Sources)
             {
-                var videoSourceChunkRef = await SwarmChunkReference.ResolveFromStringAsync(
+                var videoSourceChunkRef = await SwarmReference.ResolveFromStringAsync(
                     videoSourceDto.Reference,
                     chunkStore).ConfigureAwait(false);
                 videoSources.Add(new VideoManifestVideoSource(
@@ -86,7 +86,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 List<VideoManifestImageSource> imgSources = [];
                 foreach (var imgSourceDto in manifestDto.Thumbnail.Sources)
                 {
-                    var imgSourceChunkRef = await SwarmChunkReference.ResolveFromStringAsync(
+                    var imgSourceChunkRef = await SwarmReference.ResolveFromStringAsync(
                         imgSourceDto.Value,
                         chunkStore).ConfigureAwait(false);
                     imgSources.Add(new VideoManifestImageSource(
@@ -121,7 +121,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
         }
         
         public static async Task<(VideoManifest?, ValidationError[])> TryDeserializeManifest2Async(
-            SwarmHash manifestHash,
+            SwarmReference manifestReference,
             JsonElement previewManifestJsonElement,
             IChunkService chunksService,
             IReadOnlyChunkStore chunkStore)
@@ -137,7 +137,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             // Get details manifest.
             Manifest2DetailsDto? detailsManifestDto;
             var detailsManifestStream = await chunksService.GetFileStreamFromAddressAsync(
-                $"{manifestHash}/details", ManifestPathResolver.BrowserResolver, chunkStore).ConfigureAwait(false);
+                $"{manifestReference}/details", ManifestPathResolver.BrowserResolver, chunkStore).ConfigureAwait(false);
             await using (detailsManifestStream.ConfigureAwait(false))
             {
                 detailsManifestDto = await JsonSerializer.DeserializeAsync<Manifest2DetailsDto>(
@@ -159,8 +159,8 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             foreach (var captionDto in detailsManifestDto.Captions ?? [])
             {
                 var captionSwarmUri = new SwarmUri(captionDto.Path, UriKind.RelativeOrAbsolute);
-                var captionSwarmAddress = captionSwarmUri.ToSwarmAddress(manifestHash);
-                var captionChunkReference = await SwarmChunkReference.ResolveFromAddressAsync(
+                var captionSwarmAddress = captionSwarmUri.ToSwarmAddress(manifestReference);
+                var captionChunkReference = await SwarmReference.ResolveFromAddressAsync(
                     captionSwarmAddress,
                     chunkStore).ConfigureAwait(false);
                 var captionFileName = captionDto.Path.Split(SwarmAddress.Separator).Last();
@@ -191,8 +191,8 @@ namespace Etherna.Sdk.Tools.Video.Serialization
 
                 var swarmUri = new SwarmUri(thumbnailSourceDto.Path, UriKind.RelativeOrAbsolute);
 
-                var thumbnailAddress = swarmUri.ToSwarmAddress(manifestHash);
-                var thumbnailChunkRef = await SwarmChunkReference.ResolveFromAddressAsync(
+                var thumbnailAddress = swarmUri.ToSwarmAddress(manifestReference);
+                var thumbnailChunkRef = await SwarmReference.ResolveFromAddressAsync(
                     thumbnailAddress,
                     chunkStore).ConfigureAwait(false);
                 
@@ -212,8 +212,8 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 var videoType = Enum.Parse<VideoType>(videoSourceDto.Type, true);
                 
                 var videoSourceSwarmUri = new SwarmUri(videoSourceDto.Path, UriKind.RelativeOrAbsolute);
-                var videoSourceSwarmAddress = videoSourceSwarmUri.ToSwarmAddress(manifestHash);
-                var videoSourceChunkRef = await SwarmChunkReference.ResolveFromAddressAsync(
+                var videoSourceSwarmAddress = videoSourceSwarmUri.ToSwarmAddress(manifestReference);
+                var videoSourceChunkRef = await SwarmReference.ResolveFromAddressAsync(
                     videoSourceSwarmAddress,
                     chunkStore).ConfigureAwait(false);
                 
@@ -255,12 +255,12 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                             var segmentRelativePath = segmentPath[sourceDirectoryPath.Length..];
                             
                             var segmentSwarmAddress = new SwarmAddress(
-                                videoSourceSwarmAddress.Hash,
+                                videoSourceSwarmAddress.Reference,
                                 segmentPath);
                             
                             additionalFiles.Add(new VideoManifestVideoSourceAdditionalFile(
                                 segmentRelativePath,
-                                (await SwarmChunkReference.ResolveFromAddressAsync(
+                                (await SwarmReference.ResolveFromAddressAsync(
                                     segmentSwarmAddress,
                                     chunkStore).ConfigureAwait(false)).Hash));
                         }

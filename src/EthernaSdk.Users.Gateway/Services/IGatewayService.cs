@@ -84,12 +84,12 @@ namespace Etherna.Sdk.Users.Gateway.Services
             bool fundPinning = false,
             TagId? tagId = null);
         
-        Task<SwarmHash> UploadDirectoryAsync(
+        Task<SwarmReference> UploadDirectoryAsync(
             PostageBatchId batchId,
             string directoryPath,
             bool pinResource);
         
-        Task<SwarmHash> UploadFileAsync(
+        Task<SwarmReference> UploadFileAsync(
             PostageBatchId batchId,
             Stream content,
             string? name,

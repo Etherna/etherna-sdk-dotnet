@@ -80,15 +80,12 @@ namespace Etherna.Sdk.Tools.Video.Services
                     postageStampIssuer,
                     new MemoryStampStore());
             var mantarayManifest = new WritableMantarayManifest(
-                readOnly => HasherPipelineBuilder.BuildNewHasherPipeline(
-                    chunkStore,
-                    postageStamper,
-                    RedundancyLevel.None,
-                    false,
-                    0,
-                    null,
-                    readOnly: readOnly),
-                0);
+                chunkStore,
+                postageStamper,
+                RedundancyLevel.None,
+                false,
+                0,
+                null);
             
             //add default (preview)
             mantarayManifest.Add(
@@ -180,16 +177,16 @@ namespace Etherna.Sdk.Tools.Video.Services
                         }));
             }
 
-            return (await mantarayManifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
+            return (await mantarayManifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
         }
 
         public async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
-            SwarmHash manifestHash,
+            SwarmReference manifestReference,
             IReadOnlyChunkStore chunkStore)
         {
             JsonElement rootManifestJsonElement;
             var rootManifestStream = await chunkService.GetFileStreamFromAddressAsync(
-                manifestHash,
+                manifestReference,
                 ManifestPathResolver.BrowserResolver,
                 chunkStore).ConfigureAwait(false);
             await using (rootManifestStream.ConfigureAwait(false))
@@ -207,11 +204,11 @@ namespace Etherna.Sdk.Tools.Video.Services
             var (videoManifest, errors) = version.Major switch
             {
                 1 => await ManifestSerializer.TryDeserializeManifest1Async(rootManifestJsonElement, chunkStore).ConfigureAwait(false),
-                2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestHash, rootManifestJsonElement, chunkService, chunkStore).ConfigureAwait(false),
+                2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestReference, rootManifestJsonElement, chunkService, chunkStore).ConfigureAwait(false),
                 _ => (null, [new ValidationError(ValidationErrorType.JsonConvert, "Invalid version")])
             };
 
-            return new PublishedVideoManifest(manifestHash, videoManifest, errors);
+            return new PublishedVideoManifest(manifestReference, videoManifest, errors);
         }
     }
 }

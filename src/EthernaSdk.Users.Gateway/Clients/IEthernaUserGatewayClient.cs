@@ -107,11 +107,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             CancellationToken cancellationToken = default);
         
         /// <summary>Get referenced data</summary>
-        /// <param name="hash">Swarm address reference to content</param>
+        /// <param name="reference">Swarm reference to content</param>
         /// <returns>Retrieved content specified by reference</returns>
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
         Task<Stream> GetBytesAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -119,11 +119,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         Task<ChainState> GetChainStateAsync(CancellationToken cancellationToken = default);
 
         /// <summary>Get Chunk</summary>
-        /// <param name="hash">Swarm address of chunk</param>
+        /// <param name="reference">Swarm address of chunk</param>
         /// <returns>Retrieved chunk content</returns>
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
         Task<Stream> GetChunkAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -251,7 +251,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <param name="swarmPin">Represents if the uploaded data should be also locally pinned on the node</param>
         /// <returns>Reference hash</returns>
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
-        Task<SwarmHash> UploadBytesAsync(
+        Task<SwarmReference> UploadBytesAsync(
             Stream content,
             PostageBatchId batchId,
             bool swarmPin = false,
@@ -266,7 +266,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <param name="swarmTag">Associate upload with an existing Tag UID</param>
         /// <returns>Ok</returns>
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
-        Task<SwarmHash> UploadChunkAsync(
+        Task<SwarmReference> UploadChunkAsync(
             Stream chunkData,
             PostageBatchId? batchId,
             bool pinChunk = false,
@@ -280,7 +280,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <param name="pinDirectory"></param>
         /// <returns>Reference hash</returns>
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
-        Task<SwarmHash> UploadDirectoryAsync(
+        Task<SwarmReference> UploadDirectoryAsync(
             string directoryPath,
             PostageBatchId batchId,
             bool pinDirectory = false,
@@ -306,7 +306,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <param name="pinFile">Represents if the uploaded data should be also locally pinned on the node</param>
         /// <returns>Reference hash</returns>
         /// <exception cref="BeeNetGatewayApiException">A server side error occurred.</exception>
-        Task<SwarmHash> UploadFileAsync(
+        Task<SwarmReference> UploadFileAsync(
             Stream content,
             PostageBatchId batchId,
             string? name = null,

@@ -228,7 +228,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 tagId: tagId).ConfigureAwait(false);
         }
         
-        public Task<SwarmHash> UploadDirectoryAsync(
+        public Task<SwarmReference> UploadDirectoryAsync(
             PostageBatchId batchId,
             string directoryPath,
             bool pinResource) =>
@@ -237,7 +237,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 batchId,
                 pinDirectory: pinResource);
 
-        public Task<SwarmHash> UploadFileAsync(
+        public Task<SwarmReference> UploadFileAsync(
             PostageBatchId batchId,
             Stream content,
             string? name,

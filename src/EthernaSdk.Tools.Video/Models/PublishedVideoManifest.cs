@@ -19,13 +19,13 @@ using System.Linq;
 namespace Etherna.Sdk.Tools.Video.Models
 {
     public class PublishedVideoManifest(
-        SwarmHash hash,
+        SwarmReference reference,
         VideoManifest? manifest,
         ValidationError[] validationErrors)
     {
         // Properties.
-        public SwarmHash Hash { get; } = hash;
         public VideoManifest? Manifest { get; } = manifest;
+        public SwarmReference Reference { get; } = reference;
         public IReadOnlyCollection<ValidationError> ValidationErrors { get; } = validationErrors;
         
         // Methods.
@@ -34,13 +34,13 @@ namespace Etherna.Sdk.Tools.Video.Models
             if (ReferenceEquals(this, obj)) return true;
             if (obj is not PublishedVideoManifest other) return false;
             return GetType() == other.GetType() &&
-                   Hash.Equals(other.Hash) &&
+                   Reference.Equals(other.Reference) &&
                    EqualityComparer<VideoManifest?>.Default.Equals(Manifest, other.Manifest) &&
                    ValidationErrors.SequenceEqual(other.ValidationErrors);
         }
 
         public override int GetHashCode() =>
-            Hash.GetHashCode() ^
+            Reference.GetHashCode() ^
             Manifest?.GetHashCode() ?? 0 ^
             ValidationErrors.GetHashCode();
     }

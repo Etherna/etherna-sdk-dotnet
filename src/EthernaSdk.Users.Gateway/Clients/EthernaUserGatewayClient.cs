@@ -138,10 +138,10 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             generatedResourcesClient.PinPostAsync(hash.ToString(), cancellationToken);
 
         public Task<Stream> GetBytesAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default) =>
             BeeClient.GetBytesAsync(
-                hash: hash,
+                reference: reference,
                 cancellationToken: cancellationToken);
 
         public async Task<ChainState> GetChainStateAsync(
@@ -149,10 +149,10 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             new(await generatedSystemClient.ChainstateAsync(cancellationToken).ConfigureAwait(false));
 
         public Task<Stream> GetChunkAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default) =>
             BeeClient.GetChunkStreamAsync(
-                hash: hash,
+                reference: reference,
                 cancellationToken: cancellationToken);
 
         public async Task<UserCredit> GetCurrentUserCreditAsync(
@@ -275,7 +275,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             }
         }
 
-        public Task<SwarmHash> UploadBytesAsync(
+        public Task<SwarmReference> UploadBytesAsync(
             Stream content,
             PostageBatchId batchId,
             bool swarmPin = false,
@@ -286,7 +286,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 swarmPin: swarmPin,
                 cancellationToken: cancellationToken);
 
-        public Task<SwarmHash> UploadChunkAsync(
+        public Task<SwarmReference> UploadChunkAsync(
             Stream chunkData,
             PostageBatchId? batchId,
             bool pinChunk = false,
@@ -301,7 +301,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 presignedPostageStamp: presignedPostageStamp,
                 cancellationToken: cancellationToken);
         
-        public Task<SwarmHash> UploadDirectoryAsync(
+        public Task<SwarmReference> UploadDirectoryAsync(
             string directoryPath,
             PostageBatchId batchId,
             bool pinDirectory = false,
@@ -323,7 +323,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 swarmPin: pinManifest,
                 cancellationToken: cancellationToken);
 
-        public Task<SwarmHash> UploadFileAsync(
+        public Task<SwarmReference> UploadFileAsync(
             Stream content,
             PostageBatchId batchId,
             string? name = null,

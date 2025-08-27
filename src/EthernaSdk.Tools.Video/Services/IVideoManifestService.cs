@@ -29,7 +29,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             IPostageStampIssuer? postageStampIssuer = null);
 
         Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
-            SwarmHash manifestHash,
+            SwarmReference manifestReference,
             IReadOnlyChunkStore chunkStore);
     }
 }

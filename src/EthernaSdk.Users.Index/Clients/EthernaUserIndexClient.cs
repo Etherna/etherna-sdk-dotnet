@@ -177,7 +177,7 @@ namespace Etherna.Sdk.Users.Index.Clients
                         var swarmUri = new SwarmUri(thumbSourceDto.Path, UriKind.RelativeOrAbsolute);
 
                         var thumbAddress = swarmUri.ToSwarmAddress(v.Hash!);
-                        var thumbChunkRef = await SwarmChunkReference.ResolveFromAddressAsync(thumbAddress, chunkStore).ConfigureAwait(false);
+                        var thumbChunkRef = await SwarmReference.ResolveFromAddressAsync(thumbAddress, chunkStore).ConfigureAwait(false);
                         
                         var thumbSource = new VideoManifestImageSource(
                             fileName,

@@ -101,7 +101,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                             AddFileToManifestHelper(manifest, "captions/1.vtt", "0000000000000000000000000000000000000000000000000000000000000008");
                             AddFileToManifestHelper(manifest, "captions/2.vtt", "0000000000000000000000000000000000000000000000000000000000000009");
 
-                            return (await manifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
+                            return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
                             "845238e3bd8110f88709768946394b8bcf562f0f0253c3c39df1cacaf3800ddd", 
@@ -238,7 +238,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                             AddFileToManifestHelper(manifest, "thumb/270.jpg", "0000000000000000000000000000000000000000000000000000000000000010");
                             AddFileToManifestHelper(manifest, "thumb/540.jpg", "0000000000000000000000000000000000000000000000000000000000000011");
 
-                            return (await manifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
+                            return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
                             "1e43dd2d93290662dc37598b2d12ce1e3ac39f85f07195087f593a768c69b4c1",
@@ -318,7 +318,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                             AddRootFileToManifestHelper(manifest, "manifest", await UploadStringFileHelper(
                                 """{"v":"1.1","title":"title 3","description":"test!!!","duration":19,"originalQuality":"1954p","ownerAddress":"0x6163C4b8264a03CCAc412B83cbD1B551B6c6C246","createdAt":1660397733617,"updatedAt":1660397733617,"thumbnail":{"blurhash":"UTHoa;-VEVO=??v]SlOu2ep0slR:kisia*bJ","aspectRatio":1.7777777777777777,"sources":{"720w":"5d69d94f1ffa17560a88abc4a99aa40b0cabe6012766f51e5c19193887adacb1","480w":"0b7425036143ed65932ac64cd6c4ddb4f2fd3e9bd51ed0f13bd406926c45c325"}},"sources":[{"reference":"e44671417466df08d3b67d74a081021ab2bba70224fc0d6e4d00c35d80328c6c","quality":"1954p","size":3739997,"bitrate":1574736}],"batchId":"5d35cbf4cea6349c1f74340ce9f0befd7a60a17426508da7b205871d683a3a23"}""", chunkStore));
                 
-                            return (await manifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
+                            return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
                             "8c831938f7f10cc57a8a68a55f473868324e0c3dafe9313bfd70f4343abedb91",
@@ -369,7 +369,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                             AddRootFileToManifestHelper(manifest, "manifest", await UploadStringFileHelper(
                                 """{"title":"Test 1","description":"desc","createdAt":1645091199100,"duration":18,"originalQuality":"720p","ownerAddress":"0x6163C4b8264a03CCAc412B83cbD1B551B6c6C246","thumbnail":{"blurhash":"UTHoa;-VEVO=??v]SlOu2ep0slR:kisia*bJ","aspectRatio":1.7777777777777777,"sources":{"720w":"5d69d94f1ffa17560a88abc4a99aa40b0cabe6012766f51e5c19193887adacb1","480w":"0b7425036143ed65932ac64cd6c4ddb4f2fd3e9bd51ed0f13bd406926c45c325"}},"sources":[{"quality":"720p","reference":"94f4fcb1a902597c2bc53c5b48637af952a99328ec299f33e129740818a9e302","size":448350,"bitrate":216398}],"v":"1.0"}""", chunkStore));
                 
-                            return (await manifest.GetHashAsync(new Hasher()).ConfigureAwait(false)).Hash;
+                            return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
                             "4a6dc04a9c07b9987ae18e3e8ea3185e828efdce9e27ea30ad644b762b531cb4",
@@ -540,15 +540,12 @@ namespace Etherna.Sdk.Tools.Video.Services
         private static WritableMantarayManifest BuildNewManifestHelper(IChunkStore chunkStore)
         {
             var manifest = new WritableMantarayManifest(
-                readOnlyPipeline => HasherPipelineBuilder.BuildNewHasherPipeline(
-                    chunkStore,
-                    new FakePostageStamper(),
-                    RedundancyLevel.None,
-                    false,
-                    0,
-                    null,
-                    readOnlyPipeline),
-                0);
+                chunkStore,
+                new FakePostageStamper(),
+                RedundancyLevel.None,
+                false,
+                0,
+                null);
             return manifest;
         }
         
