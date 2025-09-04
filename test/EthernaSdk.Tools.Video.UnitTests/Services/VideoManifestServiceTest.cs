@@ -439,7 +439,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         quality: null,
                         totalSourceSize: 0,
                         additionalFiles: [],
-                        directContentReference: SwarmReference.Zero),
+                        directContentReference: SwarmReference.PlainZero),
                     new VideoManifestVideoSource(
                         sourceRelativePath: "720p/playlist.m3u8",
                         videoType: VideoType.Hls,
@@ -447,10 +447,10 @@ namespace Etherna.Sdk.Tools.Video.Services
                         totalSourceSize: 45678,
                         additionalFiles:
                         [
-                            new("1.ts", SwarmReference.Zero),
-                            new("2.ts", SwarmReference.Zero)
+                            new("1.ts", SwarmReference.PlainZero),
+                            new("2.ts", SwarmReference.PlainZero)
                         ],
-                        directContentReference: SwarmReference.Zero)
+                        directContentReference: SwarmReference.PlainZero)
                 ],
                 thumbnail: new VideoManifestImage(
                     aspectRatio: 0.123f,
@@ -460,7 +460,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                             fileName: "720.png",
                             imageType: ImageType.Png,
                             width: 720,
-                            directContentReference: SwarmReference.Zero)
+                            directContentReference: SwarmReference.PlainZero)
                     ]),
                 captionSources:
                 [
@@ -468,7 +468,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                         "eng",
                         "en-uk",
                         "0.ts",
-                        SwarmReference.Zero)
+                        SwarmReference.PlainZero)
                 ],
                 updatedAt: new DateTimeOffset(2024, 07, 12, 12, 01, 08, TimeSpan.Zero));
             var chunkDirectory = Directory.CreateTempSubdirectory();

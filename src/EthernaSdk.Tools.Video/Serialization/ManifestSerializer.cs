@@ -38,7 +38,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
         private static readonly VideoManifestImage defaultThumbnail = new(
             1.8f,
             "UcGkx38v?CKhoej[j[jtM|bHs:jZjaj[j@ay",
-            [new VideoManifestImageSource("thumb.jpg", ImageType.Jpeg, 100, SwarmReference.Zero)]);
+            [new VideoManifestImageSource("thumb.jpg", ImageType.Jpeg, 100, SwarmReference.PlainZero)]);
         private static readonly JsonSerializerOptions jsonSerializerOptions = new()
         {
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },

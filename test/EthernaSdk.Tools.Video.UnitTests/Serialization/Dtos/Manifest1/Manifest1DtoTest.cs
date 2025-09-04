@@ -53,7 +53,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
                 Sources = [new Manifest1VideoSourceDto
                 {
                     Quality = "720",
-                    Reference = SwarmReference.Zero.ToString()
+                    Reference = SwarmReference.PlainZero.ToString()
                 }]
             };
             
@@ -76,7 +76,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
                 Sources = [new Manifest1VideoSourceDto
                 {
                     Quality = "720",
-                    Reference = SwarmReference.Zero.ToString()
+                    Reference = SwarmReference.PlainZero.ToString()
                 }]
             };
             

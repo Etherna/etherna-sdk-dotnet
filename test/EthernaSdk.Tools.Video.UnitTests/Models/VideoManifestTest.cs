@@ -57,7 +57,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                                     quality: null,
                                     totalSourceSize: 0,
                                     additionalFiles: [],
-                                    directContentReference: SwarmReference.Zero),
+                                    directContentReference: SwarmReference.PlainZero),
                                 new VideoManifestVideoSource(
                                     sourceRelativePath: "720p/playlist.m3u8",
                                     videoType: VideoType.Hls,
@@ -65,10 +65,10 @@ namespace Etherna.Sdk.Tools.Video.Models
                                     totalSourceSize: 45678,
                                     additionalFiles:
                                     [
-                                        new("1.ts", SwarmReference.Zero),
-                                        new("2.ts", SwarmReference.Zero)
+                                        new("1.ts", SwarmReference.PlainZero),
+                                        new("2.ts", SwarmReference.PlainZero)
                                     ],
-                                    directContentReference: SwarmReference.Zero)
+                                    directContentReference: SwarmReference.PlainZero)
                             ],
                             thumbnail: new VideoManifestImage(
                                 aspectRatio: 0.123f,
@@ -78,7 +78,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                                         fileName: "720.png",
                                         imageType: ImageType.Png,
                                         width: 720,
-                                        directContentReference: SwarmReference.Zero)
+                                        directContentReference: SwarmReference.PlainZero)
                                 ]),
                             captionSources:
                             [
@@ -86,7 +86,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                                     "eng",
                                     "en-uk",
                                     "0.ts",
-                                    SwarmReference.Zero)
+                                    SwarmReference.PlainZero)
                             ],
                             updatedAt: new DateTimeOffset(2024, 07, 12, 12, 01, 08, TimeSpan.Zero)),
                         """{"v":"2.1","title":"I\u0027m a title","createdAt":1720111542,"updatedAt":1720785668,"ownerAddress":"0x7cd4878e21d9ce3da6611ae27a1b73827af81374","duration":42,"thumbnail":{"aspectRatio":0.123,"blurhash":"UcGkx38v?CKhoej[j[jtM|bHs:jZjaj[j@ay","sources":[{"width":720,"type":"png","path":"thumb/720.png"}]}}""",
