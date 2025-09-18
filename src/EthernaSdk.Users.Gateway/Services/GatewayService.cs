@@ -140,11 +140,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             }
         }
 
-        public Task<TagInfo> CreateTagAsync(SwarmHash hash, PostageBatchId batchId)
+        public Task<TagInfo> CreateTagAsync(SwarmHash hash)
         {
             if (options.IsDryRun)
                 return Task.FromResult(new TagInfo(new TagId(0), DateTimeOffset.UtcNow, 0, 0, 0, 0, 0));
-            return ethernaGatewayClient.BeeClient.CreateTagAsync(hash, batchId);
+            return ethernaGatewayClient.BeeClient.CreateTagAsync(hash);
         }
 
         public Task DefundResourcePinningAsync(SwarmReference reference)
@@ -156,11 +156,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             return ethernaGatewayClient.DefundResourcePinningAsync(reference);
         }
 
-        public Task DeleteTagAsync(TagId tagId, PostageBatchId batchId)
+        public Task DeleteTagAsync(TagId tagId)
         {
             if (options.IsDryRun)
                 return Task.CompletedTask;
-            return ethernaGatewayClient.BeeClient.DeleteTagAsync(tagId, batchId);
+            return ethernaGatewayClient.BeeClient.DeleteTagAsync(tagId);
         }
 
         public Task FundResourceDownloadAsync(SwarmHash hash)
@@ -202,11 +202,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             return (await ethernaGatewayClient.GetPostageBatchAsync(batchId).ConfigureAwait(false)).IsUsable;
         }
 
-        public Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash, PostageBatchId batchId)
+        public Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash)
         {
             if (options.IsDryRun)
                 return Task.CompletedTask;
-            return ethernaGatewayClient.BeeClient.UpdateTagAsync(tagId, batchId, rootHash);
+            return ethernaGatewayClient.BeeClient.UpdateTagAsync(tagId, rootHash);
         }
 
         public async Task UploadChunkAsync(

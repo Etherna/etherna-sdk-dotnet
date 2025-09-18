@@ -45,7 +45,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
             Action? onWaitingBatchUsable = null,
             Action? onBatchUsable = null);
 
-        Task<TagInfo> CreateTagAsync(SwarmHash hash, PostageBatchId batchId);
+        Task<TagInfo> CreateTagAsync(SwarmHash hash);
 
         /// <summary>
         /// Delete pin.
@@ -53,7 +53,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="reference">Resource hash</param>
         Task DefundResourcePinningAsync(SwarmReference reference);
 
-        Task DeleteTagAsync(TagId tagId, PostageBatchId batchId);
+        Task DeleteTagAsync(TagId tagId);
 
         /// <summary>
         /// Offer the content to all users.
@@ -76,7 +76,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="batchId">batch id</param>
         Task<bool> IsBatchUsableAsync(PostageBatchId batchId);
         
-        Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash, PostageBatchId batchId);
+        Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash);
 
         Task UploadChunkAsync(
             PostageBatchId batchId,
