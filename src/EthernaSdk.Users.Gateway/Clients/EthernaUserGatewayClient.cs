@@ -12,27 +12,21 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
 using Etherna.BeeNet.Models;
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ChainState = Etherna.Sdk.Users.Gateway.Models.ChainState;
-using FileResponse = Etherna.BeeNet.Models.FileResponse;
 
 namespace Etherna.Sdk.Users.Gateway.Clients
 {
     public sealed class EthernaUserGatewayClient : IEthernaUserGatewayClient
     {
         // Fields.
-        private readonly ChunksClient generatedChunksClient;
-        private readonly PostageClient generatedPostageClient;
         private readonly ResourcesClient generatedResourcesClient;
         private readonly SystemClient generatedSystemClient;
         private readonly UsersClient generatedUsersClient;
@@ -44,20 +38,12 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         {
             ArgumentNullException.ThrowIfNull(baseUrl);
 
-            generatedChunksClient = new(baseUrl.AbsoluteUri, httpClient);
-            generatedPostageClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedResourcesClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedSystemClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedUsersClient = new(baseUrl.AbsoluteUri, httpClient);
         }
 
         // Methods.
-        public Task AdminSetFreeResourcePinningAsync(
-            SwarmReference reference,
-            DateTimeOffset? freePinEndOfLife = null,
-            CancellationToken cancellationToken = default) =>
-            generatedResourcesClient.FreeAsync(reference.ToString(), freePinEndOfLife, cancellationToken);
-
         public async Task<IDictionary<SwarmHash, bool>> AreResourcesDownloadFundedAsync(
             IEnumerable<SwarmHash> resourceHashes,
             CancellationToken cancellationToken = default) =>
@@ -73,58 +59,15 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             CancellationToken cancellationToken = default) =>
             generatedUsersClient.BatchesPostAsync(depth, amount.ToPlurLong(), label, cancellationToken);
 
-        public async Task ChunksBulkUploadAsync(
-            SwarmChunk[] chunks,
-            PostageBatchId batchId,
-            CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(chunks, nameof(chunks));
-            
-            // Build payload.
-            List<byte> payload = [];
-            for (var j = 0; j < chunks.Length; j++)
-            {
-                var chunkBytes = chunks[j].GetFullPayload();
-                var chunkSizeByteArray = BitConverter.GetBytes((ushort)chunkBytes.Length);
-
-                //chunk size
-                payload.AddRange(chunkSizeByteArray);
-
-                //chunk data
-                payload.AddRange(chunkBytes.Span);
-                
-                //check hash
-                payload.AddRange(chunks[j].Hash.ToByteArray());
-            }
-            
-            var byteArrayPayload = payload.ToArray();
-            using var memoryStream = new MemoryStream(byteArrayPayload);
-            
-            await generatedChunksClient.ChunksBulkUploadAsync(
-                memoryStream,
-                swarm_postage_batch_id: batchId.ToString(),
-                cancellationToken).ConfigureAwait(false);
-        }
-
         public Task<bool> DefundResourceDownloadAsync(
             SwarmHash hash,
             CancellationToken cancellationToken = default) =>
             generatedResourcesClient.OffersDeleteAsync(hash.ToString(), cancellationToken);
 
-        public Task DilutePostageBatchAsync(
-            PostageBatchId batchId,
-            int depth,
-            CancellationToken cancellationToken = default) =>
-            generatedUsersClient.DiluteAsync(batchId.ToString(), depth, cancellationToken);
-
         public Task FundResourceDownloadAsync(
             SwarmHash hash,
             CancellationToken cancellationToken = default) =>
             generatedResourcesClient.OffersPostAsync(hash.ToString(), cancellationToken);
-
-        public async Task<ChainState> GetChainStateAsync(
-            CancellationToken cancellationToken = default) =>
-            new(await generatedSystemClient.ChainstateAsync(cancellationToken).ConfigureAwait(false));
 
         public async Task<UserCredit> GetCurrentUserCreditAsync(
             CancellationToken cancellationToken = default) =>
@@ -139,50 +82,16 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             (await generatedUsersClient.OfferedResourcesAsync(cancellationToken).ConfigureAwait(false))
             .Select(hash => new SwarmHash(hash));
 
-        public async Task<IEnumerable<SwarmReference>> GetPinFundedResourcesAsync(
-            CancellationToken cancellationToken = default) =>
-            (await generatedUsersClient.PinnedResourcesAsync(cancellationToken).ConfigureAwait(false))
-            .Select(h => new SwarmReference(h));
-
-        public async Task<PostageBatch> GetPostageBatchAsync(
-            PostageBatchId batchId,
-            CancellationToken cancellationToken = default)
-        {
-            var batchDto = await generatedUsersClient.BatchesGetAsync(
-                batchId.ToString(), cancellationToken).ConfigureAwait(false);
-            return new PostageBatch(
-                batchDto.Id,
-                BzzValue.FromPlurLong(batchDto.Value ?? 0),
-                (ulong)(batchDto.BlockNumber ?? 0),
-                batchDto.Depth,
-                batchDto.Exists ?? false,
-                batchDto.ImmutableFlag ?? false,
-                batchDto.Usable,
-                batchDto.Label,
-                TimeSpan.FromSeconds(batchDto.BatchTTL ?? 0),
-                (uint)(batchDto.Utilization ?? 0));
-        }
-
         public async Task<IEnumerable<PostageBatchRef>> GetOwnedPostageBatchesAsync(
             string? labelContainsFilter = null,
             CancellationToken cancellationToken = default) =>
             (await generatedUsersClient.BatchesGetSearchAsync(labelContainsFilter, cancellationToken).ConfigureAwait(false))
             .Select(pbr => new PostageBatchRef(pbr));
 
-        public async Task<ResourcePinStatus> GetResourcePinStatusAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default) =>
-            new(await generatedResourcesClient.PinGetAsync(reference.ToString(), cancellationToken).ConfigureAwait(false));
-
         public async Task<IEnumerable<string>> GetUsersFundingResourceDownloadAsync(
             SwarmHash hash,
             CancellationToken cancellationToken = default) =>
             await generatedResourcesClient.OffersGetAsync(hash.ToString(), cancellationToken).ConfigureAwait(false);
-
-        public async Task<IEnumerable<string>> GetUsersFundingResourcePinningAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default) =>
-            await generatedResourcesClient.UsersAsync(reference.ToString(), cancellationToken).ConfigureAwait(false);
 
         public async Task<WelcomePack> GetWelcomePackInfoAsync(
             CancellationToken cancellationToken = default) =>
@@ -191,12 +100,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         public Task RequireWelcomePackAsync(
             CancellationToken cancellationToken = default) =>
             generatedUsersClient.WelcomePostAsync(cancellationToken);
-
-        public Task TopUpPostageBatchAsync(
-            PostageBatchId batchId,
-            BzzValue amount,
-            CancellationToken cancellationToken = default) =>
-            generatedPostageClient.TopupAsync(batchId.ToString(), amount.ToPlurLong(), cancellationToken);
 
         public async Task<PostageBatchId?> TryGetNewPostageBatchIdFromPostageRefAsync(
             string postageReferenceId,

@@ -12,35 +12,18 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
 using Etherna.BeeNet.Models;
-using Etherna.BeeNet.Tools;
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Models;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ChainState = Etherna.Sdk.Users.Gateway.Models.ChainState;
 
 namespace Etherna.Sdk.Users.Gateway.Clients
 {
     public interface IEthernaUserGatewayClient
     {
         // Methods.
-        /// <summary>
-        /// Admins can set a free pin period for a resource
-        /// </summary>
-        /// <param name="reference">The swarm resource hash</param>
-        /// <param name="freePinEndOfLife">End of free period. Null for disable</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task AdminSetFreeResourcePinningAsync(
-            SwarmReference reference,
-            DateTimeOffset? freePinEndOfLife = null,
-            CancellationToken cancellationToken = default);
-
         /// <param name="resourceHashes">The swarm resource hashes list</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
@@ -61,25 +44,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             string? label = null,
             CancellationToken cancellationToken = default);
 
-        Task ChunksBulkUploadAsync(
-            SwarmChunk[] chunks,
-            PostageBatchId batchId,
-            CancellationToken cancellationToken = default);
-
         /// <param name="hash">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<bool> DefundResourceDownloadAsync(
             SwarmHash hash,
-            CancellationToken cancellationToken = default);
-
-        /// <param name="batchId">Postage batch Id</param>
-        /// <param name="depth">New postage batch depth</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task DilutePostageBatchAsync(
-            PostageBatchId batchId,
-            int depth,
             CancellationToken cancellationToken = default);
 
         /// <param name="hash">The swarm resource hash</param>
@@ -89,10 +58,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             SwarmHash hash,
             CancellationToken cancellationToken = default);
         
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<ChainState> GetChainStateAsync(CancellationToken cancellationToken = default);
-
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<UserCredit> GetCurrentUserCreditAsync(CancellationToken cancellationToken = default);
@@ -105,29 +70,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<IEnumerable<SwarmHash>> GetDownloadFundedResourcesByUserAsync(CancellationToken cancellationToken = default);
 
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<IEnumerable<SwarmReference>> GetPinFundedResourcesAsync(CancellationToken cancellationToken = default);
-
-        /// <param name="batchId">Postage batch Id</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<PostageBatch> GetPostageBatchAsync(
-            PostageBatchId batchId,
-            CancellationToken cancellationToken = default);
-
         /// <param name="labelContainsFilter">Filter only postage batches with label containing this string. Optional</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<IEnumerable<PostageBatchRef>> GetOwnedPostageBatchesAsync(
             string? labelContainsFilter = null,
-            CancellationToken cancellationToken = default);
-
-        /// <param name="reference">The swarm resource hash</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<ResourcePinStatus> GetResourcePinStatusAsync(
-            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="hash">The swarm resource hash</param>
@@ -137,13 +84,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             SwarmHash hash,
             CancellationToken cancellationToken = default);
 
-        /// <param name="reference">The swarm resource hash</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<IEnumerable<string>> GetUsersFundingResourcePinningAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default);
-
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<WelcomePack> GetWelcomePackInfoAsync(CancellationToken cancellationToken = default);
@@ -151,15 +91,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task RequireWelcomePackAsync(CancellationToken cancellationToken = default);
-
-        /// <param name="batchId">The postage batch Id</param>
-        /// <param name="amount">The amount to top up</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task TopUpPostageBatchAsync(
-            PostageBatchId batchId,
-            BzzValue amount,
-            CancellationToken cancellationToken = default);
 
         /// <param name="postageReferenceId">Postage batch reference Id</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
