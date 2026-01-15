@@ -24,8 +24,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         // Methods.
         Task ChunksBulkUploadAsync(
             SwarmChunk[] chunks,
-            PostageBatchId batchId,
-            bool swarmPin = false);
+            PostageBatchId batchId);
         
         /// <summary>
         /// Create a new batch.
@@ -45,15 +44,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             Action? onWaitingBatchUsable = null,
             Action? onBatchUsable = null);
 
-        Task<TagInfo> CreateTagAsync(SwarmHash hash);
-
         /// <summary>
         /// Delete pin.
         /// </summary>
         /// <param name="reference">Resource hash</param>
         Task DefundResourcePinningAsync(SwarmReference reference);
-
-        Task DeleteTagAsync(TagId tagId);
 
         /// <summary>
         /// Offer the content to all users.
@@ -62,23 +57,12 @@ namespace Etherna.Sdk.Users.Gateway.Services
         Task FundResourceDownloadAsync(SwarmHash hash);
 
         Task FundResourcePinningAsync(SwarmReference reference);
-
-        /// <summary>
-        /// Get the current price.
-        /// </summary>
-        Task<BzzValue> GetChainPriceAsync();
+        
+        Task<ChainState> GetChainStateAsync();
 
         Task<PostageBatch> GetPostageBatchInfoAsync(PostageBatchId batchId);
 
-        /// <summary>
-        /// Get usable batch.
-        /// </summary>
-        /// <param name="batchId">batch id</param>
-        Task<bool> IsBatchUsableAsync(PostageBatchId batchId);
-        
-        Task UpdateTagInfoAsync(TagId tagId, SwarmHash rootHash);
-
-        Task UploadChunkAsync(
+        Task<SwarmHash> UploadChunkAsync(
             PostageBatchId batchId,
             SwarmCac chunk,
             bool fundPinning = false,

@@ -29,28 +29,27 @@ namespace Etherna.Sdk.Users
             this IEthernaUserClientsBuilder builder,
             string gatewayBaseUrl = EthernaUserClientsBuilder.DefaultGatewayUrl)
         {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
             
             // Register client.
             var gatewayBaseUri = new Uri(gatewayBaseUrl, UriKind.Absolute);
-            builder.Services.AddSingleton<IBeeClient>(serviceProvider =>
+            builder.Services.AddSingleton<ISwarmClient>(serviceProvider =>
             {
                 var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>()!;
                 var httpClient = httpClientFactory.CreateClient(builder.HttpClientName);
                 
-                return new BeeClient(
-                    gatewayBaseUri,
+                return new SwarmClient(
+                    nodeUrl: gatewayBaseUri,
+                    apiCompatibility: SwarmClients.Beehive,
                     httpClient);
             });
             builder.Services.AddSingleton<IEthernaUserGatewayClient>(serviceProvider =>
             {
-                var beeClient = serviceProvider.GetRequiredService<IBeeClient>();
                 var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>()!;
                 var httpClient = httpClientFactory.CreateClient(builder.HttpClientName);
                 
                 return new EthernaUserGatewayClient(
                     gatewayBaseUri,
-                    beeClient,
                     httpClient);
             });
 

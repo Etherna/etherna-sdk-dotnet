@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 namespace Etherna.Sdk.Tools.UniversalFiles
 {
     public class SwarmUFile(
-        IBeeClient beeClient,
+        ISwarmClient swarmClient,
         UUri fileUri)
         : UFile(fileUri)
     {
@@ -41,7 +41,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             // Try to get file head.
             try
             {
-                var headers = await beeClient.TryGetFileHeadersAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
+                var headers = await swarmClient.TryGetFileHeadersAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
                 if (headers is null)
                     return (false, null);
             }
@@ -55,7 +55,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         {
             ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
             
-            var size = await beeClient.TryGetFileSizeAsync(SwarmAddress.FromString(absoluteUri.OriginalUri)).ConfigureAwait(false);
+            var size = await swarmClient.TryGetFileSizeAsync(SwarmAddress.FromString(absoluteUri.OriginalUri)).ConfigureAwait(false);
             if (size is null)
                 throw new InvalidOperationException();
             return (size.Value, null);
@@ -80,7 +80,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         {
             ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
             
-            var result = await beeClient.GetFileAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
+            var result = await swarmClient.GetFileAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
             
             // Try to extract the encoding from the Content-Type header.
             Encoding? contentEncoding = null;
@@ -99,7 +99,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
 
             return SwarmAddress.FromString(absoluteUri.OriginalUri).TryGetFileNameAsync(
-                new BeeClientChunkStore(beeClient));
+                new SwarmClientChunkStore(swarmClient));
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Etherna.Sdk.Users.Index.Clients
 {
     public class EthernaUserIndexClient(
         Uri baseUrl,
-        IBeeClient beeClient,
+        ISwarmClient swarmClient,
         HttpClient httpClient)
         : IEthernaUserIndexClient
     {
@@ -147,7 +147,7 @@ namespace Etherna.Sdk.Users.Index.Clients
 
         public async Task<PaginatedResult<VideoPreview>> GetLastPublishedVideosAsync(int? page = null, int? take = null, CancellationToken cancellationToken = default)
         {
-            var chunkStore = new BeeClientChunkStore(beeClient);
+            var chunkStore = new SwarmClientChunkStore(swarmClient);
             
             // Get API result.
             var result = await generatedVideosClient.Latest3Async(page, take, cancellationToken).ConfigureAwait(false);

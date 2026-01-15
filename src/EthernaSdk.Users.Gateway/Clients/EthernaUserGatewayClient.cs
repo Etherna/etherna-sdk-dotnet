@@ -40,21 +40,16 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         // Constructor.
         public EthernaUserGatewayClient(
             Uri baseUrl,
-            IBeeClient beeClient,
             HttpClient httpClient)
         {
-            ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
+            ArgumentNullException.ThrowIfNull(baseUrl);
 
-            BeeClient = beeClient;
             generatedChunksClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedPostageClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedResourcesClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedSystemClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedUsersClient = new(baseUrl.AbsoluteUri, httpClient);
         }
-        
-        // Properties.
-        public IBeeClient BeeClient { get; }
 
         // Methods.
         public Task AdminSetFreeResourcePinningAsync(
@@ -116,11 +111,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             CancellationToken cancellationToken = default) =>
             generatedResourcesClient.OffersDeleteAsync(hash.ToString(), cancellationToken);
 
-        public Task<bool> DefundResourcePinningAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default) =>
-            generatedResourcesClient.PinDeleteAsync(reference.ToString(), cancellationToken);
-
         public Task DilutePostageBatchAsync(
             PostageBatchId batchId,
             int depth,
@@ -132,28 +122,9 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             CancellationToken cancellationToken = default) =>
             generatedResourcesClient.OffersPostAsync(hash.ToString(), cancellationToken);
 
-        public Task FundResourcePinningAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default) =>
-            generatedResourcesClient.PinPostAsync(reference.ToString(), cancellationToken);
-
-        public Task<Stream> GetBytesAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.GetBytesAsync(
-                reference: reference,
-                cancellationToken: cancellationToken);
-
         public async Task<ChainState> GetChainStateAsync(
             CancellationToken cancellationToken = default) =>
             new(await generatedSystemClient.ChainstateAsync(cancellationToken).ConfigureAwait(false));
-
-        public Task<Stream> GetChunkAsync(
-            SwarmReference reference,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.GetChunkStreamAsync(
-                reference: reference,
-                cancellationToken: cancellationToken);
 
         public async Task<UserCredit> GetCurrentUserCreditAsync(
             CancellationToken cancellationToken = default) =>
@@ -167,13 +138,6 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             CancellationToken cancellationToken = default) =>
             (await generatedUsersClient.OfferedResourcesAsync(cancellationToken).ConfigureAwait(false))
             .Select(hash => new SwarmHash(hash));
-
-        public Task<FileResponse> GetFileAsync(
-            SwarmAddress address,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.GetFileAsync(
-                address: address,
-                cancellationToken: cancellationToken);
 
         public async Task<IEnumerable<SwarmReference>> GetPinFundedResourcesAsync(
             CancellationToken cancellationToken = default) =>
@@ -228,36 +192,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             CancellationToken cancellationToken = default) =>
             generatedUsersClient.WelcomePostAsync(cancellationToken);
 
-        public Task SendPssAsync(
-            string topic,
-            string targets,
-            PostageBatchId batchId,
-            string? recipient = null,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.SendPssAsync(topic, targets, batchId, recipient, cancellationToken);
-
         public Task TopUpPostageBatchAsync(
             PostageBatchId batchId,
             BzzValue amount,
             CancellationToken cancellationToken = default) =>
             generatedPostageClient.TopupAsync(batchId.ToString(), amount.ToPlurLong(), cancellationToken);
-
-        public async Task<FileResponse?> TryGetFeedAsync(
-            EthAddress owner,
-            SwarmFeedTopic topic,
-            long? at = null,
-            ulong? after = null,
-            SwarmFeedType type = SwarmFeedType.Sequence,
-            bool? swarmOnlyRootChunk = null,
-            CancellationToken cancellationToken = default) =>
-            await BeeClient.TryGetFeedAsync(
-                owner: owner,
-                topic: topic,
-                at: at,
-                after: after,
-                type: type,
-                swarmOnlyRootChunk: swarmOnlyRootChunk,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
 
         public async Task<PostageBatchId?> TryGetNewPostageBatchIdFromPostageRefAsync(
             string postageReferenceId,
@@ -274,79 +213,5 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                 return null;
             }
         }
-
-        public Task<SwarmReference> UploadBytesAsync(
-            Stream content,
-            PostageBatchId batchId,
-            bool swarmPin = false,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.UploadBytesAsync(
-                content,
-                batchId,
-                swarmPin: swarmPin,
-                cancellationToken: cancellationToken);
-
-        public Task<SwarmReference> UploadChunkAsync(
-            Stream chunkData,
-            PostageBatchId? batchId,
-            bool pinChunk = false,
-            TagId? tagId = null,
-            PostageStamp? presignedPostageStamp = null,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.UploadChunkAsync(
-                chunkData: chunkData,
-                batchId: batchId,
-                pinChunk: pinChunk,
-                tagId: tagId,
-                presignedPostageStamp: presignedPostageStamp,
-                cancellationToken: cancellationToken);
-        
-        public Task<SwarmReference> UploadDirectoryAsync(
-            string directoryPath,
-            PostageBatchId batchId,
-            bool pinDirectory = false,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.UploadDirectoryAsync(
-                directoryPath,
-                batchId,
-                swarmPin: pinDirectory,
-                cancellationToken: cancellationToken);
-
-        public Task<SwarmHash> UploadFeedManifestAsync(
-            SwarmFeedBase feed,
-            PostageBatchId batchId,
-            bool pinManifest = false,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.UploadFeedManifestAsync(
-                feed: feed,
-                batchId: batchId,
-                swarmPin: pinManifest,
-                cancellationToken: cancellationToken);
-
-        public Task<SwarmReference> UploadFileAsync(
-            Stream content,
-            PostageBatchId batchId,
-            string? name = null,
-            string? contentType = null,
-            bool pinFile = false,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.UploadFileAsync(
-                content,
-                batchId,
-                name: name,
-                contentType: contentType,
-                swarmPin: pinFile,
-                cancellationToken: cancellationToken);
-
-        public Task<SwarmHash> UploadSocAsync(
-            SwarmSoc soc,
-            PostageBatchId? batchId,
-            PostageStamp? presignedPostageStamp = null,
-            CancellationToken cancellationToken = default) =>
-            BeeClient.UploadSocAsync(
-                soc: soc,
-                batchId: batchId,
-                presignedPostageStamp: presignedPostageStamp,
-                cancellationToken: cancellationToken);
     }
 }

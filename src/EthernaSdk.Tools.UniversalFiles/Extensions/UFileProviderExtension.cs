@@ -23,17 +23,17 @@ namespace Etherna.Sdk.Tools.UniversalFiles.Extensions
             this IUFileProvider fileProvider,
             SwarmUUri uuri)
         {
-            ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
+            ArgumentNullException.ThrowIfNull(fileProvider);
             return (SwarmUFile)fileProvider.BuildNewUFile(uuri);
         }
 
         public static UFileProvider UseSwarmUFiles(
             this UFileProvider fileProvider,
-            IBeeClient beeClient)
+            ISwarmClient swarmClient)
         {
-            ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
+            ArgumentNullException.ThrowIfNull(fileProvider);
             
-            fileProvider.RegisterUUriType<SwarmUUri>(uuri => new SwarmUFile(beeClient, uuri));
+            fileProvider.RegisterUUriType<SwarmUUri>(uuri => new SwarmUFile(swarmClient, uuri));
             return fileProvider;
         }
     }

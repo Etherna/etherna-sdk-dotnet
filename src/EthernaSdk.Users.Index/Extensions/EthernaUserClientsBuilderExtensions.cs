@@ -30,18 +30,18 @@ namespace Etherna.Sdk.Users
             this IEthernaUserClientsBuilder builder,
             string indexBaseUrl = EthernaUserClientsBuilder.DefaultIndexUrl)
         {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
             
             builder.Services.AddScoped<IVideoManifestService, VideoManifestService>();
             
             // Register client.
             builder.Services.AddSingleton<IEthernaUserIndexClient>(serviceProvider =>
             {
-                var beeClient = serviceProvider.GetRequiredService<IBeeClient>();
+                var swarmClient = serviceProvider.GetRequiredService<ISwarmClient>();
                 var clientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                 return new EthernaUserIndexClient(
                     new Uri(indexBaseUrl, UriKind.Absolute),
-                    beeClient,
+                    swarmClient,
                     clientFactory.CreateClient(builder.HttpClientName));
             });
 
