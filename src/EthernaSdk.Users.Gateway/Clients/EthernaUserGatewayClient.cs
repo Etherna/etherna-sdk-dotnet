@@ -60,14 +60,14 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             generatedUsersClient.BatchesPostAsync(depth, amount.ToPlurLong(), label, cancellationToken);
 
         public Task<bool> DefundResourceDownloadAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default) =>
-            generatedResourcesClient.OffersDeleteAsync(hash.ToString(), cancellationToken);
+            generatedResourcesClient.OffersDeleteAsync(reference.ToString(), cancellationToken);
 
         public Task FundResourceDownloadAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default) =>
-            generatedResourcesClient.OffersPostAsync(hash.ToString(), cancellationToken);
+            generatedResourcesClient.OffersPostAsync(reference.ToString(), cancellationToken);
 
         public async Task<UserCredit> GetCurrentUserCreditAsync(
             CancellationToken cancellationToken = default) =>

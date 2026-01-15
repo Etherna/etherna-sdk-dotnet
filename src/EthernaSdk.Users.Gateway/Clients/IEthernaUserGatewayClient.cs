@@ -48,14 +48,14 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<bool> DefundResourceDownloadAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
 
         /// <param name="hash">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task FundResourceDownloadAsync(
-            SwarmHash hash,
+            SwarmReference reference,
             CancellationToken cancellationToken = default);
         
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
