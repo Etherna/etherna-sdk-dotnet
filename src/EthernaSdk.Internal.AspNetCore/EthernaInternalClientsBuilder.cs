@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Etherna.Sdk.Internal.Clients;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -19,36 +20,18 @@ using System.Net.Http;
 
 namespace Etherna.Sdk.Internal.AspNetCore
 {
-    internal sealed class EthernaInternalClientsBuilder : IEthernaInternalClientsBuilder
+    internal sealed class EthernaInternalClientsBuilder(
+        IServiceCollection services,
+        Uri ssoBaseUrl,
+        string tokenEndpoint,
+        ClientCredentialsTokenManagementBuilder clientCredentialsTokenManagementBuilder,
+        string httpClientName,
+        Action<HttpClient>? configureHttpClient)
+        : IEthernaInternalClientsBuilder
     {
         // Consts.
         private const string EthernaInternalCreditTokenClientName = "ethernaInternalCreditTokenClient";
         private const string EthernaInternalSsoTokenClientName = "ethernaInternalSsoTokenClient";
-
-        // Fields.
-        private readonly ClientCredentialsTokenManagementBuilder cctmBuilder;
-        private readonly Action<HttpClient>? configureHttpClient;
-        private readonly string httpClientName;
-        private readonly IServiceCollection services;
-        private readonly Uri ssoBaseUrl;
-        private readonly string tokenEndpoint;
-
-        // Constructor.
-        public EthernaInternalClientsBuilder(
-            IServiceCollection services,
-            Uri ssoBaseUrl,
-            string tokenEndpoint,
-            ClientCredentialsTokenManagementBuilder clientCredentialsTokenManagementBuilder,
-            string httpClientName,
-            Action<HttpClient>? configureHttpClient)
-        {
-            cctmBuilder = clientCredentialsTokenManagementBuilder;
-            this.configureHttpClient = configureHttpClient;
-            this.httpClientName = httpClientName;
-            this.services = services;
-            this.ssoBaseUrl = ssoBaseUrl;
-            this.tokenEndpoint = tokenEndpoint;
-        }
 
         // Methods.
         public IEthernaInternalClientsBuilder AddEthernaCreditClient(
@@ -57,20 +40,20 @@ namespace Etherna.Sdk.Internal.AspNetCore
             string clientSecret)
         {
             // Register client to token management.
-            cctmBuilder.AddClient(EthernaInternalCreditTokenClientName, options =>
+            clientCredentialsTokenManagementBuilder.AddClient(EthernaInternalCreditTokenClientName, options =>
             {
-                options.TokenEndpoint = tokenEndpoint;
+                options.TokenEndpoint = new Uri(tokenEndpoint);
 
-                options.ClientId = clientId;
-                options.ClientSecret = clientSecret;
+                options.ClientId = ClientId.Parse(clientId);
+                options.ClientSecret = ClientSecret.Parse(clientSecret);
 
-                options.Scope = "ethernaCredit_serviceInteract_api";
+                options.Scope = Scope.Parse("ethernaCredit_serviceInteract_api");
             });
 
             // Register http client.
             services.AddClientCredentialsHttpClient(
                 httpClientName,
-                EthernaInternalCreditTokenClientName,
+                ClientCredentialsClientName.Parse(EthernaInternalCreditTokenClientName),
                 configureHttpClient);
 
             // Register service.
@@ -90,20 +73,20 @@ namespace Etherna.Sdk.Internal.AspNetCore
             string clientSecret)
         {
             // Register client to token management.
-            cctmBuilder.AddClient(EthernaInternalSsoTokenClientName, options =>
+            clientCredentialsTokenManagementBuilder.AddClient(EthernaInternalSsoTokenClientName, options =>
             {
-                options.TokenEndpoint = tokenEndpoint;
+                options.TokenEndpoint = new Uri(tokenEndpoint);
 
-                options.ClientId = clientId;
-                options.ClientSecret = clientSecret;
+                options.ClientId = ClientId.Parse(clientId);
+                options.ClientSecret = ClientSecret.Parse(clientSecret);
 
-                options.Scope = "ethernaSso_userContactInfo_api";
+                options.Scope = Scope.Parse("ethernaSso_userContactInfo_api");
             });
 
             // Register http client.
             services.AddClientCredentialsHttpClient(
                 httpClientName,
-                EthernaInternalSsoTokenClientName,
+                ClientCredentialsClientName.Parse(EthernaInternalSsoTokenClientName),
                 configureHttpClient);
 
             // Register service.
