@@ -27,6 +27,7 @@ namespace Etherna.Sdk.Users
         [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
         public static IEthernaUserClientsBuilder AddEthernaGatewayClient(
             this IEthernaUserClientsBuilder builder,
+            SwarmClients apiCompatibility = SwarmClients.Beehive,
             string gatewayBaseUrl = EthernaUserClientsBuilder.DefaultGatewayUrl)
         {
             ArgumentNullException.ThrowIfNull(builder);
@@ -40,7 +41,7 @@ namespace Etherna.Sdk.Users
                 
                 return new SwarmClient(
                     nodeUrl: gatewayBaseUri,
-                    apiCompatibility: SwarmClients.Beehive,
+                    apiCompatibility: apiCompatibility,
                     httpClient);
             });
             builder.Services.AddSingleton<IEthernaUserGatewayClient>(serviceProvider =>
