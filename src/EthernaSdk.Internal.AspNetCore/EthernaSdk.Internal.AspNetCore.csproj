@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <PackageReference Include="Duende.AccessTokenManagement" Version="4.1.1" />
-    <PackageReference Include="GitVersion.MsBuild" Version="6.5.1">
+    <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
