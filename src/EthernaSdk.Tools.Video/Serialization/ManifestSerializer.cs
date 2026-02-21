@@ -1,14 +1,14 @@
 // Copyright 2020-present Etherna SA
 // This file is part of Etherna SDK .Net.
-// 
+//
 // Etherna SDK .Net is free software: you can redistribute it and/or modify it under the terms of the
 // GNU Lesser General Public License as published by the Free Software Foundation,
 // either version 3 of the License, or (at your option) any later version.
-// 
+//
 // Etherna SDK .Net is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
@@ -44,19 +44,19 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
             PropertyNameCaseInsensitive = true,
         };
-        
+
         // Static methods.
         public static async Task<(VideoManifest?, ValidationError[])> TryDeserializeManifest1Async(
             JsonElement manifestJsonElement,
             IReadOnlyChunkStore chunkStore)
         {
             ArgumentNullException.ThrowIfNull(chunkStore, nameof(chunkStore));
-            
+
             // Get manifest.
             var manifestDto = manifestJsonElement.Deserialize<Manifest1Dto>(jsonSerializerOptions);
             if (manifestDto is null)
                 return (null, [new ValidationError(ValidationErrorType.JsonConvert, "Empty json")]);
-            
+
             // Validate manifest.
             var validationErrors = manifestDto.GetValidationErrors();
             if (validationErrors.Length > 0)
@@ -78,7 +78,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                     [],
                     videoSourceChunkRef.Hash));
             }
-            
+
             //thumbnail
             var thumbnail = defaultThumbnail;
             if (manifestDto.Thumbnail is not null)
@@ -101,11 +101,10 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                     manifestDto.Thumbnail.Blurhash,
                     imgSources);
             }
-            
+
             //manifest
             return (new VideoManifest(
                 manifestDto.Thumbnail?.AspectRatio ?? 1,
-                manifestDto.BatchId is null ? (PostageBatchId?)null : PostageBatchId.FromString(manifestDto.BatchId),
                 DateTimeOffset.FromUnixTimeMilliseconds(manifestDto.CreatedAt ?? 0),
                 manifestDto.Description,
                 TimeSpan.FromSeconds(manifestDto.Duration),
@@ -119,7 +118,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                     DateTimeOffset.FromUnixTimeMilliseconds(manifestDto.UpdatedAt.Value) :
                     null), []);
         }
-        
+
         public static async Task<(VideoManifest?, ValidationError[])> TryDeserializeManifest2Async(
             SwarmReference manifestReference,
             JsonElement previewManifestJsonElement,
@@ -128,7 +127,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
         {
             ArgumentNullException.ThrowIfNull(chunksService, nameof(chunksService));
             ArgumentNullException.ThrowIfNull(chunkStore, nameof(chunkStore));
-            
+
             // Get preview manifest.
             var previewManifestDto = previewManifestJsonElement.Deserialize<Manifest2PreviewDto>(jsonSerializerOptions);
             if (previewManifestDto is null)
@@ -145,14 +144,14 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             }
             if (detailsManifestDto is null)
                 return (null, [new ValidationError(ValidationErrorType.JsonConvert, "Empty json details manifest")]);
-            
+
             // Validate manifests.
             List<ValidationError> errors = [];
             errors.AddRange(previewManifestDto.GetValidationErrors());
             errors.AddRange(detailsManifestDto.GetValidationErrors());
             if (errors.Count != 0)
                 return (null, errors.ToArray());
-            
+
             // Parse additional data.
             //captions
             List<VideoManifestCaptionSource> captions = [];
@@ -171,7 +170,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                     captionFileName,
                     captionChunkReference.Hash));
             }
-            
+
             //thumb sources
             List<VideoManifestImageSource> thumbnailSources = [];
             foreach (var thumbnailSourceDto in previewManifestDto.Thumbnail?.Sources ?? [])
@@ -195,78 +194,78 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 var thumbnailChunkRef = await SwarmReference.ResolveFromAddressAsync(
                     thumbnailAddress,
                     chunkStore).ConfigureAwait(false);
-                
+
                 var thumbnailSource = new VideoManifestImageSource(
                     fileName,
                     imageType,
                     thumbnailSourceDto.Width,
                     thumbnailChunkRef.Hash);
-                
+
                 thumbnailSources.Add(thumbnailSource);
             }
-                
+
             //video sources
             List<VideoManifestVideoSource> videoSources = [];
             foreach (var videoSourceDto in detailsManifestDto.Sources)
             {
                 var videoType = Enum.Parse<VideoType>(videoSourceDto.Type, true);
-                
+
                 var videoSourceSwarmUri = new SwarmUri(videoSourceDto.Path, UriKind.RelativeOrAbsolute);
                 var videoSourceSwarmAddress = videoSourceSwarmUri.ToSwarmAddress(manifestReference);
                 var videoSourceChunkRef = await SwarmReference.ResolveFromAddressAsync(
                     videoSourceSwarmAddress,
                     chunkStore).ConfigureAwait(false);
-                
+
                 var sourceDirectoryPath = VideoManifestVideoSource.GetManifestVideoSourceBaseDirectory(videoType);
                 if (!videoSourceDto.Path.StartsWith(sourceDirectoryPath, StringComparison.Ordinal))
                     return (null, [new ValidationError(ValidationErrorType.InvalidVideoSource, "Invalid video source path")]);
                 var sourceRelativePath = videoSourceDto.Path[sourceDirectoryPath.Length..];
-                
+
                 // Check for additional files.
                 List<VideoManifestVideoSourceAdditionalFile> additionalFiles = [];
                 switch (videoType)
                 {
                     case VideoType.Hls:
-                    {
-                        //if is master playlist, skip it
-                        if (videoSourceDto.Size == 0)
-                            break;
-                        
-                        //if is a stream playlist, read it from swarm
-                        var responseStream = await chunksService.GetFileStreamFromAddressAsync(
-                            videoSourceSwarmAddress, ManifestPathResolver.BrowserResolver, chunkStore).ConfigureAwait(false);
-                        using var memoryStream = new MemoryStream();
-                        await responseStream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                        memoryStream.Position = 0;
-                
-                        var byteArrayContent = memoryStream.ToArray();
-                        await responseStream.DisposeAsync().ConfigureAwait(false);
-
-                        var playlistString = Encoding.UTF8.GetString(byteArrayContent);
-                        var playlist = MediaPlaylist.LoadFromText(playlistString);
-                        
-                        var playlistDirectoryPath =
-                            (videoSourceSwarmAddress.Path[..videoSourceSwarmAddress.Path.LastIndexOf(SwarmAddress.Separator)] + SwarmAddress.Separator).TrimStart(SwarmAddress.Separator);
-                            
-                        //retrieve segments as additional files
-                        foreach (var segment in playlist.MediaSegments.First().Segments)
                         {
-                            var segmentPath = playlistDirectoryPath + segment.Uri;
-                            var segmentRelativePath = segmentPath[sourceDirectoryPath.Length..];
-                            
-                            var segmentSwarmAddress = new SwarmAddress(
-                                videoSourceSwarmAddress.Reference,
-                                segmentPath);
-                            
-                            additionalFiles.Add(new VideoManifestVideoSourceAdditionalFile(
-                                segmentRelativePath,
-                                (await SwarmReference.ResolveFromAddressAsync(
-                                    segmentSwarmAddress,
-                                    chunkStore).ConfigureAwait(false)).Hash));
+                            //if is master playlist, skip it
+                            if (videoSourceDto.Size == 0)
+                                break;
+
+                            //if is a stream playlist, read it from swarm
+                            var responseStream = await chunksService.GetFileStreamFromAddressAsync(
+                                videoSourceSwarmAddress, ManifestPathResolver.BrowserResolver, chunkStore).ConfigureAwait(false);
+                            using var memoryStream = new MemoryStream();
+                            await responseStream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                            memoryStream.Position = 0;
+
+                            var byteArrayContent = memoryStream.ToArray();
+                            await responseStream.DisposeAsync().ConfigureAwait(false);
+
+                            var playlistString = Encoding.UTF8.GetString(byteArrayContent);
+                            var playlist = MediaPlaylist.LoadFromText(playlistString);
+
+                            var playlistDirectoryPath =
+                                (videoSourceSwarmAddress.Path[..videoSourceSwarmAddress.Path.LastIndexOf(SwarmAddress.Separator)] + SwarmAddress.Separator).TrimStart(SwarmAddress.Separator);
+
+                            //retrieve segments as additional files
+                            foreach (var segment in playlist.MediaSegments.First().Segments)
+                            {
+                                var segmentPath = playlistDirectoryPath + segment.Uri;
+                                var segmentRelativePath = segmentPath[sourceDirectoryPath.Length..];
+
+                                var segmentSwarmAddress = new SwarmAddress(
+                                    videoSourceSwarmAddress.Reference,
+                                    segmentPath);
+
+                                additionalFiles.Add(new VideoManifestVideoSourceAdditionalFile(
+                                    segmentRelativePath,
+                                    (await SwarmReference.ResolveFromAddressAsync(
+                                        segmentSwarmAddress,
+                                        chunkStore).ConfigureAwait(false)).Hash));
+                            }
+
+                            break;
                         }
-                        
-                        break;
-                    }
                 }
 
                 var videoSource = new VideoManifestVideoSource(
@@ -283,7 +282,6 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             // Build manifest.
             return (new VideoManifest(
                 detailsManifestDto.AspectRatio,
-                detailsManifestDto.BatchId,
                 DateTimeOffset.FromUnixTimeSeconds(previewManifestDto.CreatedAt),
                 detailsManifestDto.Description,
                 TimeSpan.FromSeconds(previewManifestDto.Duration),

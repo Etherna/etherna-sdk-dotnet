@@ -1,14 +1,14 @@
 // Copyright 2020-present Etherna SA
 // This file is part of Etherna SDK .Net.
-// 
+//
 // Etherna SDK .Net is free software: you can redistribute it and/or modify it under the terms of the
 // GNU Lesser General Public License as published by the Free Software Foundation,
 // either version 3 of the License, or (at your option) any later version.
-// 
+//
 // Etherna SDK .Net is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
@@ -47,7 +47,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             get
             {
                 var tests = new List<ParseManifestTestElement>();
-                
+
                 //v2.1
                 {
                     tests.Add(new(
@@ -104,11 +104,9 @@ namespace Etherna.Sdk.Tools.Video.Services
                             return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
-                            "845238e3bd8110f88709768946394b8bcf562f0f0253c3c39df1cacaf3800ddd", 
+                            "845238e3bd8110f88709768946394b8bcf562f0f0253c3c39df1cacaf3800ddd",
                             new VideoManifest(
                                 1.7777778f,
-                                PostageBatchId.FromString(
-                                    "9d4d4e923cc054a94f7884772f5f4e588be0c3ec10c3ec397b64c7307c4c3336"),
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00"),
                                 "my description",
                                 TimeSpan.FromSeconds(587),
@@ -187,7 +185,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00")),
                             [])));
                 }
-                
+
                 //v2.0
                 {
                     tests.Add(new(
@@ -244,8 +242,6 @@ namespace Etherna.Sdk.Tools.Video.Services
                             "1e43dd2d93290662dc37598b2d12ce1e3ac39f85f07195087f593a768c69b4c1",
                             new VideoManifest(
                                 1.7777778f,
-                                PostageBatchId.FromString(
-                                    "9d4d4e923cc054a94f7884772f5f4e588be0c3ec10c3ec397b64c7307c4c3336"),
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00"),
                                 "my description",
                                 TimeSpan.FromSeconds(587),
@@ -308,7 +304,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00")),
                             [])));
                 }
-                
+
                 //v1.1
                 {
                     tests.Add(new(
@@ -317,14 +313,13 @@ namespace Etherna.Sdk.Tools.Video.Services
                             var manifest = BuildNewManifestHelper(chunkStore);
                             AddRootFileToManifestHelper(manifest, "manifest", await UploadStringFileHelper(
                                 """{"v":"1.1","title":"title 3","description":"test!!!","duration":19,"originalQuality":"1954p","ownerAddress":"0x6163C4b8264a03CCAc412B83cbD1B551B6c6C246","createdAt":1660397733617,"updatedAt":1660397733617,"thumbnail":{"blurhash":"UTHoa;-VEVO=??v]SlOu2ep0slR:kisia*bJ","aspectRatio":1.7777777777777777,"sources":{"720w":"5d69d94f1ffa17560a88abc4a99aa40b0cabe6012766f51e5c19193887adacb1","480w":"0b7425036143ed65932ac64cd6c4ddb4f2fd3e9bd51ed0f13bd406926c45c325"}},"sources":[{"reference":"e44671417466df08d3b67d74a081021ab2bba70224fc0d6e4d00c35d80328c6c","quality":"1954p","size":3739997,"bitrate":1574736}],"batchId":"5d35cbf4cea6349c1f74340ce9f0befd7a60a17426508da7b205871d683a3a23"}""", chunkStore));
-                
+
                             return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
                             "8c831938f7f10cc57a8a68a55f473868324e0c3dafe9313bfd70f4343abedb91",
                             new VideoManifest(
                                 1.7777777777777777f,
-                                PostageBatchId.FromString("5d35cbf4cea6349c1f74340ce9f0befd7a60a17426508da7b205871d683a3a23"),
                                 DateTimeOffset.Parse("8/13/2022 1:35:33.617 PM +00:00"),
                                 "test!!!",
                                 TimeSpan.FromSeconds(19),
@@ -359,7 +354,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                                 updatedAt: DateTimeOffset.Parse("8/13/2022 1:35:33.617 PM +00:00")),
                             [])));
                 }
-                
+
                 //v1.0
                 {
                     tests.Add(new(
@@ -368,14 +363,13 @@ namespace Etherna.Sdk.Tools.Video.Services
                             var manifest = BuildNewManifestHelper(chunkStore);
                             AddRootFileToManifestHelper(manifest, "manifest", await UploadStringFileHelper(
                                 """{"title":"Test 1","description":"desc","createdAt":1645091199100,"duration":18,"originalQuality":"720p","ownerAddress":"0x6163C4b8264a03CCAc412B83cbD1B551B6c6C246","thumbnail":{"blurhash":"UTHoa;-VEVO=??v]SlOu2ep0slR:kisia*bJ","aspectRatio":1.7777777777777777,"sources":{"720w":"5d69d94f1ffa17560a88abc4a99aa40b0cabe6012766f51e5c19193887adacb1","480w":"0b7425036143ed65932ac64cd6c4ddb4f2fd3e9bd51ed0f13bd406926c45c325"}},"sources":[{"quality":"720p","reference":"94f4fcb1a902597c2bc53c5b48637af952a99328ec299f33e129740818a9e302","size":448350,"bitrate":216398}],"v":"1.0"}""", chunkStore));
-                
+
                             return (await manifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false)).Hash;
                         },
                         new PublishedVideoManifest(
                             "4a6dc04a9c07b9987ae18e3e8ea3185e828efdce9e27ea30ad644b762b531cb4",
                             new VideoManifest(
                                 1.7777777777777777f,
-                                PostageBatchId.Zero,
                                 DateTimeOffset.Parse("2/17/2022 9:46:39.100 AM +00:00"),
                                 "desc",
                                 TimeSpan.FromSeconds(18),
@@ -421,10 +415,9 @@ namespace Etherna.Sdk.Tools.Video.Services
         {
             // Setup.
             var videoManifestService = new VideoManifestService(new ChunkService());
-            
+
             var videoManifest = new VideoManifest(
                 aspectRatio: 0.123f,
-                batchId: "f389278a2fa242de94e858e318bbfa7c10489533797ff923f9aa4524fabfcd34",
                 createdAt: new DateTimeOffset(2024, 07, 04, 16, 45, 42, TimeSpan.Zero),
                 description: "My description",
                 duration: TimeSpan.FromSeconds(42),
@@ -477,7 +470,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             var result = await videoManifestService.CreateVideoManifestChunksAsync(
                 videoManifest,
                 chunkDirectory.FullName);
-            
+
             // Assert.
             Assert.Equal("dbdf9da90a4c1ad04899527ec7a6b35e3cac07709947ce23ee01ff3526cf494d", result);
             Assert.Equal(
@@ -492,35 +485,35 @@ namespace Etherna.Sdk.Tools.Video.Services
                     "e250fc8865894b98b21a28002decf162874f00a81f44c8af96c1249bef84c3fc.cac"
                 ],
                 Directory.GetFiles(chunkDirectory.FullName).Select(Path.GetFileName).Order());
-            
+
             // Cleanup.
             Directory.Delete(chunkDirectory.FullName, true);
         }
-        
+
         [Theory, MemberData(nameof(ParseManifestTests))]
         public async Task ParseManifestAsync(ParseManifestTestElement test)
         {
             ArgumentNullException.ThrowIfNull(test, nameof(test));
-            
+
             // Setup.
             var chunkStore = new MemoryChunkStore();
             var rootHash = await test.UploadContentsAsync(chunkStore);
             VideoManifestService videoManifestService = new(new ChunkService());
-        
+
             // Action.
             var videoManifest = await videoManifestService.GetPublishedVideoManifestAsync(rootHash, chunkStore);
-        
+
             // Assert.
             Assert.Equal(test.ExpectedManifest, videoManifest);
         }
-        
+
         // Helpers.
         private static void AddFileToManifestHelper(
             WritableMantarayManifest manifest,
             string path,
             SwarmReference fileReference) =>
             manifest.Add(path, ManifestEntry.NewFile(fileReference, new Dictionary<string, string>()));
-        
+
         private static void AddRootFileToManifestHelper(
             WritableMantarayManifest manifest,
             string rootFileName,
@@ -548,7 +541,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 null);
             return manifest;
         }
-        
+
         private static async Task<SwarmReference> UploadStringFileHelper(
             string strValue,
             IChunkStore chunkStore)

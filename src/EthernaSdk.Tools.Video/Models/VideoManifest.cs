@@ -1,14 +1,14 @@
 // Copyright 2020-present Etherna SA
 // This file is part of Etherna SDK .Net.
-// 
+//
 // Etherna SDK .Net is free software: you can redistribute it and/or modify it under the terms of the
 // GNU Lesser General Public License as published by the Free Software Foundation,
 // either version 3 of the License, or (at your option) any later version.
-// 
+//
 // Etherna SDK .Net is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
@@ -29,7 +29,6 @@ namespace Etherna.Sdk.Tools.Video.Models
     [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase")]
     public class VideoManifest(
         float aspectRatio,
-        PostageBatchId? batchId,
         DateTimeOffset createdAt,
         string description,
         TimeSpan duration,
@@ -50,7 +49,6 @@ namespace Etherna.Sdk.Tools.Video.Models
 
         // Properties.
         public float AspectRatio { get; } = aspectRatio;
-        public PostageBatchId BatchId { get; set; } = batchId ?? PostageBatchId.Zero; //can be updated later
         public IEnumerable<(SwarmUri Uri, VideoManifestCaptionSource Source)> CaptionSources { get; }
             = captionSources.Select(s => (new SwarmUri($"captions/{s.FileName}", UriKind.Relative), s));
         public DateTimeOffset CreatedAt { get; } = createdAt;
@@ -66,7 +64,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             = videoSources.Select(s => (new SwarmUri(
                 VideoManifestVideoSource.GetManifestVideoSourceBaseDirectory(s.VideoType) + s.SourceRelativePath,
                 UriKind.Relative), s));
-        
+
         // Methods.
         public override bool Equals(object? obj)
         {
@@ -74,7 +72,6 @@ namespace Etherna.Sdk.Tools.Video.Models
             if (obj is not VideoManifest other) return false;
             return GetType() == other.GetType() &&
                    AspectRatio.Equals(other.AspectRatio) &&
-                   BatchId.Equals(other.BatchId) &&
                    CaptionSources.SequenceEqual(other.CaptionSources) &&
                    DateTimeOffset.Equals(CreatedAt, other.CreatedAt) &&
                    string.Equals(Description, other.Description, StringComparison.Ordinal) &&
@@ -100,13 +97,12 @@ namespace Etherna.Sdk.Tools.Video.Models
             string.GetHashCode(PersonalDataRaw, StringComparison.Ordinal) ^
             Thumbnail.GetHashCode() ^
             VideoSources.GetHashCode();
-        
+
         public string SerializeDetailsManifest()
         {
             var manifestDetails = new Manifest2DetailsDto(
                 description: Description,
                 aspectRatio: AspectRatio,
-                batchId: BatchId,
                 personalData: PersonalDataRaw,
                 captions: CaptionSources.Select(s => new Manifest2CaptionSourceDto(
                     s.Source.Label,
@@ -137,7 +133,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                         path: s.Uri))));
             return JsonSerializer.Serialize(manifestPreview, jsonSerializerOptions);
         }
-        
+
         // Helpers.
         private static VideoManifestPersonalData? TryParsePersonalData(string? personalDataRaw)
         {
