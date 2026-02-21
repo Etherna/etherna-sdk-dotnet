@@ -148,8 +148,8 @@ namespace Etherna.Sdk.Tools.Video.Services
             }
             
             //add encoded thumbnail files, only if uri is relative
-            foreach (var thumbnailSource in manifest.Thumbnail.Sources.Where(
-                         ts => ts.Uri.UriKind == UriKind.Relative))
+            foreach (var thumbnailSource in manifest.Thumbnail?.Sources.Where(
+                         ts => ts.Uri.UriKind == UriKind.Relative) ?? [])
             {
                 mantarayManifest.Add(
                     thumbnailSource.Uri.ToString(),

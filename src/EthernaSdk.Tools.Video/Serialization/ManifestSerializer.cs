@@ -34,11 +34,6 @@ namespace Etherna.Sdk.Tools.Video.Serialization
 {
     public static class ManifestSerializer
     {
-        // Fields.
-        private static readonly VideoManifestImage defaultThumbnail = new(
-            1.8f,
-            "UcGkx38v?CKhoej[j[jtM|bHs:jZjaj[j@ay",
-            [new VideoManifestImageSource("thumb.jpg", ImageType.Jpeg, 100, SwarmReference.PlainZero)]);
         private static readonly JsonSerializerOptions jsonSerializerOptions = new()
         {
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
@@ -80,7 +75,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             }
             
             //thumbnail
-            var thumbnail = defaultThumbnail;
+            VideoManifestImage? thumbnail = null;
             if (manifestDto.Thumbnail is not null)
             {
                 List<VideoManifestImageSource> imgSources = [];
@@ -173,36 +168,45 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             }
             
             //thumb sources
-            List<VideoManifestImageSource> thumbnailSources = [];
-            foreach (var thumbnailSourceDto in previewManifestDto.Thumbnail?.Sources ?? [])
+            VideoManifestImage? thumbnail = null;
+            if (previewManifestDto.Thumbnail is not null)
             {
-                var imageType = Enum.Parse<ImageType>(thumbnailSourceDto.Type, true);
+                List<VideoManifestImageSource> thumbnailSources = [];
+                foreach (var thumbnailSourceDto in previewManifestDto.Thumbnail.Sources ?? [])
+                {
+                    var imageType = Enum.Parse<ImageType>(thumbnailSourceDto.Type, true);
 
-                var fileName = thumbnailSourceDto.Path.Split(SwarmAddress.Separator).Last();
-                if (!Path.HasExtension(fileName))
-                    fileName += imageType switch
-                    {
-                        ImageType.Avif => ".avif",
-                        ImageType.Jpeg => ".jpeg",
-                        ImageType.Png => ".png",
-                        ImageType.Webp => ".webp",
-                        _ => throw new InvalidOperationException()
-                    };
+                    var fileName = thumbnailSourceDto.Path.Split(SwarmAddress.Separator).Last();
+                    if (!Path.HasExtension(fileName))
+                        fileName += imageType switch
+                        {
+                            ImageType.Avif => ".avif",
+                            ImageType.Jpeg => ".jpeg",
+                            ImageType.Png => ".png",
+                            ImageType.Webp => ".webp",
+                            _ => throw new InvalidOperationException()
+                        };
 
-                var swarmUri = new SwarmUri(thumbnailSourceDto.Path, UriKind.RelativeOrAbsolute);
+                    var swarmUri = new SwarmUri(thumbnailSourceDto.Path, UriKind.RelativeOrAbsolute);
 
-                var thumbnailAddress = swarmUri.ToSwarmAddress(manifestReference);
-                var thumbnailChunkRef = await SwarmReference.ResolveFromAddressAsync(
-                    thumbnailAddress,
-                    chunkStore).ConfigureAwait(false);
-                
-                var thumbnailSource = new VideoManifestImageSource(
-                    fileName,
-                    imageType,
-                    thumbnailSourceDto.Width,
-                    thumbnailChunkRef.Hash);
-                
-                thumbnailSources.Add(thumbnailSource);
+                    var thumbnailAddress = swarmUri.ToSwarmAddress(manifestReference);
+                    var thumbnailChunkRef = await SwarmReference.ResolveFromAddressAsync(
+                        thumbnailAddress,
+                        chunkStore).ConfigureAwait(false);
+                    
+                    var thumbnailSource = new VideoManifestImageSource(
+                        fileName,
+                        imageType,
+                        thumbnailSourceDto.Width,
+                        thumbnailChunkRef.Hash);
+                    
+                    thumbnailSources.Add(thumbnailSource);
+                }
+
+                thumbnail = new VideoManifestImage(
+                    previewManifestDto.Thumbnail.AspectRatio,
+                    previewManifestDto.Thumbnail.Blurhash,
+                    thumbnailSources);
             }
                 
             //video sources
@@ -291,11 +295,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 previewManifestDto.OwnerAddress,
                 detailsManifestDto.PersonalData,
                 videoSources,
-                previewManifestDto.Thumbnail is null ? defaultThumbnail :
-                    new VideoManifestImage(
-                        previewManifestDto.Thumbnail.AspectRatio,
-                        previewManifestDto.Thumbnail.Blurhash,
-                        thumbnailSources),
+                thumbnail,
                 captions,
                 previewManifestDto.UpdatedAt.HasValue ?
                     DateTimeOffset.FromUnixTimeSeconds(previewManifestDto.UpdatedAt.Value) :
