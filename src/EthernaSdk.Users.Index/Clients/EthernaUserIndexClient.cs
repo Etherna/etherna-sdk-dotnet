@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using VoteValue = Etherna.Sdk.Users.Index.Models.VoteValue;
 
 namespace Etherna.Sdk.Users.Index.Clients
 {
@@ -55,7 +56,7 @@ namespace Etherna.Sdk.Users.Index.Clients
             generatedSystemClient.VideoAsync(videoId, cancellationToken);
 
         public Task AdminReindexAllVideosAsync(CancellationToken cancellationToken = default) =>
-            generatedSearchClient.ReindexAsync(cancellationToken);
+            generatedSearchClient.RebuildAsync(cancellationToken);
 
         public async Task<Comment> CreateCommentAsync(
             string videoId,
@@ -67,13 +68,13 @@ namespace Etherna.Sdk.Users.Index.Clients
                 commentText,
                 cancellationToken).ConfigureAwait(false);
             return new Comment(
-                id: response.Id,
+                id: response.Id!,
                 creationDateTime: response.CreationDateTime,
                 isEditable: response.IsEditable,
                 isFrozen: response.IsFrozen,
                 ownerAddress: response.OwnerAddress,
-                textHistory: response.TextHistory,
-                videoId: response.VideoId);
+                textHistory: response.TextHistory ?? new Dictionary<string, string>(),
+                videoId: response.VideoId!);
         }
 
         public Task DeleteOwnedCommentAsync(string commentId, CancellationToken cancellationToken = default) =>
@@ -129,7 +130,7 @@ namespace Etherna.Sdk.Users.Index.Clients
         {
             var response = await generatedUsersClient.CurrentAsync(cancellationToken).ConfigureAwait(false);
             return new IndexUserInfo(
-                response.Id,
+                response.Id!,
                 response.Address,
                 response.CreationDateTime,
                 response.IsSuperModerator);
@@ -154,7 +155,7 @@ namespace Etherna.Sdk.Users.Index.Clients
 
             // Build response.
             List<VideoPreview> videoPreviews = [];
-            foreach (var v in result.Elements.Where(v => v.Hash is not null))
+            foreach (var v in (result.Elements ?? []).Where(v => v.Hash is not null))
             {
                 try
                 {
@@ -192,7 +193,7 @@ namespace Etherna.Sdk.Users.Index.Clients
                     videoPreviews.Add(new VideoPreview(
                         reference: v.Hash is not null ?
                             v.Hash : (SwarmReference?)null,
-                        id: v.Id,
+                        id: v.Id!,
                         createdAt: v.CreatedAt,
                         duration: v.Duration,
                         ownerAddress: v.OwnerAddress,
@@ -220,8 +221,8 @@ namespace Etherna.Sdk.Users.Index.Clients
         {
             var result = await generatedUsersClient.List2Async(page, take, cancellationToken).ConfigureAwait(false);
             return new PaginatedResult<IndexUserInfo>(
-                result.Elements.Select(u => new IndexUserInfo(
-                    id: u.Id,
+                (result.Elements ?? []).Select(u => new IndexUserInfo(
+                    id: u.Id!,
                     address: u.Address,
                     creationDateTime: u.CreationDateTime,
                     null)),
@@ -237,7 +238,7 @@ namespace Etherna.Sdk.Users.Index.Clients
         {
             var response = await generatedUsersClient.UsersGetAsync(address, cancellationToken).ConfigureAwait(false);
             return new IndexUserInfo(
-                id: response.Id,
+                id: response.Id!,
                 address: response.Address,
                 creationDateTime: response.CreationDateTime,
                 null);
@@ -264,14 +265,14 @@ namespace Etherna.Sdk.Users.Index.Clients
         {
             var result = await generatedVideosClient.Comments3Async(videoId, page, take, cancellationToken).ConfigureAwait(false);
             return new PaginatedResult<Comment>(
-                result.Elements.Select(c => new Comment(
-                    id: c.Id,
+                (result.Elements ?? []).Select(c => new Comment(
+                    id: c.Id!,
                     creationDateTime: c.CreationDateTime,
                     isEditable: c.IsEditable,
                     isFrozen: c.IsFrozen,
                     ownerAddress: c.OwnerAddress,
-                    textHistory: c.TextHistory,
-                    videoId: c.VideoId)),
+                    textHistory: c.TextHistory ?? new Dictionary<string, string>(),
+                    videoId: c.VideoId!)),
                 result.TotalElements,
                 result.PageSize,
                 result.CurrentPage,
@@ -288,7 +289,7 @@ namespace Etherna.Sdk.Users.Index.Clients
             var result = await generatedUsersClient.Videos3Async(userAddress, page, take, cancellationToken).ConfigureAwait(false);
 
             List<IndexedVideo> indexedVideos = [];
-            foreach (var videoDto in result.Elements)
+            foreach (var videoDto in result.Elements ?? [])
                 try
                 {
                     var indexedVideo = BuildIndexedVideo(videoDto);
@@ -362,12 +363,12 @@ namespace Etherna.Sdk.Users.Index.Clients
             generatedVideosClient.Update2Async(videoId, newManifestReference.ToString(), cancellationToken);
 
         public Task VotesVideoAsync(string id, VoteValue value, CancellationToken cancellationToken = default) =>
-            generatedVideosClient.VotesAsync(id, Enum.Parse<Value>(value.ToString()), cancellationToken);
+            generatedVideosClient.VotesAsync(id, Enum.Parse<Sdk.Index.GenClients.VoteValue>(value.ToString()), cancellationToken);
         
         // Helpers.
         private static IndexedVideo BuildIndexedVideo(Video2Dto videoDto)
         {
-            ArgumentNullException.ThrowIfNull(videoDto, nameof(videoDto));
+            ArgumentNullException.ThrowIfNull(videoDto);
 
             // Build published video manifest.
             SwarmReference? lastValidManifestReference = null;
@@ -377,7 +378,7 @@ namespace Etherna.Sdk.Users.Index.Clients
             // Build indexed video.
             VideoManifestPersonalData.TryDeserialize(videoDto.LastValidManifest?.PersonalData, out var personalData);
             return new IndexedVideo(
-                id: videoDto.Id,
+                id: videoDto.Id!,
                 creationDateTime: videoDto.CreationDateTime,
                 currentVoteValue: videoDto.CurrentVoteValue.HasValue ?
                     Enum.Parse<VoteValue>(videoDto.CurrentVoteValue.Value.ToString()) : null,
