@@ -47,7 +47,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             bool createDirectory = true,
             IPostageStampIssuer? postageStampIssuer = null)
         {
-            ArgumentNullException.ThrowIfNull(manifest, nameof(manifest));
+            ArgumentNullException.ThrowIfNull(manifest);
             
             // Serialize manifest.
             var previewManifest = manifest.SerializePreviewManifest();

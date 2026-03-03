@@ -30,7 +30,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         // Public static methods.
         public static UUriKind GetUriKind(string uri)
         {
-            ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+            ArgumentNullException.ThrowIfNull(uri);
 
             var uriKind = UUriKind.None;
 
@@ -62,7 +62,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
         protected internal override UUri? TryGetParentDirectoryAsAbsoluteUri(UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             switch (absoluteUri.UriKind)
             {
@@ -85,7 +85,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             string? baseDirectory,
             UUriKind uriKind)
         {
-            ArgumentNullException.ThrowIfNull(originalUri, nameof(originalUri));
+            ArgumentNullException.ThrowIfNull(originalUri);
             
             // Verify base directory is absolute.
             if ((uriKind & UUriKind.Relative) != 0 &&

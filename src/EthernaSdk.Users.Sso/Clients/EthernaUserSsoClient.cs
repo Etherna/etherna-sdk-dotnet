@@ -29,7 +29,7 @@ namespace Etherna.Sdk.Users.Sso.Clients
         // Constructor.
         public EthernaUserSsoClient(Uri baseUrl, HttpClient httpClient)
         {
-            ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
+            ArgumentNullException.ThrowIfNull(baseUrl);
 
             generatedClient = new IdentityClient(baseUrl.ToString(), httpClient);
         }

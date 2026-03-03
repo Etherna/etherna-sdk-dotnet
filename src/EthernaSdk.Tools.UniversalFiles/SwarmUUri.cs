@@ -28,7 +28,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
         public static UUriKind GetUriKind(string uri)
         {
-            ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+            ArgumentNullException.ThrowIfNull(uri);
             return SwarmReference.IsValidReference(uri.Split(SwarmAddress.Separator)[0])
                 ? UUriKind.OnlineAbsolute
                 : UUriKind.OnlineRelative;
@@ -45,7 +45,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             string? baseDirectory,
             UUriKind uriKind)
         {
-            ArgumentNullException.ThrowIfNull(originalUri, nameof(originalUri));
+            ArgumentNullException.ThrowIfNull(originalUri);
 
             // Resolve absolute url.
             switch (uriKind)

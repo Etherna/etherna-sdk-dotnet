@@ -36,7 +36,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         
         public UFile BuildNewUFile(UUri uuri)
         {
-            ArgumentNullException.ThrowIfNull(uuri, nameof(uuri));
+            ArgumentNullException.ThrowIfNull(uuri);
             
             var builder = uFileBuilders[uuri.GetType()];
             return builder(uuri);
@@ -51,7 +51,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             string? baseDirectory = null,
             BasicUUri? outputUUri = null)
         {
-            ArgumentNullException.ThrowIfNull(inputUFile, nameof(inputUFile));
+            ArgumentNullException.ThrowIfNull(inputUFile);
 
             // If it's already a local file, skip file retrieve.
             if (inputUFile is BasicUFile basicUFile &&

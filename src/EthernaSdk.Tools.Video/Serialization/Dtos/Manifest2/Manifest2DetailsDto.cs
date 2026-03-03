@@ -37,14 +37,12 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2
         public Manifest2DetailsDto(
             string description,
             float aspectRatio,
-            PostageBatchId batchId,
             string? personalData,
             IEnumerable<Manifest2CaptionSourceDto> captions,
             IEnumerable<Manifest2VideoSourceDto> sources)
         {
             Description = description;
             AspectRatio = aspectRatio;
-            BatchId = batchId.ToString();
             PersonalData = personalData;
             Captions = captions;
             Sources = sources;
@@ -57,7 +55,6 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2
         //from v2.0
         public string Description { get; set; }
         public float AspectRatio { get; set; }
-        public string BatchId { get; set; }
         public string? PersonalData
         {
             get => _personalData;

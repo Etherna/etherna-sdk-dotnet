@@ -25,7 +25,7 @@ namespace Etherna.Sdk.Users
         public static IEthernaUserClientsBuilder AddEthernaSsoClient(
             this IEthernaUserClientsBuilder builder)
         {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
             
             // Register client.
             builder.Services.AddSingleton<IEthernaUserSsoClient>(serviceProvider =>

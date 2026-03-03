@@ -29,7 +29,6 @@ namespace Etherna.Sdk.Tools.Video.Models
     [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase")]
     public class VideoManifest(
         float aspectRatio,
-        PostageBatchId? batchId,
         DateTimeOffset createdAt,
         string description,
         TimeSpan duration,
@@ -50,7 +49,6 @@ namespace Etherna.Sdk.Tools.Video.Models
 
         // Properties.
         public float AspectRatio { get; } = aspectRatio;
-        public PostageBatchId BatchId { get; set; } = batchId ?? PostageBatchId.Zero; //can be updated later
         public IEnumerable<(SwarmUri Uri, VideoManifestCaptionSource Source)> CaptionSources { get; }
             = captionSources.Select(s => (new SwarmUri($"captions/{s.FileName}", UriKind.Relative), s));
         public DateTimeOffset CreatedAt { get; } = createdAt;
@@ -74,7 +72,6 @@ namespace Etherna.Sdk.Tools.Video.Models
             if (obj is not VideoManifest other) return false;
             return GetType() == other.GetType() &&
                    AspectRatio.Equals(other.AspectRatio) &&
-                   BatchId.Equals(other.BatchId) &&
                    CaptionSources.SequenceEqual(other.CaptionSources) &&
                    DateTimeOffset.Equals(CreatedAt, other.CreatedAt) &&
                    string.Equals(Description, other.Description, StringComparison.Ordinal) &&
@@ -106,7 +103,6 @@ namespace Etherna.Sdk.Tools.Video.Models
             var manifestDetails = new Manifest2DetailsDto(
                 description: Description,
                 aspectRatio: AspectRatio,
-                batchId: BatchId,
                 personalData: PersonalDataRaw,
                 captions: CaptionSources.Select(s => new Manifest2CaptionSourceDto(
                     s.Source.Label,

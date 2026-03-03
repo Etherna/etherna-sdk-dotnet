@@ -27,7 +27,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             FileBase? masterFile,
             VideoVariantBase[] variants)
         {
-            ArgumentNullException.ThrowIfNull(variants, nameof(variants));
+            ArgumentNullException.ThrowIfNull(variants);
             if (variants.Length == 0)
                 throw new ArgumentException("Variant list can't be empty");
 

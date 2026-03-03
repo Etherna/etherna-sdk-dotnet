@@ -28,7 +28,7 @@ namespace Etherna.Sdk.Users
             this IEthernaUserClientsBuilder builder,
             string creditServiceBaseUrl = EthernaUserClientsBuilder.DefaultCreditUrl)
         {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder);
             
             // Register client.
             builder.Services.AddSingleton<IEthernaUserCreditClient>(serviceProvider =>

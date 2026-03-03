@@ -32,7 +32,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override async Task<(bool Result, (byte[] ByteArray, Encoding? Encoding)? ContentCache)> ExistsAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             if (absoluteUri.UriKind != UUriKind.OnlineAbsolute)
                 throw new InvalidOperationException(
@@ -53,7 +53,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override async Task<(long Result, (byte[] ByteArray, Encoding? Encoding)? ContentCache)> GetByteSizeAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             var size = await swarmClient.TryGetFileSizeAsync(SwarmAddress.FromString(absoluteUri.OriginalUri)).ConfigureAwait(false);
             if (size is null)
@@ -78,7 +78,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
         protected override async Task<(Stream Stream, Encoding? Encoding)> ReadToStreamAsync(UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             var result = await swarmClient.GetFileAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
             
@@ -96,7 +96,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override Task<string?> TryGetFileNameAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
 
             return SwarmAddress.FromString(absoluteUri.OriginalUri).TryGetFileNameAsync(
                 new SwarmClientChunkStore(swarmClient));

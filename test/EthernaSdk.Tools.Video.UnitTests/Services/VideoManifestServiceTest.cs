@@ -107,8 +107,6 @@ namespace Etherna.Sdk.Tools.Video.Services
                             "845238e3bd8110f88709768946394b8bcf562f0f0253c3c39df1cacaf3800ddd", 
                             new VideoManifest(
                                 1.7777778f,
-                                PostageBatchId.FromString(
-                                    "9d4d4e923cc054a94f7884772f5f4e588be0c3ec10c3ec397b64c7307c4c3336"),
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00"),
                                 "my description",
                                 TimeSpan.FromSeconds(587),
@@ -244,8 +242,6 @@ namespace Etherna.Sdk.Tools.Video.Services
                             "1e43dd2d93290662dc37598b2d12ce1e3ac39f85f07195087f593a768c69b4c1",
                             new VideoManifest(
                                 1.7777778f,
-                                PostageBatchId.FromString(
-                                    "9d4d4e923cc054a94f7884772f5f4e588be0c3ec10c3ec397b64c7307c4c3336"),
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00"),
                                 "my description",
                                 TimeSpan.FromSeconds(587),
@@ -324,7 +320,6 @@ namespace Etherna.Sdk.Tools.Video.Services
                             "8c831938f7f10cc57a8a68a55f473868324e0c3dafe9313bfd70f4343abedb91",
                             new VideoManifest(
                                 1.7777777777777777f,
-                                PostageBatchId.FromString("5d35cbf4cea6349c1f74340ce9f0befd7a60a17426508da7b205871d683a3a23"),
                                 DateTimeOffset.Parse("8/13/2022 1:35:33.617 PM +00:00"),
                                 "test!!!",
                                 TimeSpan.FromSeconds(19),
@@ -375,7 +370,6 @@ namespace Etherna.Sdk.Tools.Video.Services
                             "4a6dc04a9c07b9987ae18e3e8ea3185e828efdce9e27ea30ad644b762b531cb4",
                             new VideoManifest(
                                 1.7777777777777777f,
-                                PostageBatchId.Zero,
                                 DateTimeOffset.Parse("2/17/2022 9:46:39.100 AM +00:00"),
                                 "desc",
                                 TimeSpan.FromSeconds(18),
@@ -424,7 +418,6 @@ namespace Etherna.Sdk.Tools.Video.Services
             
             var videoManifest = new VideoManifest(
                 aspectRatio: 0.123f,
-                batchId: "f389278a2fa242de94e858e318bbfa7c10489533797ff923f9aa4524fabfcd34",
                 createdAt: new DateTimeOffset(2024, 07, 04, 16, 45, 42, TimeSpan.Zero),
                 description: "My description",
                 duration: TimeSpan.FromSeconds(42),
@@ -479,17 +472,17 @@ namespace Etherna.Sdk.Tools.Video.Services
                 chunkDirectory.FullName);
             
             // Assert.
-            Assert.Equal("dbdf9da90a4c1ad04899527ec7a6b35e3cac07709947ce23ee01ff3526cf494d", result);
+            Assert.Equal("e5885262e0129b5fea0a479a361d619e785d7b6627e75329faaa470723925fb4", result);
             Assert.Equal(
                 [
                     "0cc878d32c96126d47f63fbe391114ee1438cd521146fc975dea1546d302b6c0.cac",
+                    "30bc8210952c3dfc47f134847e91118cd961b05ca9b45463a70ef9eb6b1530bc.cac",
+                    "31accd890b1fa475306c6993587494c59b1ddc3725db2f73cf3787d918540867.cac",
                     "8504f2a107ca940beafc4ce2f6c9a9f0968c62a5b5893ff0e4e1e2983048d276.cac",
-                    "8d32d3dbda22b76d7b5d27237c38ec37f65db202a995a84955a8808316a70a13.cac",
                     "a966438c28b6566f5762471c52cbd4e3d83445f2ed07d20e93b9205f6c9e9998.cac",
-                    "dbdf9da90a4c1ad04899527ec7a6b35e3cac07709947ce23ee01ff3526cf494d.cac",
                     "dd031c128974182a84ccc69a3a6d1fdfd6962ac958f215d012866cce425281b4.cac",
-                    "e189fae0c2bbd455c1d81bc53817e173cf292bd0e9cfd1a3f7e8d02c02534344.cac",
-                    "e250fc8865894b98b21a28002decf162874f00a81f44c8af96c1249bef84c3fc.cac"
+                    "e250fc8865894b98b21a28002decf162874f00a81f44c8af96c1249bef84c3fc.cac",
+                    "e5885262e0129b5fea0a479a361d619e785d7b6627e75329faaa470723925fb4.cac"
                 ],
                 Directory.GetFiles(chunkDirectory.FullName).Select(Path.GetFileName).Order());
             
@@ -500,7 +493,7 @@ namespace Etherna.Sdk.Tools.Video.Services
         [Theory, MemberData(nameof(ParseManifestTests))]
         public async Task ParseManifestAsync(ParseManifestTestElement test)
         {
-            ArgumentNullException.ThrowIfNull(test, nameof(test));
+            ArgumentNullException.ThrowIfNull(test);
             
             // Setup.
             var chunkStore = new MemoryChunkStore();
