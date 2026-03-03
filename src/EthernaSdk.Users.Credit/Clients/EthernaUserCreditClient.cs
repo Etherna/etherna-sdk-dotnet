@@ -31,7 +31,7 @@ namespace Etherna.Sdk.Users.Credit.Clients
         // Constructor.
         public EthernaUserCreditClient(Uri baseUrl, HttpClient httpClient)
         {
-            ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
+            ArgumentNullException.ThrowIfNull(baseUrl);
 
             generatedClient = new UserClient(baseUrl.ToString(), httpClient);
         }

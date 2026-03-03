@@ -31,7 +31,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override async Task<(bool Result, (byte[] ByteArray, Encoding? Encoding)? ContentCache)> ExistsAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             switch (absoluteUri.UriKind)
             {
@@ -56,7 +56,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override async Task<(long Result, (byte[] ByteArray, Encoding? Encoding)? ContentCache)> GetByteSizeAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             switch (absoluteUri.UriKind)
             {
@@ -82,7 +82,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override async Task<(byte[] ByteArray, Encoding? Encoding)> ReadToByteArrayAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             switch (absoluteUri.UriKind)
             {
@@ -101,7 +101,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected override async Task<(Stream Stream, Encoding? Encoding)> ReadToStreamAsync(
             UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             switch (absoluteUri.UriKind)
             {
@@ -119,7 +119,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
         protected override Task<string?> TryGetFileNameAsync(UUri absoluteUri)
         {
-            ArgumentNullException.ThrowIfNull(absoluteUri, nameof(absoluteUri));
+            ArgumentNullException.ThrowIfNull(absoluteUri);
             
             if (absoluteUri.OriginalUri.EndsWith('/') ||
                 absoluteUri.OriginalUri.EndsWith('\\'))

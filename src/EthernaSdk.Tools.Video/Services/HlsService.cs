@@ -36,8 +36,8 @@ namespace Etherna.Sdk.Tools.Video.Services
             MasterPlaylist masterPlaylist,
             IReadOnlyChunkStore chunkStore)
         {
-            ArgumentNullException.ThrowIfNull(masterFile, nameof(masterFile));
-            ArgumentNullException.ThrowIfNull(masterPlaylist, nameof(masterPlaylist));
+            ArgumentNullException.ThrowIfNull(masterFile);
+            ArgumentNullException.ThrowIfNull(masterPlaylist);
 
             // Get master playlist directory.
             var masterFileDirectory = Path.GetDirectoryName(masterFile.UUri.OriginalUri);
@@ -94,7 +94,7 @@ namespace Etherna.Sdk.Tools.Video.Services
             int width,
             IReadOnlyChunkStore chunkStore)
         {
-            ArgumentNullException.ThrowIfNull(streamPlaylistFile, nameof(streamPlaylistFile));
+            ArgumentNullException.ThrowIfNull(streamPlaylistFile);
 
             // Get stream playlist directory.
             var streamPlaylistDirectory = Path.GetDirectoryName(streamPlaylistFile.UUri.OriginalUri);
@@ -141,7 +141,7 @@ namespace Etherna.Sdk.Tools.Video.Services
 
         public async Task<MasterPlaylist?> TryParseHlsMasterPlaylistFromFileAsync(FileBase hlsPlaylist)
         {
-            ArgumentNullException.ThrowIfNull(hlsPlaylist, nameof(hlsPlaylist));
+            ArgumentNullException.ThrowIfNull(hlsPlaylist);
             
             var hlsPlaylistText = await hlsPlaylist.ReadToStringAsync().ConfigureAwait(false);
             

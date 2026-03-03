@@ -52,7 +52,6 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
         //from v1.1
         public long? CreatedAt { get; set; }
         public long? UpdatedAt { get; set; }
-        public string? BatchId { get; set; }
         
         //from v1.2
         public string? PersonalData

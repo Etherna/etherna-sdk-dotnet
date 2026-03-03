@@ -50,7 +50,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             JsonElement manifestJsonElement,
             IReadOnlyChunkStore chunkStore)
         {
-            ArgumentNullException.ThrowIfNull(chunkStore, nameof(chunkStore));
+            ArgumentNullException.ThrowIfNull(chunkStore);
             
             // Get manifest.
             var manifestDto = manifestJsonElement.Deserialize<Manifest1Dto>(jsonSerializerOptions);
@@ -105,7 +105,6 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             //manifest
             return (new VideoManifest(
                 manifestDto.Thumbnail?.AspectRatio ?? 1,
-                manifestDto.BatchId is null ? (PostageBatchId?)null : PostageBatchId.FromString(manifestDto.BatchId),
                 DateTimeOffset.FromUnixTimeMilliseconds(manifestDto.CreatedAt ?? 0),
                 manifestDto.Description,
                 TimeSpan.FromSeconds(manifestDto.Duration),
@@ -126,8 +125,8 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             IChunkService chunksService,
             IReadOnlyChunkStore chunkStore)
         {
-            ArgumentNullException.ThrowIfNull(chunksService, nameof(chunksService));
-            ArgumentNullException.ThrowIfNull(chunkStore, nameof(chunkStore));
+            ArgumentNullException.ThrowIfNull(chunksService);
+            ArgumentNullException.ThrowIfNull(chunkStore);
             
             // Get preview manifest.
             var previewManifestDto = previewManifestJsonElement.Deserialize<Manifest2PreviewDto>(jsonSerializerOptions);
@@ -283,7 +282,6 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             // Build manifest.
             return (new VideoManifest(
                 detailsManifestDto.AspectRatio,
-                detailsManifestDto.BatchId,
                 DateTimeOffset.FromUnixTimeSeconds(previewManifestDto.CreatedAt),
                 detailsManifestDto.Description,
                 TimeSpan.FromSeconds(previewManifestDto.Duration),

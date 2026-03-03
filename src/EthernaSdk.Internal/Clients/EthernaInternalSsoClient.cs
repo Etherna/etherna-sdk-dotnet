@@ -30,7 +30,7 @@ namespace Etherna.Sdk.Internal.Clients
         // Constructor.
         public EthernaInternalSsoClient(Uri baseUrl, HttpClient httpClient)
         {
-            ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
+            ArgumentNullException.ThrowIfNull(baseUrl);
 
             generatedClient = new ServiceInteractClient(baseUrl.ToString(), httpClient);
         }

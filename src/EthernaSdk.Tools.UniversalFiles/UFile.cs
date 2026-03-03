@@ -28,7 +28,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         protected UFile(
             UUri fileUri)
         {
-            ArgumentNullException.ThrowIfNull(fileUri, nameof(fileUri));
+            ArgumentNullException.ThrowIfNull(fileUri);
             
             FileUri = fileUri;
         }

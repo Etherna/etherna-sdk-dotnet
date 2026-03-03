@@ -42,7 +42,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             string langaugeCode,
             SwarmReference? swarmReference = null)
         {
-            ArgumentNullException.ThrowIfNull(uFile, nameof(uFile));
+            ArgumentNullException.ThrowIfNull(uFile);
 
             // Get image info.
             var byteSize = await uFile.GetByteSizeAsync().ConfigureAwait(false);

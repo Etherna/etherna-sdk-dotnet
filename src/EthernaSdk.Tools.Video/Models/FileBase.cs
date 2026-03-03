@@ -29,7 +29,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         // Static builders.
         public static async Task<FileBase> BuildFromUFileAsync(UFile uFile)
         {
-            ArgumentNullException.ThrowIfNull(uFile, nameof(uFile));
+            ArgumentNullException.ThrowIfNull(uFile);
             
             var fileSize = await uFile.GetByteSizeAsync().ConfigureAwait(false);
             var fileName = await uFile.TryGetFileNameAsync().ConfigureAwait(false) ?? throw new InvalidOperationException(

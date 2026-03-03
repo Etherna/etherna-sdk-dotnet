@@ -28,8 +28,8 @@ namespace Etherna.Sdk.Tools.Video.Models
             int width)
             : base(height, width)
         {
-            ArgumentNullException.ThrowIfNull(hlsStreamPlaylistFile, nameof(hlsStreamPlaylistFile));
-            ArgumentNullException.ThrowIfNull(hlsSegmentFiles, nameof(hlsSegmentFiles));
+            ArgumentNullException.ThrowIfNull(hlsStreamPlaylistFile);
+            ArgumentNullException.ThrowIfNull(hlsSegmentFiles);
             if (hlsSegmentFiles.Length == 0)
                 throw new ArgumentException("Segments list can't be empty");
             
