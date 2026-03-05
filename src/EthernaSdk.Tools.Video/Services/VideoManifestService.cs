@@ -12,9 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
 using Etherna.BeeNet.Hashing;
-using Etherna.BeeNet.Hashing.Pipeline;
 using Etherna.BeeNet.Hashing.Postage;
 using Etherna.BeeNet.Hashing.Signer;
 using Etherna.BeeNet.Manifest;
@@ -148,8 +146,8 @@ namespace Etherna.Sdk.Tools.Video.Services
             }
             
             //add encoded thumbnail files, only if uri is relative
-            foreach (var thumbnailSource in manifest.Thumbnail.Sources.Where(
-                         ts => ts.Uri.UriKind == UriKind.Relative))
+            foreach (var thumbnailSource in manifest.Thumbnail?.Sources.Where(
+                         ts => ts.Uri.UriKind == UriKind.Relative) ?? [])
             {
                 mantarayManifest.Add(
                     thumbnailSource.Uri.ToString(),

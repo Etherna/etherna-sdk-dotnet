@@ -36,7 +36,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         string ownerEthAddress,
         string? personalData,
         IEnumerable<VideoManifestVideoSource> videoSources,
-        VideoManifestImage thumbnail,
+        VideoManifestImage? thumbnail,
         IEnumerable<VideoManifestCaptionSource> captionSources,
         DateTimeOffset? updatedAt = null)
     {
@@ -58,7 +58,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         public string OwnerEthAddress { get; } = ownerEthAddress;
         public VideoManifestPersonalData? PersonalData { get; } = TryParsePersonalData(personalData);
         public string? PersonalDataRaw { get; } = personalData;
-        public VideoManifestImage Thumbnail { get; } = thumbnail;
+        public VideoManifestImage? Thumbnail { get; } = thumbnail;
         public DateTimeOffset? UpdatedAt { get; set; } = updatedAt;
         public IEnumerable<(SwarmUri Uri, VideoManifestVideoSource Metadata)> VideoSources { get; }
             = videoSources.Select(s => (new SwarmUri(
@@ -80,7 +80,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                    string.Equals(OwnerEthAddress, other.OwnerEthAddress, StringComparison.Ordinal) &&
                    EqualityComparer<VideoManifestPersonalData>.Default.Equals(PersonalData, other.PersonalData) &&
                    string.Equals(PersonalDataRaw, other.PersonalDataRaw, StringComparison.Ordinal) &&
-                   Thumbnail.Equals(other.Thumbnail) &&
+                   (Thumbnail?.Equals(other.Thumbnail) ?? other.Thumbnail is null) &&
                    EqualityComparer<DateTimeOffset?>.Default.Equals(UpdatedAt, other.UpdatedAt) &&
                    VideoSources.SequenceEqual(other.VideoSources);
         }
@@ -95,7 +95,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             string.GetHashCode(OwnerEthAddress, StringComparison.Ordinal) ^
             PersonalData?.GetHashCode() ?? 0 ^
             string.GetHashCode(PersonalDataRaw, StringComparison.Ordinal) ^
-            Thumbnail.GetHashCode() ^
+            Thumbnail?.GetHashCode() ?? 0 ^
             VideoSources.GetHashCode();
         
         public string SerializeDetailsManifest()
@@ -118,19 +118,25 @@ namespace Etherna.Sdk.Tools.Video.Models
 
         public string SerializePreviewManifest()
         {
+            Manifest2ThumbnailDto? thumbnailDto = null;
+            if (Thumbnail is not null)
+            {
+                thumbnailDto = new Manifest2ThumbnailDto(
+                    aspectRatio: Thumbnail.AspectRatio,
+                    blurhash: Thumbnail.Blurhash,
+                    sources: Thumbnail.Sources.Select(s => new Manifest2ThumbnailSourceDto(
+                        width: s.Metadata.Width,
+                        type: s.Metadata.ImageType,
+                        path: s.Uri)));
+            }
+
             var manifestPreview = new Manifest2PreviewDto(
                 title: Title,
                 createdAt: CreatedAt.ToUnixTimeSeconds(),
                 updatedAt: UpdatedAt?.ToUnixTimeSeconds(),
                 ownerEthAddress: OwnerEthAddress,
                 duration: (long)Duration.TotalSeconds,
-                thumbnail: new Manifest2ThumbnailDto(
-                    aspectRatio: Thumbnail.AspectRatio,
-                    blurhash: Thumbnail.Blurhash,
-                    sources: Thumbnail.Sources.Select(s => new Manifest2ThumbnailSourceDto(
-                        width: s.Metadata.Width,
-                        type: s.Metadata.ImageType,
-                        path: s.Uri))));
+                thumbnail: thumbnailDto);
             return JsonSerializer.Serialize(manifestPreview, jsonSerializerOptions);
         }
         

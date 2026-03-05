@@ -27,7 +27,8 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2
         public const int TitleMaxLength = 200;
 
         // Constructors.
-        public Manifest2PreviewDto(string title,
+        public Manifest2PreviewDto(
+            string title,
             long createdAt,
             long? updatedAt,
             string ownerEthAddress,
