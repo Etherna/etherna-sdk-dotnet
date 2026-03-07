@@ -2584,9 +2584,18 @@ namespace Etherna.Sdk.Index.GenClients
         System.Threading.Tasks.Task<VideoManifestStatusDto> ValidationGet2Async(string reference, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// Deprecated: Use "videos/create2" instead
+        /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         System.Threading.Tasks.Task<string> VideosPostAsync(VideoCreateInput body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<string> Create2Async(VideoCreateInput2 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
@@ -2615,7 +2624,7 @@ namespace Etherna.Sdk.Index.GenClients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<VideoManifestStatusDto>> BulkValidationPut2Async(System.Collections.Generic.IEnumerable<string> body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<VideoManifestStatusDto>> BulkValidationPut2Async(System.Collections.Generic.IEnumerable<object> body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
@@ -4351,8 +4360,12 @@ namespace Etherna.Sdk.Index.GenClients
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <remarks>
+        /// Deprecated: Use "videos/create2" instead
+        /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         public virtual async System.Threading.Tasks.Task<string> VideosPostAsync(VideoCreateInput body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
@@ -4375,6 +4388,96 @@ namespace Etherna.Sdk.Index.GenClients
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
                     // Operation Path: "api/v0.3/videos"
                     urlBuilder_.Append("api/v0.3/videos");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<string>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new EthernaIndexApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new EthernaIndexApiException("Bad Request", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new EthernaIndexApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new EthernaIndexApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<string> Create2Async(VideoCreateInput2 body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "api/v0.3/videos/create2"
+                    urlBuilder_.Append("api/v0.3/videos/create2");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -4795,7 +4898,7 @@ namespace Etherna.Sdk.Index.GenClients
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<VideoManifestStatusDto>> BulkValidationPut2Async(System.Collections.Generic.IEnumerable<string> body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<VideoManifestStatusDto>> BulkValidationPut2Async(System.Collections.Generic.IEnumerable<object> body, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -5373,7 +5476,7 @@ namespace Etherna.Sdk.Index.GenClients
 
         [System.Text.Json.Serialization.JsonPropertyName("sources")]
         [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.IDictionary<string, string> Sources { get; set; } = new System.Collections.Generic.Dictionary<string, string>();
+        public object Sources { get; set; } = new object();
 
         private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 
@@ -5764,6 +5867,11 @@ namespace Etherna.Sdk.Index.GenClients
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public string? Id { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("batchId")]
+        [System.ComponentModel.DataAnnotations.StringLength(64, MinimumLength = 64)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-fA-F0-9]{64}$")]
+        public string BatchId { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("creationDateTime")]
         public System.DateTimeOffset CreationDateTime { get; set; } = default!;
 
@@ -5806,6 +5914,29 @@ namespace Etherna.Sdk.Index.GenClients
         [System.ComponentModel.DataAnnotations.StringLength(128, MinimumLength = 64)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^([a-fA-F0-9]{64}|[a-fA-F0-9]{128})$")]
         public string ManifestHash { get; set; } = default!;
+
+        private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    internal partial class VideoCreateInput2
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("batchId")]
+        public string? BatchId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("manifestReference")]
+        [System.ComponentModel.DataAnnotations.StringLength(128, MinimumLength = 64)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^([a-fA-F0-9]{64}|[a-fA-F0-9]{128})$")]
+        public string ManifestReference { get; set; } = default!;
 
         private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 
@@ -5866,11 +5997,6 @@ namespace Etherna.Sdk.Index.GenClients
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$")]
         public float AspectRatio { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("batchId")]
-        [System.ComponentModel.DataAnnotations.StringLength(64, MinimumLength = 64)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-fA-F0-9]{64}$")]
-        public string BatchId { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)$")]
         public long CreatedAt { get; set; } = default!;
@@ -5917,11 +6043,6 @@ namespace Etherna.Sdk.Index.GenClients
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
     internal partial class VideoManifestDto
     {
-
-        [System.Text.Json.Serialization.JsonPropertyName("batchId")]
-        [System.ComponentModel.DataAnnotations.StringLength(64, MinimumLength = 64)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-fA-F0-9]{64}$")]
-        public string BatchId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
         public string? Description { get; set; } = default!;

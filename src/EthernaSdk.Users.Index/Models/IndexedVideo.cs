@@ -20,6 +20,7 @@ namespace Etherna.Sdk.Users.Index.Models
 {
     public class IndexedVideo(
         string id,
+        PostageBatchId? batchId,
         DateTimeOffset creationDateTime,
         VoteValue? currentVoteValue,
         string? description,
@@ -32,6 +33,7 @@ namespace Etherna.Sdk.Users.Index.Models
     {
         // Properties.
         public string Id { get; } = id;
+        public PostageBatchId? BatchId { get; } = batchId;
         public DateTimeOffset CreationDateTime { get; } = creationDateTime;
         public VoteValue? CurrentVoteValue { get; } = currentVoteValue;
         public string? Description { get; } = description;

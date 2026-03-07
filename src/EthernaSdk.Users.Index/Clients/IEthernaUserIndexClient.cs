@@ -245,6 +245,7 @@ namespace Etherna.Sdk.Users.Index.Clients
         /// <exception cref="EthernaIndexApiException">A server side error occurred.</exception>
         Task<string> PublishNewVideoAsync(
             SwarmReference manifestReference,
+            PostageBatchId? batchId,
             CancellationToken cancellationToken = default);
 
         /// <summary>

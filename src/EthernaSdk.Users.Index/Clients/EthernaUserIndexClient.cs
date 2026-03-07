@@ -344,8 +344,15 @@ namespace Etherna.Sdk.Users.Index.Clients
         public Task OwnerRemoveVideoAsync(string videoId, CancellationToken cancellationToken = default) =>
             generatedVideosClient.VideosDeleteAsync(videoId, cancellationToken);
 
-        public Task<string> PublishNewVideoAsync(SwarmReference manifestReference, CancellationToken cancellationToken = default) =>
-            generatedVideosClient.VideosPostAsync(new VideoCreateInput { ManifestHash = manifestReference.ToString() }, cancellationToken);
+        public Task<string> PublishNewVideoAsync(
+            SwarmReference manifestReference,
+            PostageBatchId? batchId,
+            CancellationToken cancellationToken = default) =>
+            generatedVideosClient.Create2Async(new VideoCreateInput2
+            {
+                BatchId = batchId?.ToString(),
+                ManifestReference = manifestReference.ToString()
+            }, cancellationToken);
 
         public Task ReportUnsuitableVideoAsync(string videoId, SwarmReference manifestReference, string description, CancellationToken cancellationToken = default) =>
             generatedVideosClient.ReportsAsync(videoId, manifestReference.ToString(), description, cancellationToken);
@@ -379,6 +386,7 @@ namespace Etherna.Sdk.Users.Index.Clients
             VideoManifestPersonalData.TryDeserialize(videoDto.LastValidManifest?.PersonalData, out var personalData);
             return new IndexedVideo(
                 id: videoDto.Id!,
+                batchId: videoDto.BatchId,
                 creationDateTime: videoDto.CreationDateTime,
                 currentVoteValue: videoDto.CurrentVoteValue.HasValue ?
                     Enum.Parse<VoteValue>(videoDto.CurrentVoteValue.Value.ToString()) : null,
