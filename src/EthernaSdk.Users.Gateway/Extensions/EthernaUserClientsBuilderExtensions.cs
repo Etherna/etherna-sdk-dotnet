@@ -28,6 +28,7 @@ namespace Etherna.Sdk.Users
         public static IEthernaUserClientsBuilder AddEthernaGatewayClient(
             this IEthernaUserClientsBuilder builder,
             SwarmClients apiCompatibility = SwarmClients.Beehive,
+            bool dryMode = false,
             string gatewayBaseUrl = EthernaUserClientsBuilder.DefaultGatewayUrl)
         {
             ArgumentNullException.ThrowIfNull(builder);
@@ -42,7 +43,8 @@ namespace Etherna.Sdk.Users
                 return new SwarmClient(
                     nodeUrl: gatewayBaseUri,
                     apiCompatibility: apiCompatibility,
-                    httpClient);
+                    httpClient: httpClient,
+                    isDryMode: dryMode);
             });
             builder.Services.AddSingleton<IEthernaUserGatewayClient>(serviceProvider =>
             {
