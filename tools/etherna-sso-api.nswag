@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "https://localhost:44379/swagger/v0.3/swagger.json",
+      "url": "https://localhost:44379/openapi/sso03.json",
       "output": null,
       "newLineBehavior": "Auto"
     }
@@ -92,7 +92,7 @@
       "enumNameGeneratorType": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "../src/EthernaSdk.Sso/GenClients/NSwagEthernaSsoClient.cs",
+      "output": "../src/EthernaSdk.Sso.Common/GenClients/NSwagEthernaSsoClient.cs",
       "newLineBehavior": "Auto"
     }
   }
