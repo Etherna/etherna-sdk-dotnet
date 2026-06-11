@@ -13,11 +13,9 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Duende.AccessTokenManagement;
-using Duende.IdentityModel.Client;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Internal.AspNetCore
 {
@@ -35,6 +33,10 @@ namespace Etherna.Sdk.Internal.AspNetCore
             Action<HttpClient>? configureHttpClient = null)
         {
             ArgumentNullException.ThrowIfNull(ssoBaseUrl);
+            if (requireHttps &&
+                ssoBaseUrl.Scheme != Uri.UriSchemeHttps &&
+                !ssoBaseUrl.IsLoopback)
+                throw new ArgumentException("HTTPS is required for the SSO base URL.", nameof(ssoBaseUrl));
 
             // Register memory cache to keep tokens.
             services.AddHybridCache();
@@ -42,10 +44,9 @@ namespace Etherna.Sdk.Internal.AspNetCore
             // Register client token management.
             var clientCredentialsTokenManagementBuilder = services.AddClientCredentialsTokenManagement();
 
-            // Discover token endpoint.
-            var discoverTokenEndpointTask = DiscoverTokenEndpointAsync(requireHttps, ssoBaseUrl);
-            discoverTokenEndpointTask.Wait();
-            var tokenEndpoint = discoverTokenEndpointTask.Result;
+            // Build token endpoint from IdentityServer's conventional route, without network discovery.
+            // This way the SSO server is not required to be reachable when the application starts.
+            var tokenEndpoint = ssoBaseUrl.AbsoluteUri.TrimEnd('/') + "/connect/token";
 
             return new EthernaInternalClientsBuilder(
                 services,
@@ -54,27 +55,6 @@ namespace Etherna.Sdk.Internal.AspNetCore
                 clientCredentialsTokenManagementBuilder,
                 httpClientName,
                 configureHttpClient);
-        }
-
-        // Helpers.
-        private static async Task<string> DiscoverTokenEndpointAsync(
-            bool requireHttps,
-            Uri ssoBaseUrl)
-        {
-            // Discover endpoints from metadata.
-            using var httpClient = new HttpClient();
-            using var request = new DiscoveryDocumentRequest
-            {
-                Address = ssoBaseUrl.AbsoluteUri,
-                Policy = new DiscoveryPolicy { RequireHttps = requireHttps }
-            };
-
-            var discoveryDocResult = await httpClient.GetDiscoveryDocumentAsync(request).ConfigureAwait(false);
-
-            if (discoveryDocResult.IsError)
-                throw discoveryDocResult.Exception ?? new InvalidOperationException();
-
-            return discoveryDocResult.TokenEndpoint!;
         }
     }
 }
