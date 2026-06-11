@@ -12,10 +12,11 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet.Models;
-using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Tools.UniversalFiles;
 using Etherna.Sdk.Tools.Video.Models;
+using Etherna.SwarmSdk.Manifest;
+using Etherna.SwarmSdk.Models;
+using Etherna.SwarmSdk.Stores;
 using M3U8Parser;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 if (masterSwarmAddress is not null)
                 {
                     streamSwarmAddress = SwarmAddress.FromString(masterFileDirectory.TrimEnd(SwarmAddress.Separator) + SwarmAddress.Separator + streamInfo.Uri);
-                    streamPlaylistFile.SwarmReference = await SwarmReference.ResolveFromAddressAsync(
+                    streamPlaylistFile.SwarmReference = await SwarmAddressResolver.ResolveReferenceAsync(
                         streamSwarmAddress.Value,
                         chunkStore).ConfigureAwait(false);
                 }
@@ -124,7 +125,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                 {
                     var segmentSwarmAddress = SwarmAddress.FromString(
                         streamPlaylistDirectory.TrimEnd(SwarmAddress.Separator) + SwarmAddress.Separator + segment.Uri);
-                    segmentFile.SwarmReference = await SwarmReference.ResolveFromAddressAsync(
+                    segmentFile.SwarmReference = await SwarmAddressResolver.ResolveReferenceAsync(
                             segmentSwarmAddress,
                             chunkStore).ConfigureAwait(false);
                 }

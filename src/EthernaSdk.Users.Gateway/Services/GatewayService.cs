@@ -12,10 +12,10 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
-using Etherna.BeeNet.Models;
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Clients;
+using Etherna.SwarmSdk;
+using Etherna.SwarmSdk.Models;
 using System;
 using System.IO;
 using System.Net.Http.Headers;
@@ -124,7 +124,10 @@ namespace Etherna.Sdk.Users.Gateway.Services
             SwarmChunk[] chunks,
             PostageBatchId batchId,
             CancellationToken cancellationToken = default) =>
-            swarmClient.ChunksBulkUploadAsync(chunks, batchId, cancellationToken);
+            swarmClient.ChunksBulkUploadAsync(
+                chunks,
+                batchId,
+                cancellationToken: cancellationToken);
 
         public Task<bool> CreatePinAsync(SwarmReference reference, CancellationToken cancellationToken = default) =>
             swarmClient.CreatePinAsync(reference, cancellationToken);
@@ -166,15 +169,15 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         public Task<Stream> GetBytesAsync(
             SwarmReference reference,
-            RedundancyLevel? swarmRedundancyLevel = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            RedundancyLevel? redundancyLevel = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default) =>
             swarmClient.GetBytesAsync(
                 reference,
-                swarmRedundancyLevel: swarmRedundancyLevel,
-                swarmRedundancyStrategy: swarmRedundancyStrategy,
-                swarmRedundancyFallbackMode: swarmRedundancyFallbackMode,
+                redundancyLevel: redundancyLevel,
+                redundancyStrategy: redundancyStrategy,
+                redundancyFallbackMode: redundancyFallbackMode,
                 cancellationToken: cancellationToken);
 
         public Task<HttpContentHeaders?> GetBytesHeadersAsync(
@@ -198,19 +201,19 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         public Task<FileResponse> GetFileAsync(
             SwarmAddress address,
-            RedundancyLevel? swarmRedundancyLevel = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            RedundancyLevel? redundancyLevel = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default) =>
             swarmClient.GetFileAsync(
                 address,
-                swarmRedundancyLevel: swarmRedundancyLevel,
-                swarmRedundancyStrategy: swarmRedundancyStrategy,
-                swarmRedundancyFallbackMode: swarmRedundancyFallbackMode,
+                redundancyLevel: redundancyLevel,
+                redundancyStrategy: redundancyStrategy,
+                redundancyFallbackMode: redundancyFallbackMode,
                 cancellationToken: cancellationToken);
 
         public Task<(PostageBatch PostageBatch, EthAddress Owner)[]> GetGlobalValidPostageBatchesAsync(CancellationToken cancellationToken = default) =>
-            swarmClient.GetGlobalValidPostageBatchesAsync(cancellationToken);
+            swarmClient.GetGlobalValidPostageBatchesAsync(cancellationToken: cancellationToken);
 
         public Task<Health> GetHealthAsync(CancellationToken cancellationToken = default) =>
             swarmClient.GetHealthAsync(cancellationToken);
@@ -221,7 +224,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         public Task<PostageBatch[]> GetOwnedPostageBatchesAsync(CancellationToken cancellationToken = default) =>
             swarmClient.GetOwnedPostageBatchesAsync(cancellationToken);
 
-        public Task<bool> GetPinStatusAsync(SwarmReference reference, CancellationToken cancellationToken = default) =>
+        public Task<PinStatus> GetPinStatusAsync(SwarmReference reference, CancellationToken cancellationToken = default) =>
             swarmClient.GetPinStatusAsync(reference, cancellationToken);
 
         public Task<PostageBatch> GetPostageBatchAsync(PostageBatchId batchId, CancellationToken cancellationToken = default) =>
@@ -236,16 +239,16 @@ namespace Etherna.Sdk.Users.Gateway.Services
         public Task<FileResponse> GetSocDataAsync(
             EthAddress owner,
             string id,
-            bool? swarmOnlyRootChunk = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            bool? onlyRootChunk = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default) =>
             swarmClient.GetSocDataAsync(
                 owner: owner,
                 id: id,
-                swarmOnlyRootChunk: swarmOnlyRootChunk,
-                swarmRedundancyStrategy: swarmRedundancyStrategy,
-                swarmRedundancyFallbackMode: swarmRedundancyFallbackMode,
+                onlyRootChunk: onlyRootChunk,
+                redundancyStrategy: redundancyStrategy,
+                redundancyFallbackMode: redundancyFallbackMode,
                 cancellationToken: cancellationToken);
 
         public Task<bool> IsChunkExistingAsync(
@@ -268,9 +271,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
             ulong? after = null,
             int? afterLevel = null,
             SwarmFeedType type = SwarmFeedType.Sequence,
-            bool? swarmOnlyRootChunk = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            bool? onlyRootChunk = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default) =>
             swarmClient.TryGetFeedAsync(
                 owner: owner,
@@ -279,9 +282,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 after: after,
                 afterLevel: afterLevel,
                 type: type,
-                swarmOnlyRootChunk: swarmOnlyRootChunk,
-                swarmRedundancyStrategy: swarmRedundancyStrategy,
-                swarmRedundancyFallbackMode: swarmRedundancyFallbackMode,
+                onlyRootChunk: onlyRootChunk,
+                redundancyStrategy: redundancyStrategy,
+                redundancyFallbackMode: redundancyFallbackMode,
                 cancellationToken: cancellationToken);
 
         public Task<HttpContentHeaders?> TryGetFileHeadersAsync(
@@ -314,17 +317,17 @@ namespace Etherna.Sdk.Users.Gateway.Services
             Stream body,
             PostageBatchId batchId,
             ushort? compactLevel,
-            bool? swarmPin = null,
-            bool? swarmEncrypt = null,
-            RedundancyLevel swarmRedundancyLevel = RedundancyLevel.None,
+            bool? pin = null,
+            bool? encrypt = null,
+            RedundancyLevel redundancyLevel = RedundancyLevel.None,
             CancellationToken cancellationToken = default) =>
             swarmClient.UploadBytesAsync(
                 body,
                 batchId: batchId,
                 compactLevel: compactLevel,
-                swarmPin: swarmPin,
-                swarmEncrypt: swarmEncrypt,
-                swarmRedundancyLevel: swarmRedundancyLevel,
+                pin: pin,
+                encrypt: encrypt,
+                redundancyLevel: redundancyLevel,
                 cancellationToken: cancellationToken);
 
         public Task<SwarmHash> UploadChunkAsync(
@@ -353,34 +356,34 @@ namespace Etherna.Sdk.Users.Gateway.Services
             string directoryPath,
             PostageBatchId batchId,
             ushort? compactLevel,
-            bool? swarmPin = null,
-            bool? swarmEncrypt = null,
-            string? swarmIndexDocument = null,
-            string? swarmErrorDocument = null,
-            RedundancyLevel swarmRedundancyLevel = RedundancyLevel.None,
+            bool? pin = null,
+            bool? encrypt = null,
+            string? indexDocument = null,
+            string? errorDocument = null,
+            RedundancyLevel redundancyLevel = RedundancyLevel.None,
             CancellationToken cancellationToken = default) =>
             swarmClient.UploadDirectoryAsync(
                 directoryPath,
                 batchId: batchId,
                 compactLevel: compactLevel,
-                swarmPin: swarmPin,
-                swarmEncrypt: swarmEncrypt,
-                swarmIndexDocument: swarmIndexDocument,
-                swarmErrorDocument: swarmErrorDocument,
-                swarmRedundancyLevel: swarmRedundancyLevel,
+                pin: pin,
+                encrypt: encrypt,
+                indexDocument: indexDocument,
+                errorDocument: errorDocument,
+                redundancyLevel: redundancyLevel,
                 cancellationToken: cancellationToken);
 
         public Task<SwarmHash> UploadFeedManifestAsync(
             SwarmFeedBase feed,
             PostageBatchId batchId,
             ushort? compactLevel,
-            bool swarmPin = false,
+            bool pin = false,
             CancellationToken cancellationToken = default) =>
             swarmClient.UploadFeedManifestAsync(
                 feed,
                 batchId: batchId,
                 compactLevel: compactLevel,
-                swarmPin: swarmPin,
+                pin: pin,
                 cancellationToken: cancellationToken);
 
         public Task<SwarmReference> UploadFileAsync(
@@ -390,11 +393,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             string? name = null,
             string? contentType = null,
             bool isFileCollection = false,
-            bool? swarmPin = null,
-            bool? swarmEncrypt = null,
-            string? swarmIndexDocument = null,
-            string? swarmErrorDocument = null,
-            RedundancyLevel swarmRedundancyLevel = RedundancyLevel.None,
+            bool? pin = null,
+            bool? encrypt = null,
+            string? indexDocument = null,
+            string? errorDocument = null,
+            RedundancyLevel redundancyLevel = RedundancyLevel.None,
             CancellationToken cancellationToken = default) =>
             swarmClient.UploadFileAsync(
                 content,
@@ -403,24 +406,24 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 name: name,
                 contentType: contentType,
                 isFileCollection: isFileCollection,
-                swarmPin: swarmPin,
-                swarmEncrypt: swarmEncrypt,
-                swarmIndexDocument: swarmIndexDocument,
-                swarmErrorDocument: swarmErrorDocument,
-                swarmRedundancyLevel: swarmRedundancyLevel,
+                pin: pin,
+                encrypt: encrypt,
+                indexDocument: indexDocument,
+                errorDocument: errorDocument,
+                redundancyLevel: redundancyLevel,
                 cancellationToken: cancellationToken);
 
         public Task<SwarmHash> UploadSocAsync(
             SwarmSoc soc,
             PostageBatchId? batchId,
             PostageStamp? presignedPostageStamp = null,
-            bool? swarmPin = null,
+            bool? pin = null,
             CancellationToken cancellationToken = default) =>
             swarmClient.UploadSocAsync(
                 soc,
                 batchId: batchId,
                 presignedPostageStamp: presignedPostageStamp,
-                swarmPin: swarmPin,
+                pin: pin,
                 cancellationToken: cancellationToken);
 
         // Helpers.

@@ -12,13 +12,13 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet.Manifest;
-using Etherna.BeeNet.Models;
-using Etherna.BeeNet.Services;
-using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1;
 using Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2;
+using Etherna.SwarmSdk.Manifest;
+using Etherna.SwarmSdk.Models;
+using Etherna.SwarmSdk.Services;
+using Etherna.SwarmSdk.Stores;
 using M3U8Parser;
 using System;
 using System.Collections.Generic;
@@ -63,7 +63,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             List<VideoManifestVideoSource> videoSources = [];
             foreach (var videoSourceDto in manifestDto.Sources)
             {
-                var videoSourceChunkRef = await SwarmReference.ResolveFromStringAsync(
+                var videoSourceChunkRef = await SwarmAddressResolver.ResolveReferenceAsync(
                     videoSourceDto.Reference,
                     chunkStore).ConfigureAwait(false);
                 videoSources.Add(new VideoManifestVideoSource(
@@ -82,7 +82,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 List<VideoManifestImageSource> imgSources = [];
                 foreach (var imgSourceDto in manifestDto.Thumbnail.Sources)
                 {
-                    var imgSourceChunkRef = await SwarmReference.ResolveFromStringAsync(
+                    var imgSourceChunkRef = await SwarmAddressResolver.ResolveReferenceAsync(
                         imgSourceDto.Value,
                         chunkStore).ConfigureAwait(false);
                     imgSources.Add(new VideoManifestImageSource(
@@ -155,7 +155,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             {
                 var captionSwarmUri = new SwarmUri(captionDto.Path, UriKind.RelativeOrAbsolute);
                 var captionSwarmAddress = captionSwarmUri.ToSwarmAddress(manifestReference);
-                var captionChunkReference = await SwarmReference.ResolveFromAddressAsync(
+                var captionChunkReference = await SwarmAddressResolver.ResolveReferenceAsync(
                     captionSwarmAddress,
                     chunkStore).ConfigureAwait(false);
                 var captionFileName = captionDto.Path.Split(SwarmAddress.Separator).Last();
@@ -190,7 +190,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                     var swarmUri = new SwarmUri(thumbnailSourceDto.Path, UriKind.RelativeOrAbsolute);
 
                     var thumbnailAddress = swarmUri.ToSwarmAddress(manifestReference);
-                    var thumbnailChunkRef = await SwarmReference.ResolveFromAddressAsync(
+                    var thumbnailChunkRef = await SwarmAddressResolver.ResolveReferenceAsync(
                         thumbnailAddress,
                         chunkStore).ConfigureAwait(false);
                     
@@ -217,7 +217,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                 
                 var videoSourceSwarmUri = new SwarmUri(videoSourceDto.Path, UriKind.RelativeOrAbsolute);
                 var videoSourceSwarmAddress = videoSourceSwarmUri.ToSwarmAddress(manifestReference);
-                var videoSourceChunkRef = await SwarmReference.ResolveFromAddressAsync(
+                var videoSourceChunkRef = await SwarmAddressResolver.ResolveReferenceAsync(
                     videoSourceSwarmAddress,
                     chunkStore).ConfigureAwait(false);
                 
@@ -264,7 +264,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
                             
                             additionalFiles.Add(new VideoManifestVideoSourceAdditionalFile(
                                 segmentRelativePath,
-                                (await SwarmReference.ResolveFromAddressAsync(
+                                (await SwarmAddressResolver.ResolveReferenceAsync(
                                     segmentSwarmAddress,
                                     chunkStore).ConfigureAwait(false)).Hash));
                         }

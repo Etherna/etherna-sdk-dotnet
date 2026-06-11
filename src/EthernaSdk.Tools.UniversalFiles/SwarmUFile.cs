@@ -12,9 +12,10 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
-using Etherna.BeeNet.Models;
-using Etherna.BeeNet.Stores;
+using Etherna.SwarmSdk;
+using Etherna.SwarmSdk.Manifest;
+using Etherna.SwarmSdk.Models;
+using Etherna.SwarmSdk.Stores;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -98,7 +99,8 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         {
             ArgumentNullException.ThrowIfNull(absoluteUri);
 
-            return SwarmAddress.FromString(absoluteUri.OriginalUri).TryGetFileNameAsync(
+            return SwarmAddressResolver.TryGetFileNameAsync(
+                SwarmAddress.FromString(absoluteUri.OriginalUri),
                 new SwarmClientChunkStore(swarmClient));
         }
     }

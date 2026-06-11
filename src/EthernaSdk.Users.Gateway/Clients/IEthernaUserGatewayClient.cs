@@ -12,9 +12,9 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet.Models;
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Models;
+using Etherna.SwarmSdk.Models;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

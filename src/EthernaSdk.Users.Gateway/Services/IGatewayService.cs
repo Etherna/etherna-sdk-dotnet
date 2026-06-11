@@ -12,8 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet.Exceptions;
-using Etherna.BeeNet.Models;
+using Etherna.SwarmSdk.Models;
 using System;
 using System.IO;
 using System.Net.Http.Headers;
@@ -95,16 +94,16 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         /// <summary>Get referenced data</summary>
         /// <param name="reference">Swarm content reference</param>
-        /// <param name="swarmRedundancyLevel"></param>
-        /// <param name="swarmRedundancyStrategy">Specify the retrieve strategy on redundant data. The numbers stand for NONE, DATA, PROX and RACE, respectively. Strategy NONE means no prefetching takes place. Strategy DATA means only data chunks are prefetched. Strategy PROX means only chunks that are close to the node are prefetched. Strategy RACE means all chunks are prefetched: n data chunks and k parity chunks. The first n chunks to arrive are used to reconstruct the file. Multiple strategies can be used in a fallback cascade if the swarm redundancy fallback mode is set to true. The default strategy is NONE, DATA, falling back to PROX, falling back to RACE</param>
-        /// <param name="swarmRedundancyFallbackMode">Specify if the retrieve strategies (chunk prefetching on redundant data) are used in a fallback cascade. The default is true.</param>
+        /// <param name="redundancyLevel"></param>
+        /// <param name="redundancyStrategy">Specify the retrieve strategy on redundant data. The numbers stand for NONE, DATA, PROX and RACE, respectively. Strategy NONE means no prefetching takes place. Strategy DATA means only data chunks are prefetched. Strategy PROX means only chunks that are close to the node are prefetched. Strategy RACE means all chunks are prefetched: n data chunks and k parity chunks. The first n chunks to arrive are used to reconstruct the file. Multiple strategies can be used in a fallback cascade if the swarm redundancy fallback mode is set to true. The default strategy is NONE, DATA, falling back to PROX, falling back to RACE</param>
+        /// <param name="redundancyFallbackMode">Specify if the retrieve strategies (chunk prefetching on redundant data) are used in a fallback cascade. The default is true.</param>
         /// <returns>Retrieved content specified by reference</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
         Task<Stream> GetBytesAsync(
             SwarmReference reference,
-            RedundancyLevel? swarmRedundancyLevel = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            RedundancyLevel? redundancyLevel = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default);
         
         /// <summary>
@@ -140,16 +139,16 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <summary>Get file or index document from a collection of files</summary>
         /// <param name="address">Swarm address of content</param>
         /// <param name="swarmCache">Determines if the download data should be cached on the node. By default the download will be cached</param>
-        /// <param name="swarmRedundancyStrategy">Specify the retrieve strategy on redundant data. The numbers stand for NONE, DATA, PROX and RACE, respectively. Strategy NONE means no prefetching takes place. Strategy DATA means only data chunks are prefetched. Strategy PROX means only chunks that are close to the node are prefetched. Strategy RACE means all chunks are prefetched: n data chunks and k parity chunks. The first n chunks to arrive are used to reconstruct the file. Multiple strategies can be used in a fallback cascade if the swarm redundancy fallback mode is set to true. The default strategy is NONE, DATA, falling back to PROX, falling back to RACE</param>
-        /// <param name="swarmRedundancyFallbackMode">Specify if the retrieve strategies (chunk prefetching on redundant data) are used in a fallback cascade. The default is true.</param>
+        /// <param name="redundancyStrategy">Specify the retrieve strategy on redundant data. The numbers stand for NONE, DATA, PROX and RACE, respectively. Strategy NONE means no prefetching takes place. Strategy DATA means only data chunks are prefetched. Strategy PROX means only chunks that are close to the node are prefetched. Strategy RACE means all chunks are prefetched: n data chunks and k parity chunks. The first n chunks to arrive are used to reconstruct the file. Multiple strategies can be used in a fallback cascade if the swarm redundancy fallback mode is set to true. The default strategy is NONE, DATA, falling back to PROX, falling back to RACE</param>
+        /// <param name="redundancyFallbackMode">Specify if the retrieve strategies (chunk prefetching on redundant data) are used in a fallback cascade. The default is true.</param>
         /// <param name="swarmChunkRetrievalTimeout">Specify the timeout for chunk retrieval. The default is 30 seconds.</param>
         /// <returns>Ok</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
         Task<FileResponse> GetFileAsync(
             SwarmAddress address,
-            RedundancyLevel? swarmRedundancyLevel = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            RedundancyLevel? redundancyLevel = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -181,7 +180,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="reference">Swarm content reference</param>
         /// <returns>Reference of the pinned root hash</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
-        Task<bool> GetPinStatusAsync(
+        Task<PinStatus> GetPinStatusAsync(
             SwarmReference reference,
             CancellationToken cancellationToken = default);
 
@@ -206,9 +205,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
         Task<FileResponse> GetSocDataAsync(
             EthAddress owner,
             string id,
-            bool? swarmOnlyRootChunk = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            bool? onlyRootChunk = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default);
         
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -249,9 +248,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
             ulong? after = null,
             int? afterLevel = null,
             SwarmFeedType type = SwarmFeedType.Sequence,
-            bool? swarmOnlyRootChunk = null,
-            RedundancyStrategy? swarmRedundancyStrategy = null,
-            bool? swarmRedundancyFallbackMode = null,
+            bool? onlyRootChunk = null,
+            RedundancyStrategy? redundancyStrategy = null,
+            bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -284,10 +283,10 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="body"></param>
         /// <param name="batchId">ID of Postage Batch that is used to upload data with</param>
         /// <param name="tagId">Associate upload with an existing Tag UID</param>
-        /// <param name="swarmPin">Represents if the uploaded data should be also locally pinned on the node.</param>
-        /// <param name="swarmEncrypt">Represents the encrypting state of the file</param>
+        /// <param name="pin">Represents if the uploaded data should be also locally pinned on the node.</param>
+        /// <param name="encrypt">Represents the encrypting state of the file</param>
         /// <param name="swarmDeferredUpload">Determines if the uploaded data should be sent to the network immediately or in a deferred fashion. By default the upload will be deferred.</param>
-        /// <param name="swarmRedundancyLevel"></param>
+        /// <param name="redundancyLevel"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>Content reference</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
@@ -295,9 +294,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
             Stream body,
             PostageBatchId batchId,
             ushort? compactLevel = 0,
-            bool? swarmPin = null,
-            bool? swarmEncrypt = null,
-            RedundancyLevel swarmRedundancyLevel = RedundancyLevel.None,
+            bool? pin = null,
+            bool? encrypt = null,
+            RedundancyLevel redundancyLevel = RedundancyLevel.None,
             CancellationToken cancellationToken = default);
 
         /// <summary>Upload Chunk</summary>
@@ -332,12 +331,12 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="directoryPath">The directory path</param>
         /// <param name="batchId">ID of Postage Batch that is used to upload data with</param>
         /// <param name="tagId">Associate upload with an existing Tag UID</param>
-        /// <param name="swarmPin">Represents if the uploaded data should be also locally pinned on the node.</param>
-        /// <param name="swarmEncrypt">Represents the encrypting state of the file</param>
-        /// <param name="swarmIndexDocument">Default file to be referenced on path, if exists under that path</param>
-        /// <param name="swarmErrorDocument">Configure custom error document to be returned when a specified path can not be found in collection</param>
+        /// <param name="pin">Represents if the uploaded data should be also locally pinned on the node.</param>
+        /// <param name="encrypt">Represents the encrypting state of the file</param>
+        /// <param name="indexDocument">Default file to be referenced on path, if exists under that path</param>
+        /// <param name="errorDocument">Configure custom error document to be returned when a specified path can not be found in collection</param>
         /// <param name="swarmDeferredUpload">Determines if the uploaded data should be sent to the network immediately or in a deferred fashion. By default the upload will be deferred.</param>
-        /// <param name="swarmRedundancyLevel">Add redundancy to the data being uploaded so that downloaders can download it with better UX. 0 value is default and does not add any redundancy to the file.</param>
+        /// <param name="redundancyLevel">Add redundancy to the data being uploaded so that downloaders can download it with better UX. 0 value is default and does not add any redundancy to the file.</param>
         /// <param name="swarmAct"></param>
         /// <param name="swarmActHistoryAddress"></param>
         /// <param name="cancellationToken"></param>
@@ -347,24 +346,24 @@ namespace Etherna.Sdk.Users.Gateway.Services
             string directoryPath,
             PostageBatchId batchId,
             ushort? compactLevel = 0,
-            bool? swarmPin = null,
-            bool? swarmEncrypt = null,
-            string? swarmIndexDocument = null,
-            string? swarmErrorDocument = null,
-            RedundancyLevel swarmRedundancyLevel = RedundancyLevel.None,
+            bool? pin = null,
+            bool? encrypt = null,
+            string? indexDocument = null,
+            string? errorDocument = null,
+            RedundancyLevel redundancyLevel = RedundancyLevel.None,
             CancellationToken cancellationToken = default);
 
         /// <summary>Upload feed root manifest</summary>
         /// <param name="feed">Feed</param>
         /// <param name="batchId">ID of Postage Batch that is used to upload data with</param>
-        /// <param name="swarmPin">Represents if the uploaded data should be also locally pinned on the node.</param>
+        /// <param name="pin">Represents if the uploaded data should be also locally pinned on the node.</param>
         /// <returns>Reference hash</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
         Task<SwarmHash> UploadFeedManifestAsync(
             SwarmFeedBase feed,
             PostageBatchId batchId,
             ushort? compactLevel = 0,
-            bool swarmPin = false,
+            bool pin = false,
             CancellationToken cancellationToken = default);
 
         /// <summary>Upload a file</summary>
@@ -374,12 +373,12 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// <param name="contentType">The specified content-type is preserved for download of the asset</param>
         /// <param name="isFileCollection">Upload file/files as a collection</param>
         /// <param name="tagId">Associate upload with an existing Tag UID</param>
-        /// <param name="swarmPin">Represents if the uploaded data should be also locally pinned on the node.</param>
-        /// <param name="swarmEncrypt">Represents the encrypting state of the file</param>
-        /// <param name="swarmIndexDocument">Default file to be referenced on path, if exists under that path</param>
-        /// <param name="swarmErrorDocument">Configure custom error document to be returned when a specified path can not be found in collection</param>
+        /// <param name="pin">Represents if the uploaded data should be also locally pinned on the node.</param>
+        /// <param name="encrypt">Represents the encrypting state of the file</param>
+        /// <param name="indexDocument">Default file to be referenced on path, if exists under that path</param>
+        /// <param name="errorDocument">Configure custom error document to be returned when a specified path can not be found in collection</param>
         /// <param name="swarmDeferredUpload">Determines if the uploaded data should be sent to the network immediately or in a deferred fashion. By default the upload will be deferred.</param>
-        /// <param name="swarmRedundancyLevel">Add redundancy to the data being uploaded so that downloaders can download it with better UX. 0 value is default and does not add any redundancy to the file.</param>
+        /// <param name="redundancyLevel">Add redundancy to the data being uploaded so that downloaders can download it with better UX. 0 value is default and does not add any redundancy to the file.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Content reference</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
@@ -390,11 +389,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
             string? name = null,
             string? contentType = null,
             bool isFileCollection = false,
-            bool? swarmPin = null,
-            bool? swarmEncrypt = null,
-            string? swarmIndexDocument = null,
-            string? swarmErrorDocument = null,
-            RedundancyLevel swarmRedundancyLevel = RedundancyLevel.None,
+            bool? pin = null,
+            bool? encrypt = null,
+            string? indexDocument = null,
+            string? errorDocument = null,
+            RedundancyLevel redundancyLevel = RedundancyLevel.None,
             CancellationToken cancellationToken = default);
 
         /// <summary>Upload single owner chunk</summary>
@@ -406,7 +405,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
             SwarmSoc soc,
             PostageBatchId? batchId,
             PostageStamp? presignedPostageStamp = null,
-            bool? swarmPin = null,
+            bool? pin = null,
             CancellationToken cancellationToken = default);
     }
 }

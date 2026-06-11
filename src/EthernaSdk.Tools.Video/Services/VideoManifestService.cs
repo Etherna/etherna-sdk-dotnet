@@ -12,15 +12,15 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet.Hashing;
-using Etherna.BeeNet.Hashing.Postage;
-using Etherna.BeeNet.Hashing.Signer;
-using Etherna.BeeNet.Manifest;
-using Etherna.BeeNet.Models;
-using Etherna.BeeNet.Services;
-using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.Sdk.Tools.Video.Serialization;
+using Etherna.SwarmSdk.Hashing;
+using Etherna.SwarmSdk.Hashing.Postage;
+using Etherna.SwarmSdk.Hashing.Signer;
+using Etherna.SwarmSdk.Manifest;
+using Etherna.SwarmSdk.Models;
+using Etherna.SwarmSdk.Services;
+using Etherna.SwarmSdk.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;

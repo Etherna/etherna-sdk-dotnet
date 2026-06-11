@@ -12,13 +12,14 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet;
-using Etherna.BeeNet.Exceptions;
-using Etherna.BeeNet.Models;
-using Etherna.BeeNet.Stores;
 using Etherna.Sdk.Index.GenClients;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.Sdk.Users.Index.Models;
+using Etherna.SwarmSdk;
+using Etherna.SwarmSdk.Exceptions;
+using Etherna.SwarmSdk.Manifest;
+using Etherna.SwarmSdk.Models;
+using Etherna.SwarmSdk.Stores;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -179,7 +180,10 @@ namespace Etherna.Sdk.Users.Index.Clients
                         var swarmUri = new SwarmUri(thumbSourceDto.Path, UriKind.RelativeOrAbsolute);
 
                         var thumbAddress = swarmUri.ToSwarmAddress(v.Hash!);
-                        var thumbChunkRef = await SwarmReference.ResolveFromAddressAsync(thumbAddress, chunkStore).ConfigureAwait(false);
+                        var thumbChunkRef = await SwarmAddressResolver.ResolveReferenceAsync(
+                            thumbAddress,
+                            chunkStore,
+                            cancellationToken).ConfigureAwait(false);
                         
                         var thumbSource = new VideoManifestImageSource(
                             fileName,
@@ -297,7 +301,7 @@ namespace Etherna.Sdk.Users.Index.Clients
 
                     onFoundVideo?.Invoke(indexedVideo);
                 }
-                catch (BeeNetApiException e) when(e.StatusCode == 404)
+                catch (SwarmSdkApiException e) when(e.StatusCode == 404)
                 { }
             
             return new PaginatedResult<IndexedVideo>(

@@ -12,14 +12,15 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.BeeNet.Models;
+using Etherna.Sdk.Credit.GenClients;
+using Etherna.SwarmSdk.Models;
 
 namespace Etherna.Sdk.Internal.Models
 {
     public class UserCredit
     {
         // Constructors.
-        internal UserCredit(Credit.GenClients.CreditDto credit)
+        internal UserCredit(CreditDto credit)
         {
             Balance = credit.Balance;
             IsUnlimited = credit.IsUnlimited;
