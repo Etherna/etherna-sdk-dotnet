@@ -30,6 +30,6 @@ namespace Etherna.Sdk.Users.Gateway.Models
         // Properties.
         public PostageBatchId BatchId { get; }
         public string? Label { get; }
-        public string OwnerNodeId { get; }
+        public string? OwnerNodeId { get; }
     }
 }

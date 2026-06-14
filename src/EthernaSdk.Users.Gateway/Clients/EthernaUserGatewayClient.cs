@@ -57,7 +57,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             int depth,
             string? label = null,
             CancellationToken cancellationToken = default) =>
-            generatedUsersClient.BatchesPostAsync(depth, amount.ToPlurLong(), label, cancellationToken);
+            generatedUsersClient.BatchesPostAsync(depth, amount.ToPlurString(), label, cancellationToken);
 
         public Task<bool> DefundResourceDownloadAsync(
             SwarmReference reference,
@@ -71,22 +71,16 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         public async Task<UserCredit> GetCurrentUserCreditAsync(
             CancellationToken cancellationToken = default) =>
-            new(await generatedUsersClient.CreditAsync(cancellationToken).ConfigureAwait(false));
+            new(await generatedUsersClient.Credit2Async(cancellationToken).ConfigureAwait(false));
 
-        public Task<double> GetDownloadBytePriceAsync(
+        public async Task<XDaiValue> GetDownloadBytePriceAsync(
             CancellationToken cancellationToken = default) =>
-            generatedSystemClient.BytepriceAsync(cancellationToken);
+            XDaiValue.FromWeiString(await generatedSystemClient.Byteprice2Async(cancellationToken).ConfigureAwait(false));
 
         public async Task<IEnumerable<SwarmHash>> GetDownloadFundedResourcesByUserAsync(
             CancellationToken cancellationToken = default) =>
             (await generatedUsersClient.OfferedResourcesAsync(cancellationToken).ConfigureAwait(false))
             .Select(hash => new SwarmHash(hash));
-
-        public async Task<IEnumerable<PostageBatchRef>> GetOwnedPostageBatchesAsync(
-            string? labelContainsFilter = null,
-            CancellationToken cancellationToken = default) =>
-            (await generatedUsersClient.BatchesGetSearchAsync(labelContainsFilter, cancellationToken).ConfigureAwait(false))
-            .Select(pbr => new PostageBatchRef(pbr));
 
         public async Task<IEnumerable<string>> GetUsersFundingResourceDownloadAsync(
             SwarmHash hash,

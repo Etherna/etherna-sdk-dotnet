@@ -22,7 +22,7 @@ namespace Etherna.Sdk.Users.Gateway.Models
         // Constructors.
         internal UserCredit(UserCreditDto credit)
         {
-            Balance = credit.Balance;
+            Balance = XDaiValue.FromWeiString(credit.Balance);
             IsUnlimited = credit.IsUnlimited;
         }
 

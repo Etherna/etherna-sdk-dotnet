@@ -64,18 +64,11 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<double> GetDownloadBytePriceAsync(CancellationToken cancellationToken = default);
+        Task<XDaiValue> GetDownloadBytePriceAsync(CancellationToken cancellationToken = default);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
         Task<IEnumerable<SwarmHash>> GetDownloadFundedResourcesByUserAsync(CancellationToken cancellationToken = default);
-
-        /// <param name="labelContainsFilter">Filter only postage batches with label containing this string. Optional</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
-        Task<IEnumerable<PostageBatchRef>> GetOwnedPostageBatchesAsync(
-            string? labelContainsFilter = null,
-            CancellationToken cancellationToken = default);
 
         /// <param name="hash">The swarm resource hash</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>

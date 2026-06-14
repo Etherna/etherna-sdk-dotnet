@@ -21,6 +21,9 @@ using System.IO;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using RedundancyLevel = Etherna.SwarmSdk.Models.RedundancyLevel;
+using RedundancyStrategy = Etherna.SwarmSdk.Models.RedundancyStrategy;
+using SwarmFeedType = Etherna.SwarmSdk.Models.SwarmFeedType;
 
 namespace Etherna.Sdk.Users.Gateway.Services
 {
@@ -174,7 +177,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
             bool? redundancyFallbackMode = null,
             CancellationToken cancellationToken = default) =>
             swarmClient.GetBytesAsync(
-                reference,
+                reference: reference,
                 redundancyLevel: redundancyLevel,
                 redundancyStrategy: redundancyStrategy,
                 redundancyFallbackMode: redundancyFallbackMode,
