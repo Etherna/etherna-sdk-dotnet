@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "https://localhost:44369/swagger/v0.3/swagger.json",
+      "url": "https://localhost:44369/openapi/credit03.json",
       "output": null,
       "newLineBehavior": "Auto"
     }
@@ -92,7 +92,7 @@
       "enumNameGeneratorType": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "../src/EthernaSdk.Credit/GenClients/NSwagEthernaCreditClient.cs",
+      "output": "../src/EthernaSdk.Credit.Common/GenClients/NSwagEthernaCreditClient.cs",
       "newLineBehavior": "Auto"
     }
   }
