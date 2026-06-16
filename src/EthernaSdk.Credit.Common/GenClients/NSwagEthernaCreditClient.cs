@@ -947,21 +947,25 @@ namespace Etherna.Sdk.Credit.GenClients
         public double Amount { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("author")]
-        public string? Author { get; set; } = default!;
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Author { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("creationDateTime")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset CreationDateTime { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isApplied")]
         public bool? IsApplied { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("operationName")]
-        public string? OperationName { get; set; } = default!;
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string OperationName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("reason")]
         public string? Reason { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("userAddress")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.ComponentModel.DataAnnotations.StringLength(42, MinimumLength = 40)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^(0x)?[a-fA-F0-9]{40}$")]
         public string UserAddress { get; set; } = default!;

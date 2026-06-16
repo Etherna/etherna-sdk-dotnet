@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		EthernaSdk.sln.DotSettings = EthernaSdk.sln.DotSettings
 		nuget.config = nuget.config
+		AGENTS.md = AGENTS.md
+		CLAUDE.md = CLAUDE.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC8EACB1-0C4A-456E-9A99-AEE5BB64CADF}"
