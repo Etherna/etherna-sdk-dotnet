@@ -472,17 +472,17 @@ namespace Etherna.Sdk.Tools.Video.Services
                 chunkDirectory.FullName);
             
             // Assert.
-            Assert.Equal("e5885262e0129b5fea0a479a361d619e785d7b6627e75329faaa470723925fb4", result);
+            Assert.Equal("1bca0eebb358c5b846188359d049d36675119317de0fc9ca5f750f49a6529e90", result);
             Assert.Equal(
                 [
                     "0cc878d32c96126d47f63fbe391114ee1438cd521146fc975dea1546d302b6c0.cac",
+                    "15ed8d465d278faa9a8f305fccb7d315f68659503d87a3e0e2a9f9ec9d0a99f2.cac",
+                    "1bca0eebb358c5b846188359d049d36675119317de0fc9ca5f750f49a6529e90.cac",
                     "30bc8210952c3dfc47f134847e91118cd961b05ca9b45463a70ef9eb6b1530bc.cac",
                     "31accd890b1fa475306c6993587494c59b1ddc3725db2f73cf3787d918540867.cac",
                     "8504f2a107ca940beafc4ce2f6c9a9f0968c62a5b5893ff0e4e1e2983048d276.cac",
-                    "a966438c28b6566f5762471c52cbd4e3d83445f2ed07d20e93b9205f6c9e9998.cac",
-                    "dd031c128974182a84ccc69a3a6d1fdfd6962ac958f215d012866cce425281b4.cac",
-                    "e250fc8865894b98b21a28002decf162874f00a81f44c8af96c1249bef84c3fc.cac",
-                    "e5885262e0129b5fea0a479a361d619e785d7b6627e75329faaa470723925fb4.cac"
+                    "adcb138c9638ba3b0a7abab11775416c300a51cc142219c691e0f05e1e6fa46c.cac",
+                    "e250fc8865894b98b21a28002decf162874f00a81f44c8af96c1249bef84c3fc.cac"
                 ],
                 Directory.GetFiles(chunkDirectory.FullName).Select(Path.GetFileName).Order());
             

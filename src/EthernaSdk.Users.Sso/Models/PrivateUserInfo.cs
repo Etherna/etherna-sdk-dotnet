@@ -13,7 +13,9 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.Sdk.Sso.GenClients;
+using Etherna.SwarmSdk.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Etherna.Sdk.Users.Sso.Models
 {
@@ -25,18 +27,20 @@ namespace Etherna.Sdk.Users.Sso.Models
             Email = privateInfo.Email;
             EtherAddress = privateInfo.EtherAddress;
             EtherManagedPrivateKey = privateInfo.EtherManagedPrivateKey;
-            EtherPreviousAddresses = privateInfo.EtherPreviousAddresses;
-            EtherLoginAddress = privateInfo.EtherLoginAddress;
+            EtherPreviousAddresses = privateInfo.EtherPreviousAddresses.Select(EthAddress.FromString).ToArray();
+            EtherLoginAddress = privateInfo.EtherLoginAddress is null
+                ? null
+                : (EthAddress?)EthAddress.FromString(privateInfo.EtherLoginAddress);
             PhoneNumber = privateInfo.PhoneNumber;
             Username = privateInfo.Username;
         }
         
         public string AccountType { get; }
         public string? Email { get; }
-        public string EtherAddress { get; }
+        public EthAddress EtherAddress { get; }
         public string? EtherManagedPrivateKey { get; }
-        public IEnumerable<string> EtherPreviousAddresses { get; }
-        public string? EtherLoginAddress { get; }
+        public IEnumerable<EthAddress> EtherPreviousAddresses { get; }
+        public EthAddress? EtherLoginAddress { get; }
         public string? PhoneNumber { get; }
         public string? Username { get; }
     }

@@ -13,7 +13,9 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.Sdk.Sso.GenClients;
+using Etherna.SwarmSdk.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Etherna.Sdk.Users.Sso.Models
 {
@@ -23,13 +25,13 @@ namespace Etherna.Sdk.Users.Sso.Models
         internal SsoUserInfo(UserDto userInfo)
         {
             EtherAddress = userInfo.EtherAddress;
-            EtherPreviousAddresses = userInfo.EtherPreviousAddresses;
+            EtherPreviousAddresses = userInfo.EtherPreviousAddresses.Select(EthAddress.FromString).ToArray();
             Username = userInfo.Username;
         }
 
         // Properties.
-        public string EtherAddress { get; }
-        public IEnumerable<string> EtherPreviousAddresses { get; }
+        public EthAddress EtherAddress { get; }
+        public IEnumerable<EthAddress> EtherPreviousAddresses { get; }
         public string? Username { get; }
     }
 }

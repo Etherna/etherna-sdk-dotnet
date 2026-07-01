@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.SwarmSdk.Models;
 using System;
 using System.Collections.Generic;
 
@@ -22,7 +23,7 @@ namespace Etherna.Sdk.Users.Index.Models
         DateTimeOffset creationDateTime,
         bool isEditable,
         bool isFrozen,
-        string ownerAddress,
+        EthAddress ownerAddress,
         IDictionary<string, string> textHistory,
         string videoId)
     {
@@ -31,7 +32,7 @@ namespace Etherna.Sdk.Users.Index.Models
         public DateTimeOffset CreationDateTime { get; } = creationDateTime;
         public bool IsEditable { get; } = isEditable;
         public bool IsFrozen { get; } = isFrozen;
-        public string OwnerAddress { get; } = ownerAddress;
+        public EthAddress OwnerAddress { get; } = ownerAddress;
         public IDictionary<string, string> TextHistory { get; } = textHistory;
         public string VideoId { get; } = videoId;
     }

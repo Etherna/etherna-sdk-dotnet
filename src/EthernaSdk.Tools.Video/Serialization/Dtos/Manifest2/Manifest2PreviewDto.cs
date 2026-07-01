@@ -13,6 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.Sdk.Tools.Video.Models;
+using Etherna.SwarmSdk.Models;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
@@ -31,7 +32,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2
             string title,
             long createdAt,
             long? updatedAt,
-            string ownerEthAddress,
+            EthAddress ownerEthAddress,
             long duration,
             Manifest2ThumbnailDto? thumbnail)
         {
@@ -51,7 +52,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2
         public string Title { get; set; }
         public long CreatedAt { get; set; }
         public long? UpdatedAt { get; set; }
-        public string OwnerAddress { get; set; }
+        public EthAddress OwnerAddress { get; set; }
         public long Duration { get; set; }
         public Manifest2ThumbnailDto? Thumbnail { get; set; }
 

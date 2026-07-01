@@ -37,6 +37,6 @@ namespace Etherna.Sdk.Users.Credit.Models
         public bool? IsApplied { get; }
         public string OperationName { get; }
         public string? Reason { get; }
-        public string UserAddress { get; }
+        public EthAddress UserAddress { get; }
     }
 }

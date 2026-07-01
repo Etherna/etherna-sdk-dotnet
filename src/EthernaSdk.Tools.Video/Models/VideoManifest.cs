@@ -33,7 +33,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         string description,
         TimeSpan duration,
         string title,
-        string ownerEthAddress,
+        EthAddress ownerEthAddress,
         string? personalData,
         IEnumerable<VideoManifestVideoSource> videoSources,
         VideoManifestImage? thumbnail,
@@ -55,7 +55,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         public string Description { get; } = description;
         public TimeSpan Duration { get; } = duration;
         public string Title { get; } = title;
-        public string OwnerEthAddress { get; } = ownerEthAddress;
+        public EthAddress OwnerEthAddress { get; } = ownerEthAddress;
         public VideoManifestPersonalData? PersonalData { get; } = TryParsePersonalData(personalData);
         public string? PersonalDataRaw { get; } = personalData;
         public VideoManifestImage? Thumbnail { get; } = thumbnail;
@@ -77,7 +77,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                    string.Equals(Description, other.Description, StringComparison.Ordinal) &&
                    Duration.Equals(other.Duration) &&
                    string.Equals(Title, other.Title, StringComparison.Ordinal) &&
-                   string.Equals(OwnerEthAddress, other.OwnerEthAddress, StringComparison.Ordinal) &&
+                   OwnerEthAddress.Equals(other.OwnerEthAddress) &&
                    EqualityComparer<VideoManifestPersonalData>.Default.Equals(PersonalData, other.PersonalData) &&
                    string.Equals(PersonalDataRaw, other.PersonalDataRaw, StringComparison.Ordinal) &&
                    (Thumbnail?.Equals(other.Thumbnail) ?? other.Thumbnail is null) &&
@@ -92,7 +92,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             string.GetHashCode(Description, StringComparison.Ordinal) ^
             Duration.GetHashCode() ^
             string.GetHashCode(Title, StringComparison.Ordinal) ^
-            string.GetHashCode(OwnerEthAddress, StringComparison.Ordinal) ^
+            OwnerEthAddress.GetHashCode() ^
             PersonalData?.GetHashCode() ?? 0 ^
             string.GetHashCode(PersonalDataRaw, StringComparison.Ordinal) ^
             Thumbnail?.GetHashCode() ?? 0 ^

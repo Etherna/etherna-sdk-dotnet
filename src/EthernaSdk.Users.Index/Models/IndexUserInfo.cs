@@ -12,19 +12,20 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.SwarmSdk.Models;
 using System;
 
 namespace Etherna.Sdk.Users.Index.Models
 {
     public class IndexUserInfo(
         string id,
-        string? address,
+        EthAddress? address,
         DateTimeOffset creationDateTime,
         bool? isSuperModerator)
     {
         // Properties.
         public string Id { get; } = id;
-        public string? Address { get; } = address;
+        public EthAddress? Address { get; } = address;
         public DateTimeOffset CreationDateTime { get; } = creationDateTime;
         public bool? IsSuperModerator { get; } = isSuperModerator;
     }

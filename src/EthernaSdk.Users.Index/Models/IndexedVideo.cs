@@ -25,7 +25,7 @@ namespace Etherna.Sdk.Users.Index.Models
         VoteValue? currentVoteValue,
         string? description,
         SwarmReference? lastValidManifestReference,
-        string ownerAddress,
+        EthAddress ownerAddress,
         VideoManifestPersonalData? personalData,
         string? title,
         long totDownvotes,
@@ -38,7 +38,7 @@ namespace Etherna.Sdk.Users.Index.Models
         public VoteValue? CurrentVoteValue { get; } = currentVoteValue;
         public string? Description { get; } = description;
         public SwarmReference? LastValidManifestReference { get; } = lastValidManifestReference;
-        public string OwnerAddress { get; } = ownerAddress;
+        public EthAddress OwnerAddress { get; } = ownerAddress;
         public VideoManifestPersonalData? PersonalData { get; } = personalData;
         public string? Title { get; } = title;
         public long TotDownvotes { get; } = totDownvotes;

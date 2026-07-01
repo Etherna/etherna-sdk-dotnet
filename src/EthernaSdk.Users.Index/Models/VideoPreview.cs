@@ -22,7 +22,7 @@ namespace Etherna.Sdk.Users.Index.Models
         long? createdAt,
         long? duration,
         SwarmReference? reference,
-        string ownerAddress,
+        EthAddress ownerAddress,
         VideoManifestImage thumbnail,
         string? title,
         long? updatedAt)
@@ -31,7 +31,7 @@ namespace Etherna.Sdk.Users.Index.Models
         public string Id { get; } = id;
         public long? CreatedAt { get; } = createdAt;
         public long? Duration { get; } = duration;
-        public string OwnerAddress { get; } = ownerAddress;
+        public EthAddress OwnerAddress { get; } = ownerAddress;
         public SwarmReference? Reference { get; } = reference;
         public VideoManifestImage Thumbnail { get; } = thumbnail;
         public string? Title { get; } = title;

@@ -13,6 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.Sdk.Tools.Video.Models;
+using Etherna.SwarmSdk.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -44,7 +45,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
         public string Title { get; set; }
         public string Description { get; set; }
         public string OriginalQuality { get; set; }
-        public string OwnerAddress { get; set; }
+        public EthAddress OwnerAddress { get; set; }
         public long Duration { get; set; }
         public Manifest1ThumbnailDto? Thumbnail { get; set; }
         public IEnumerable<Manifest1VideoSourceDto> Sources { get; set; }
