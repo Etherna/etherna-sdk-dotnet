@@ -26,29 +26,7 @@ namespace Etherna.Sdk.Users
         public const string DefaultEthernaUserHttpClientName = "ethernaUserHttpClient";
 
         // Methods.
-        public static IEthernaUserClientsBuilder AddEthernaUserClientsWithApiKeyAuth(
-            this IServiceCollection services,
-            string apiKey,
-            IEnumerable<string> scopes,
-            string authority = EthernaUserClientsBuilder.DefaultSsoUrl,
-            string httpClientName = DefaultEthernaUserHttpClientName,
-            Action<HttpClient>? configureHttpClient = null)
-        {
-            // Register Etherna OpenId Connect client with "password" flow.
-            services.AddEthernaApiKeyOidcClient(
-                authority,
-                apiKey,
-                scopes,
-                httpClientName,
-                configureHttpClient);
-
-            return new EthernaUserClientsBuilder(
-                services,
-                httpClientName,
-                new Uri(authority));
-        }
-
-        public static IEthernaUserClientsBuilder AddEthernaUserClientsWithCodeAuth(
+        public static IEthernaUserClientsBuilder AddEthernaUserClients(
             this IServiceCollection services,
             string clientId,
             string? clientSecret,
@@ -58,8 +36,9 @@ namespace Etherna.Sdk.Users
             string httpClientName = DefaultEthernaUserHttpClientName,
             Action<HttpClient>? configureHttpClient = null)
         {
-            // Register Etherna OpenId Connect client with "code" flow.
-            services.AddEthernaCodeOidcClient(
+            // Register Etherna OpenId Connect client with all the sign in flows. The flow is chosen
+            // at sign in time with the IEthernaSignInService overloads, eventually passing an api key.
+            services.AddEthernaOidcClient(
                 authority,
                 clientId,
                 clientSecret,

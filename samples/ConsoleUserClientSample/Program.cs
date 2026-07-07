@@ -100,34 +100,26 @@ namespace ConsoleUserClientSample
             
             // Register etherna credit service client.
             var services = new ServiceCollection();
-            IEthernaUserClientsBuilder ethernaClientsBuilder;
-            if (string.IsNullOrWhiteSpace(apiKey)) //"code" grant flow
-            {
-                ethernaClientsBuilder = services.AddEthernaUserClientsWithCodeAuth(
-                    ssoClientId!,
-                    ssoClientSecret,
-                    3000,
-                    new[] { "userApi.credit" },
-                    authority: ssoBaseUrl!);
-            }
-            else //"password" grant flow
-            {
-                ethernaClientsBuilder = services.AddEthernaUserClientsWithApiKeyAuth(
-                    apiKey,
-                    new[] { "userApi.credit" },
-                    authority: ssoBaseUrl!);
-            }
+            var ethernaClientsBuilder = services.AddEthernaUserClients(
+                ssoClientId!,
+                ssoClientSecret,
+                3000,
+                ["userApi.credit"],
+                authority: ssoBaseUrl!);
             ethernaClientsBuilder.AddEthernaCreditClient(creditBaseUrl!);
             
             // Get client.
             var serviceProvider = services.BuildServiceProvider();
             var client = serviceProvider.GetRequiredService<IEthernaUserCreditClient>();
             
-            // Signin user.
+            // Signin user, choosing the flow from the parsed input.
             var ethernaSignInService = serviceProvider.GetRequiredService<IEthernaSignInService>();
             try
             {
-                await ethernaSignInService.SignInAsync();
+                if (string.IsNullOrWhiteSpace(apiKey)) //"code" grant flow
+                    await ethernaSignInService.SignInAsync();
+                else //"password" grant flow
+                    await ethernaSignInService.SignInAsync(apiKey);
             }
             catch (InvalidOperationException e)
             {

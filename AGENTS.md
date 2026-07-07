@@ -24,7 +24,7 @@ There is nothing to "run": to exercise the clients use the projects under `sampl
 Solution `EthernaSdk.sln`. Project folders are named `EthernaSdk.*` but root namespaces use `Etherna.Sdk.*`; under the root, namespace mirrors the folder path.
 
 - **`src/EthernaSdk.{Credit,Gateway,Index,Sso}.Common`** (`Etherna.Sdk.<Service>`) — Each contains only the NSwag-generated client under `GenClients/` (namespace `Etherna.Sdk.<Service>.GenClients`, file `NSwagEtherna<Service>Client.cs`). Generated code: never edit by hand, regenerate instead (see below).
-- **`src/EthernaSdk.UsersCommon`** (`Etherna.Sdk.Users`) — The user-clients builder (`IEthernaUserClientsBuilder`/`EthernaUserClientsBuilder`) and `ServiceCollectionExtensions` entry points `AddEthernaUserClientsWithApiKeyAuth` / `AddEthernaUserClientsWithCodeAuth`. Authentication ("api key" or "oauth code" flow, with access-token expiration management) comes from `Etherna.Authentication.Native`.
+- **`src/EthernaSdk.UsersCommon`** (`Etherna.Sdk.Users`) — The user-clients builder (`IEthernaUserClientsBuilder`/`EthernaUserClientsBuilder`) and the `ServiceCollectionExtensions` entry point `AddEthernaUserClients`. Authentication comes from `Etherna.Authentication.Native`, which registers both sign-in flows together ("oauth code" and "api key", with access-token expiration management); the flow is chosen only at sign-in time via the `IEthernaSignInService.SignInAsync()` / `SignInAsync(apiKey)` overloads, with no registration-time commitment.
 - **`src/EthernaSdk.Users.{Credit,Gateway,Index,Sso}`** (`Etherna.Sdk.Users.<Service>`) — The public per-service clients for user applications. `Clients/` holds the interface + implementation pair (`IEthernaUserSsoClient`/`EthernaUserSsoClient`, …); `Models/` holds the public wrapper models; `Extensions/EthernaUserClientsBuilderExtensions.cs` adds the per-service registration (`AddEthernaCreditClient`, `AddEthernaGatewayClient`, `AddEthernaIndexClient`, `AddEthernaSsoClient`), declared in the `Etherna.Sdk.Users` namespace via `// ReSharper disable CheckNamespace` so all registrations are reachable from one using. `Users.Gateway` also has `Services/GatewayService` (higher-level gateway operations, e.g. postage batch creation/waiting), with an optional `dryMode` on `AddEthernaGatewayClient`.
 - **`src/EthernaSdk.Internal`** (`Etherna.Sdk.Internal`) — Service-to-service clients (`EthernaInternalCreditClient`, `EthernaInternalSsoClient`) for internal worker applications only.
 - **`src/EthernaSdk.Internal.AspNetCore`** (`Etherna.Sdk.Internal.AspNetCore`) — ASP.NET Core registration adapter for the internal clients: `AddEthernaInternalClients` + `IEthernaInternalClientsBuilder`, "client credentials" flow via `Duende.AccessTokenManagement`.
@@ -181,7 +181,7 @@ Task<PrivateUserInfo> GetPrivateUserInfoAsync(CancellationToken cancellationToke
 ## Dependency Injection
 
 - Constructor injection exclusively
-- Builder pattern with extension methods: `AddEthernaUserClientsWithCodeAuth()` / `AddEthernaUserClientsWithApiKeyAuth()` + per-service `AddEtherna<Service>Client()`, `AddEthernaInternalClients()`
+- Builder pattern with extension methods: `AddEthernaUserClients()` + per-service `AddEtherna<Service>Client()`, `AddEthernaInternalClients()`
 - Factory-based registration for complex dependencies
 
 ## Testing (xUnit + Moq)
