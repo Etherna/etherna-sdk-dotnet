@@ -12,8 +12,8 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.IdentityModel.Client;
 using Etherna.Sdk.Internal.Clients;
-using IdentityModel.Client;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
