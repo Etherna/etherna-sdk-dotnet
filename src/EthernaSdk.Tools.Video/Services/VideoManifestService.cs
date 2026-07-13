@@ -194,19 +194,23 @@ namespace Etherna.Sdk.Tools.Video.Services
 
             // Find version.
             var versionStr = rootManifestJsonElement.TryGetProperty("v", out var jsonVersion) ?
-                jsonVersion.GetString()! :
+                (jsonVersion.ValueKind == JsonValueKind.String ? jsonVersion.GetString() : null) :
                 "1.0"; //first version didn't have an identifier
-            var version = new Version(versionStr);
+            if (!Version.TryParse(versionStr, out var version))
+                return new PublishedVideoManifest(
+                    manifestReference,
+                    null,
+                    [new ValidationError(ValidationErrorType.JsonConvert, $"Invalid manifest version: {versionStr}")]);
 
             // Deserialize document.
             var (videoManifest, errors) = version.Major switch
             {
                 1 => await ManifestSerializer.TryDeserializeManifest1Async(rootManifestJsonElement, chunkStore).ConfigureAwait(false),
                 2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestReference, rootManifestJsonElement, chunkService, chunkStore).ConfigureAwait(false),
-                _ => (null, [new ValidationError(ValidationErrorType.JsonConvert, "Invalid version")])
+                _ => (null, [new ValidationError(ValidationErrorType.UnsupportedManifestVersion, $"Unsupported manifest version: {version}")])
             };
 
-            return new PublishedVideoManifest(manifestReference, videoManifest, errors);
+            return new PublishedVideoManifest(manifestReference, videoManifest, errors, version);
         }
     }
 }

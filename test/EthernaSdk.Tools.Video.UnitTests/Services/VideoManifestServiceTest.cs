@@ -183,7 +183,8 @@ namespace Etherna.Sdk.Tools.Video.Services
                                         "0000000000000000000000000000000000000000000000000000000000000009")
                                 ],
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00")),
-                            [])));
+                            [],
+                            new Version(2, 1))));
                 }
                 
                 //v2.0
@@ -302,7 +303,8 @@ namespace Etherna.Sdk.Tools.Video.Services
                                     ]),
                                 [],
                                 DateTimeOffset.Parse("8/22/2024 12:18:54 AM +00:00")),
-                            [])));
+                            [],
+                            new Version(2, 0))));
                 }
                 
                 //v1.1
@@ -352,7 +354,8 @@ namespace Etherna.Sdk.Tools.Video.Services
                                     ]),
                                 [],
                                 updatedAt: DateTimeOffset.Parse("8/13/2022 1:35:33.617 PM +00:00")),
-                            [])));
+                            [],
+                            new Version(1, 1))));
                 }
                 
                 //v1.0
@@ -402,7 +405,8 @@ namespace Etherna.Sdk.Tools.Video.Services
                                     ]),
                                 [],
                                 updatedAt: null),
-                            [])));
+                            [],
+                            new Version(1, 0))));
                 }
 
                 return tests.Select(t => new object[] { t });

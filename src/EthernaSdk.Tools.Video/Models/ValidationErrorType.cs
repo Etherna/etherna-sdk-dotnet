@@ -30,5 +30,6 @@ namespace Etherna.Sdk.Tools.Video.Models
         MissingOriginalQuality,
         MissingTitle,
         Unknown,
+        UnsupportedManifestVersion,
     }
 }

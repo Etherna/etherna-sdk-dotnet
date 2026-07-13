@@ -13,6 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.SwarmSdk.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,11 +22,18 @@ namespace Etherna.Sdk.Tools.Video.Models
     public class PublishedVideoManifest(
         SwarmReference reference,
         VideoManifest? manifest,
-        ValidationError[] validationErrors)
+        ValidationError[] validationErrors,
+        Version? schemaVersion = null)
     {
         // Properties.
         public VideoManifest? Manifest { get; } = manifest;
         public SwarmReference Reference { get; } = reference;
+
+        /// <summary>
+        /// The manifest schema version declared by the published document, when detectable.
+        /// </summary>
+        public Version? SchemaVersion { get; } = schemaVersion;
+
         public IReadOnlyCollection<ValidationError> ValidationErrors { get; } = validationErrors;
         
         // Methods.
@@ -36,12 +44,14 @@ namespace Etherna.Sdk.Tools.Video.Models
             return GetType() == other.GetType() &&
                    Reference.Equals(other.Reference) &&
                    EqualityComparer<VideoManifest?>.Default.Equals(Manifest, other.Manifest) &&
+                   EqualityComparer<Version?>.Default.Equals(SchemaVersion, other.SchemaVersion) &&
                    ValidationErrors.SequenceEqual(other.ValidationErrors);
         }
 
         public override int GetHashCode() =>
             Reference.GetHashCode() ^
             Manifest?.GetHashCode() ?? 0 ^
+            SchemaVersion?.GetHashCode() ?? 0 ^
             ValidationErrors.GetHashCode();
     }
 }
