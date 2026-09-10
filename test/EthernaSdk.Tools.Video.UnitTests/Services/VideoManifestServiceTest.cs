@@ -12,7 +12,10 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.UniversalFiles;
+using Etherna.Sdk.Tools.UniversalFiles.Extensions;
 using Etherna.Sdk.Tools.Video.Models;
+using Etherna.SwarmSdk;
 using Etherna.SwarmSdk.Hashing;
 using Etherna.SwarmSdk.Hashing.Pipeline;
 using Etherna.SwarmSdk.Hashing.Postage;
@@ -20,11 +23,14 @@ using Etherna.SwarmSdk.Manifest;
 using Etherna.SwarmSdk.Models;
 using Etherna.SwarmSdk.Services;
 using Etherna.SwarmSdk.Stores;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -510,6 +516,53 @@ namespace Etherna.Sdk.Tools.Video.Services
             // Assert.
             Assert.Equal(test.ExpectedManifest, videoManifest);
         }
+
+        [Theory, MemberData(nameof(ParseManifestTests))]
+        public async Task ParseManifestWithFileProviderAsync(ParseManifestTestElement test)
+        {
+            ArgumentNullException.ThrowIfNull(test);
+            
+            // Setup.
+            var chunkStore = new MemoryChunkStore();
+            var rootHash = await test.UploadContentsAsync(chunkStore);
+            var swarmClientMock = new Mock<ISwarmClient>();
+            swarmClientMock.Setup(c => c.GetFileAsync(
+                    It.IsAny<SwarmAddress>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<RedundancyLevel?>(),
+                    It.IsAny<RedundancyStrategy?>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<int?>(),
+                    It.IsAny<long?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(new InvocationFunc(invocation =>
+                    GetFileResponseHelper((SwarmAddress)invocation.Arguments[0], chunkStore)));
+            var uFileProvider = new UFileProvider(new Mock<IHttpClientFactory>().Object)
+                .UseSwarmUFiles(swarmClientMock.Object);
+            VideoManifestService videoManifestService = new(new ChunkService());
+        
+            // Action.
+            var videoManifest = await videoManifestService.GetPublishedVideoManifestAsync(rootHash, chunkStore, uFileProvider);
+        
+            // Assert.
+            Assert.Equal(test.ExpectedManifest, videoManifest);
+            swarmClientMock.Verify(c => c.GetFileAsync(
+                    It.IsAny<SwarmAddress>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<RedundancyLevel?>(),
+                    It.IsAny<RedundancyStrategy?>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<int?>(),
+                    It.IsAny<long?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<CancellationToken>()),
+                Times.AtLeastOnce);
+        }
         
         // Helpers.
         private static void AddFileToManifestHelper(
@@ -545,6 +598,16 @@ namespace Etherna.Sdk.Tools.Video.Services
                 null);
             return manifest;
         }
+
+        private static async Task<FileResponse> GetFileResponseHelper(
+            SwarmAddress address,
+            IReadOnlyChunkStore chunkStore) =>
+            new(null,
+                new Dictionary<string, IEnumerable<string>>(),
+                await new ChunkService().GetFileStreamFromAddressAsync(
+                    address,
+                    ManifestPathResolver.BrowserResolver,
+                    chunkStore));
         
         private static async Task<SwarmReference> UploadStringFileHelper(
             string strValue,
