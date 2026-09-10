@@ -28,7 +28,7 @@ Solution `EthernaSdk.sln`. Project folders are named `EthernaSdk.*` but root nam
 - **`src/EthernaSdk.Users.{Credit,Gateway,Index,Sso}`** (`Etherna.Sdk.Users.<Service>`) — The public per-service clients for user applications. `Clients/` holds the interface + implementation pair (`IEthernaUserSsoClient`/`EthernaUserSsoClient`, …); `Models/` holds the public wrapper models; `Extensions/EthernaUserClientsBuilderExtensions.cs` adds the per-service registration (`AddEthernaCreditClient`, `AddEthernaGatewayClient`, `AddEthernaIndexClient`, `AddEthernaSsoClient`), declared in the `Etherna.Sdk.Users` namespace via `// ReSharper disable CheckNamespace` so all registrations are reachable from one using. `Users.Gateway` also has `Services/GatewayService` (higher-level gateway operations, e.g. postage batch creation/waiting), with an optional `dryMode` on `AddEthernaGatewayClient`.
 - **`src/EthernaSdk.Internal`** (`Etherna.Sdk.Internal`) — Service-to-service clients (`EthernaInternalCreditClient`, `EthernaInternalSsoClient`) for internal worker applications only.
 - **`src/EthernaSdk.Internal.AspNetCore`** (`Etherna.Sdk.Internal.AspNetCore`) — ASP.NET Core registration adapter for the internal clients: `AddEthernaInternalClients` + `IEthernaInternalClientsBuilder`, "client credentials" flow via `Duende.AccessTokenManagement`.
-- **`src/EthernaSdk.Tools.Video`** (`Etherna.Sdk.Tools.Video`) — Tools to build, serialize and parse Etherna video manifests (`VideoManifestService`, `HlsService`); versioned manifest DTOs under `Serialization/Dtos/` (`Manifest1/`, `Manifest2/`, `PersonalData1/`).
+- **`src/EthernaSdk.Tools.Video`** (`Etherna.Sdk.Tools.Video`) — Tools to build, serialize and parse Etherna video manifests (`VideoManifestService`, `HlsService`); versioned manifest DTOs under `Serialization/Dtos/` (`Manifest1/`, `Manifest2/`, `PersonalData1/`). A published manifest is read through `Services/SwarmResourceReader`: file contents (preview, details, HLS playlists) go through the `IUFileProvider` when the caller passes one — a Swarm file is then served whole by the bzz endpoint, one request per file — and chunk by chunk through the chunk store otherwise; entry references (sources, thumbnails, captions, HLS segments) are always resolved through the chunk store, walking each mantaray manifest once per read.
 - **`src/EthernaSdk.Tools.UniversalFiles`** (`Etherna.Sdk.Tools.UniversalFiles`) — The `UUri`/`UFile` abstraction over local, online and Swarm resources (`UUriKind` flags, `UFileProvider`).
 - **`src/EthernaSdk.Tools.Tokens`** (`Etherna.Sdk.Tools.Tokens`) — Blockchain token utilities on Nethereum (e.g. `UniswapService` pool price reads).
 - **`test/`** — xUnit + Moq: `EthernaSdk.Tools.UniversalFiles.Tests`, `EthernaSdk.Tools.Video.UnitTests`.
@@ -134,7 +134,7 @@ Use principal-style section comments (singular `// Constructor.` when there is o
 - Nullable reference types enabled
 - `ArgumentNullException.ThrowIfNull()` for parameter validation
 - `is null` / `is not null` pattern matching
-- Prefer `null` over `default` as default value for optional parameters
+- Prefer `null` over `default` wherever the type admits it: optional parameter defaults, late-init member initializers (`= null!`, not `= default!`), returns and assignments. Keep `default` only where `null` can't apply: non-nullable value types (e.g. `CancellationToken cancellationToken = default`) and unconstrained generic type parameters.
 - `??` and `??=` operators
 
 ## XML Documentation
@@ -165,6 +165,7 @@ Task<PrivateUserInfo> GetPrivateUserInfoAsync(CancellationToken cancellationToke
 - Primary constructors everywhere applicable
 - Collection expressions: `[]`, `[..spread]`
 - Target-typed `new()` when type is clear
+- Lock fields: prefer the dedicated `System.Threading.Lock` type (.NET 9+) over a plain `object` — more expressive, and the compiler enforces correct `lock` usage on it.
 - Raw string literals for embedded data:
   ```csharp
   private const string UniswapV3Abi =

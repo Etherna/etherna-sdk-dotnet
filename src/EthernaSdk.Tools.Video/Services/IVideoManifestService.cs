@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.UniversalFiles;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.SwarmSdk.Hashing.Postage;
 using Etherna.SwarmSdk.Models;
@@ -28,8 +29,28 @@ namespace Etherna.Sdk.Tools.Video.Services
             bool createDirectory = true,
             IPostageStampIssuer? postageStampIssuer = null);
 
+        /// <summary>
+        /// Get a published video manifest, reading every resource through the chunk store.
+        /// </summary>
+        /// <param name="manifestReference">The manifest root reference</param>
+        /// <param name="chunkStore">The chunk store</param>
+        /// <returns>The published video manifest, with its validation errors</returns>
         Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
             SwarmReference manifestReference,
             IReadOnlyChunkStore chunkStore);
+
+        /// <summary>
+        /// Get a published video manifest, reading file contents through the file provider and resolving entry
+        /// references through the chunk store. A Swarm file provider serves each file whole from the bzz endpoint,
+        /// instead of composing it chunk by chunk.
+        /// </summary>
+        /// <param name="manifestReference">The manifest root reference</param>
+        /// <param name="chunkStore">The chunk store, resolving the entry references</param>
+        /// <param name="uFileProvider">The file provider, reading the file contents</param>
+        /// <returns>The published video manifest, with its validation errors</returns>
+        Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+            SwarmReference manifestReference,
+            IReadOnlyChunkStore chunkStore,
+            IUFileProvider uFileProvider);
     }
 }

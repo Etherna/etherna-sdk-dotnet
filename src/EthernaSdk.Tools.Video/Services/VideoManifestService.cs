@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.UniversalFiles;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.Sdk.Tools.Video.Serialization;
 using Etherna.SwarmSdk.Hashing;
@@ -178,15 +179,32 @@ namespace Etherna.Sdk.Tools.Video.Services
             return await mantarayManifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false);
         }
 
-        public async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+        public Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
             SwarmReference manifestReference,
-            IReadOnlyChunkStore chunkStore)
+            IReadOnlyChunkStore chunkStore) =>
+            GetPublishedVideoManifestAsync(
+                manifestReference,
+                new SwarmResourceReader(chunkService, chunkStore));
+
+        public Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+            SwarmReference manifestReference,
+            IReadOnlyChunkStore chunkStore,
+            IUFileProvider uFileProvider)
+        {
+            ArgumentNullException.ThrowIfNull(uFileProvider);
+
+            return GetPublishedVideoManifestAsync(
+                manifestReference,
+                new SwarmResourceReader(chunkService, chunkStore, uFileProvider));
+        }
+
+        // Helpers.
+        private static async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+            SwarmReference manifestReference,
+            SwarmResourceReader resourceReader)
         {
             JsonElement rootManifestJsonElement;
-            var rootManifestStream = await chunkService.GetFileStreamFromAddressAsync(
-                manifestReference,
-                ManifestPathResolver.BrowserResolver,
-                chunkStore).ConfigureAwait(false);
+            var rootManifestStream = await resourceReader.GetFileStreamAsync(manifestReference).ConfigureAwait(false);
             await using (rootManifestStream.ConfigureAwait(false))
             {
                 rootManifestJsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(rootManifestStream).ConfigureAwait(false);
@@ -205,8 +223,8 @@ namespace Etherna.Sdk.Tools.Video.Services
             // Deserialize document.
             var (videoManifest, errors) = version.Major switch
             {
-                1 => await ManifestSerializer.TryDeserializeManifest1Async(rootManifestJsonElement, chunkStore).ConfigureAwait(false),
-                2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestReference, rootManifestJsonElement, chunkService, chunkStore).ConfigureAwait(false),
+                1 => await ManifestSerializer.TryDeserializeManifest1Async(rootManifestJsonElement, resourceReader).ConfigureAwait(false),
+                2 => await ManifestSerializer.TryDeserializeManifest2Async(manifestReference, rootManifestJsonElement, resourceReader).ConfigureAwait(false),
                 _ => (null, [new ValidationError(ValidationErrorType.UnsupportedManifestVersion, $"Unsupported manifest version: {version}")])
             };
 

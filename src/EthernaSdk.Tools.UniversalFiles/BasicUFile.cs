@@ -197,7 +197,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             }
             catch { }
 
-            return default;
+            return null;
         }
     }
 }
