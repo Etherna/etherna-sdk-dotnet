@@ -134,7 +134,7 @@ Use principal-style section comments (singular `// Constructor.` when there is o
 - Nullable reference types enabled
 - `ArgumentNullException.ThrowIfNull()` for parameter validation
 - `is null` / `is not null` pattern matching
-- Prefer `null` over `default` as default value for optional parameters
+- Prefer `null` over `default` wherever the type admits it: optional parameter defaults, late-init member initializers (`= null!`, not `= default!`), returns and assignments. Keep `default` only where `null` can't apply: non-nullable value types (e.g. `CancellationToken cancellationToken = default`) and unconstrained generic type parameters.
 - `??` and `??=` operators
 
 ## XML Documentation
@@ -165,6 +165,7 @@ Task<PrivateUserInfo> GetPrivateUserInfoAsync(CancellationToken cancellationToke
 - Primary constructors everywhere applicable
 - Collection expressions: `[]`, `[..spread]`
 - Target-typed `new()` when type is clear
+- Lock fields: prefer the dedicated `System.Threading.Lock` type (.NET 9+) over a plain `object` — more expressive, and the compiler enforces correct `lock` usage on it.
 - Raw string literals for embedded data:
   ```csharp
   private const string UniswapV3Abi =

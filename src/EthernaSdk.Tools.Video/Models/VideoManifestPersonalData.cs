@@ -68,7 +68,7 @@ namespace Etherna.Sdk.Tools.Video.Models
         // Static methods.
         public static bool TryDeserialize(string? rawPersonalData, out VideoManifestPersonalData personalData)
         {
-            personalData = default!;
+            personalData = null!;
 
             if (rawPersonalData is null)
                 return false;
