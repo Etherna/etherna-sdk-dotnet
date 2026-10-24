@@ -132,8 +132,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 batchId,
                 cancellationToken: cancellationToken);
 
-        public Task<bool> CreatePinAsync(SwarmReference reference, CancellationToken cancellationToken = default) =>
-            swarmClient.CreatePinAsync(reference, cancellationToken);
+        public Task<bool> CreatePinAsync(
+            SwarmReference reference,
+            RedundancyLevel? redundancyLevel = null,
+            CancellationToken cancellationToken = default) =>
+            swarmClient.CreatePinAsync(reference, redundancyLevel, cancellationToken);
 
         public Task<bool> DefundResourceDownloadAsync(
             SwarmReference reference,

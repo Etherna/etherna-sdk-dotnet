@@ -539,7 +539,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                     It.IsAny<string?>(),
                     It.IsAny<CancellationToken>()))
                 .Returns(new InvocationFunc(invocation =>
-                    GetFileResponseHelper((SwarmAddress)invocation.Arguments[0], chunkStore)));
+                    GetFileResponseHelper((SwarmAddress)invocation.Arguments[0]!, chunkStore)));
             var uFileProvider = new UFileProvider(new Mock<IHttpClientFactory>().Object)
                 .UseSwarmUFiles(swarmClientMock.Object);
             VideoManifestService videoManifestService = new(new ChunkService());

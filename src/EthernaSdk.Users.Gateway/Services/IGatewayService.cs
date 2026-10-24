@@ -51,9 +51,11 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         /// <summary>Pin the root hash with the given reference</summary>
         /// <param name="reference">Swarm content reference</param>
+        /// <param name="redundancyLevel"></param>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
         Task<bool> CreatePinAsync(
             SwarmReference reference,
+            RedundancyLevel? redundancyLevel = null,
             CancellationToken cancellationToken = default);
 
         Task<bool> DefundResourceDownloadAsync(

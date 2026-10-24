@@ -138,7 +138,7 @@ namespace Etherna.Sdk.Tools.Video.Services
                     It.IsAny<CancellationToken>()))
                 .Returns(new InvocationFunc(invocation =>
                 {
-                    var address = (SwarmAddress)invocation.Arguments[0];
+                    var address = (SwarmAddress)invocation.Arguments[0]!;
                     requestedAddresses.Add(address);
                     return GetFileResponseHelper(address, chunkStore);
                 }));
