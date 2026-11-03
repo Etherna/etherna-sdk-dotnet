@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using System.Threading;
 
 // ReSharper disable CheckNamespace
 namespace Etherna.Sdk.Users
@@ -29,7 +30,8 @@ namespace Etherna.Sdk.Users
             this IEthernaUserClientsBuilder builder,
             SwarmClients apiCompatibility = SwarmClients.Beehive,
             bool dryMode = false,
-            string gatewayBaseUrl = EthernaUserClientsBuilder.DefaultGatewayUrl)
+            string gatewayBaseUrl = EthernaUserClientsBuilder.DefaultGatewayUrl,
+            SwarmClientTimeouts? timeouts = null)
         {
             ArgumentNullException.ThrowIfNull(builder);
             
@@ -39,12 +41,18 @@ namespace Etherna.Sdk.Users
             {
                 var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>()!;
                 var httpClient = httpClientFactory.CreateClient(builder.HttpClientName);
+
+                // The swarm client bounds each call by the class of its operation, and refuses an HttpClient whose
+                // timeout is shorter than any bound. The factory builds a new instance at every call, so lifting
+                // the timeout here leaves the consumer's one to the instances of the REST clients.
+                httpClient.Timeout = Timeout.InfiniteTimeSpan;
                 
                 return new SwarmClient(
                     nodeUrl: gatewayBaseUri,
                     apiCompatibility: apiCompatibility,
                     httpClient: httpClient,
-                    isDryMode: dryMode);
+                    isDryMode: dryMode,
+                    timeouts: timeouts);
             });
             builder.Services.AddSingleton<IEthernaUserGatewayClient>(serviceProvider =>
             {

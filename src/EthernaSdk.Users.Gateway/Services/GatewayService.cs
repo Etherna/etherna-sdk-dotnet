@@ -15,6 +15,7 @@
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Clients;
 using Etherna.SwarmSdk;
+using Etherna.SwarmSdk.Exceptions;
 using Etherna.SwarmSdk.Models;
 using System;
 using System.IO;
@@ -227,13 +228,13 @@ namespace Etherna.Sdk.Users.Gateway.Services
         public Task<NodeInfo> GetNodeInfoAsync(CancellationToken cancellationToken = default) =>
             swarmClient.GetNodeInfoAsync(cancellationToken);
 
-        public Task<PostageBatch[]> GetOwnedPostageBatchesAsync(CancellationToken cancellationToken = default) =>
+        public Task<PostageBatchResponse[]> GetOwnedPostageBatchesAsync(CancellationToken cancellationToken = default) =>
             swarmClient.GetOwnedPostageBatchesAsync(cancellationToken);
 
         public Task<PinStatus> GetPinStatusAsync(SwarmReference reference, CancellationToken cancellationToken = default) =>
             swarmClient.GetPinStatusAsync(reference, cancellationToken);
 
-        public Task<PostageBatch> GetPostageBatchAsync(PostageBatchId batchId, CancellationToken cancellationToken = default) =>
+        public Task<PostageBatchResponse> GetPostageBatchAsync(PostageBatchId batchId, CancellationToken cancellationToken = default) =>
             swarmClient.GetPostageBatchAsync(batchId, cancellationToken);
 
         public Task<PostageBucketsStatus> GetPostageBatchBucketsAsync(PostageBatchId batchId, CancellationToken cancellationToken = default) =>
@@ -450,10 +451,12 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 try
                 {
                     var batchInfo = await swarmClient.GetPostageBatchAsync(batchId).ConfigureAwait(false);
-                    batchIsUsable = batchInfo.IsUsable;
+                    batchIsUsable = batchInfo.PostageBatch.IsUsable;
                 }
                 catch (EthernaGatewayApiException e) when
                     (e.StatusCode == 504) //single request timeout
+                { }
+                catch (SwarmClientTimeoutException) //single read not answered within its bound
                 { }
 
                 //waiting for batch usable
