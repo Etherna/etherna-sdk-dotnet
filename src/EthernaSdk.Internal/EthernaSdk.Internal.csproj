@@ -30,11 +30,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.402">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.403">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SwarmSdk" Version="0.6.0-alpha.94" />
+    <PackageReference Include="SwarmSdk" Version="0.6.0-alpha.104" />
   </ItemGroup>
 
   <ItemGroup>

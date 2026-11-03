@@ -174,9 +174,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
         Task<NodeInfo> GetNodeInfoAsync(CancellationToken cancellationToken = default);
 
         /// <summary>Get all owned postage batches by this node</summary>
-        /// <returns>List of all owned postage batches</returns>
+        /// <returns>List of all owned postage batches, each with the error the gateway reports when its owner node could not answer</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred</exception>
-        Task<PostageBatch[]> GetOwnedPostageBatchesAsync(CancellationToken cancellationToken = default);
+        Task<PostageBatchResponse[]> GetOwnedPostageBatchesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>Get pinning status of the root hash with the given reference</summary>
         /// <param name="reference">Swarm content reference</param>
@@ -188,9 +188,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
 
         /// <summary>Get an individual postage batch status</summary>
         /// <param name="batchId">Swarm address of the stamp</param>
-        /// <returns>Returns an individual postage batch state</returns>
+        /// <returns>Returns an individual postage batch state, with the error the gateway reports when its owner node could not answer</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
-        Task<PostageBatch> GetPostageBatchAsync(
+        Task<PostageBatchResponse> GetPostageBatchAsync(
             PostageBatchId batchId,
             CancellationToken cancellationToken = default);
 
