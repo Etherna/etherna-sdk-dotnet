@@ -1,5 +1,6 @@
-mode: ContinuousDeployment
-branches: {}
-ignore:
-  sha: []
-merge-message-formats: {}
+calculation:
+  ignore:
+    sha: []
+  merge-message-formats: {}
+  mode: ContinuousDeployment
+output: {}

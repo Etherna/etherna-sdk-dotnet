@@ -25,12 +25,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="6.8.2">
+    <PackageReference Include="GitVersion.MsBuild" Version="7.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="M3U8Parser" Version="3.0.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.403">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.404">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
