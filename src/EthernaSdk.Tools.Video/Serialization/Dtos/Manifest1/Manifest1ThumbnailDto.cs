@@ -16,7 +16,6 @@ using Etherna.Sdk.Tools.Video.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -44,7 +43,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest1
         {
             var errors = new List<ValidationError>();
 
-            if (Sources is null || !Sources.Any())
+            if (Sources is null || Sources.Count == 0)
                 errors.Add(new ValidationError(ValidationErrorType.InvalidThumbnailSource, "Thumbnail has missing sources"));
 
             foreach (var source in Sources ?? new Dictionary<string, string>())
