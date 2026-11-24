@@ -17,7 +17,7 @@ dotnet test --filter "FullyQualifiedName~BasicUUriTest.GetUriKind"              
 
 There is nothing to "run": to exercise the clients use the projects under `samples/` (`ConsoleUserClientSample`, `ConsoleInternalClientSample`, `AspNetCoreInternalClientSample`).
 
-`nuget.config` adds the `ethernaMyget` feed (https://www.myget.org/F/etherna/api/v3/index.json) next to nuget.org — prerelease dependencies like `SwarmSdk`/`SwarmSdk.Client` and `Etherna.Authentication.Native` come from there. Versioning is automatic via **GitVersion** (`mode: ContinuousDeployment`, `GitVersion.MsBuild` in every package project, plus SourceLink). CI (`.github/workflows/`): pushes to `dev` and `release/**` build, test, pack and push unstable packages to MyGet; tags `v*.*.*` push stable packages to NuGet.
+`nuget.config` adds the `ethernaNuget` feed (https://nuget.etherna.io/v3/index.json, Etherna's own NuGet server) next to nuget.org — prerelease dependencies like `SwarmSdk`/`SwarmSdk.Client` and `Etherna.Authentication.Native` come from there. Versioning is automatic via **GitVersion** (`mode: ContinuousDeployment`, `GitVersion.MsBuild` in every package project, plus SourceLink). CI (`.github/workflows/`): pushes to `dev` and `release/**` build, test, pack and push unstable packages to nuget.etherna.io; tags `v*.*.*` push stable packages to NuGet.
 
 ## Architecture
 
