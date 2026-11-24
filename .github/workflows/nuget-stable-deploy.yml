@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*.*.*'
 
+# Opt out of the usage telemetry of GitVersion, which runs at every build.
+env:
+  DO_NOT_TRACK: 1
+
 jobs:
   build-test-package:
     runs-on: ubuntu-latest
