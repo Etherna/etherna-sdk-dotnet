@@ -4,7 +4,7 @@ Etherna SDK .Net is a set of **.NET client libraries** (NuGet packages) to consu
 
 ## Build, run, test
 
-Source projects multi-target **net9.0 and net10.0** (test projects target net10.0 only). There is no `Directory.Build.props`: every `.csproj` carries its own full property block — `TreatWarningsAsErrors=true`, `AnalysisMode=AllEnabledByDefault`, `Nullable=enable`, `EnableNETAnalyzers=true` (and `IsAotCompatible=true` on the client packages) — warnings break the build. When adding a project, copy the property block from an existing one.
+Source projects multi-target **net9.0 and net10.0** (test projects target net10.0 only). There is no `Directory.Build.props`: every `.csproj` carries its own full property block — `TreatWarningsAsErrors=true`, `AnalysisMode=AllEnabledByDefault`, `Nullable=enable`, `EnableNETAnalyzers=true` (and `IsAotCompatible=true` on the client packages) — warnings break the build. When adding a project, copy the property block from an existing one, and give it its own `PackageId`.
 
 ```bash
 dotnet restore EthernaSdk.sln
@@ -21,7 +21,7 @@ There is nothing to "run": to exercise the clients use the projects under `sampl
 
 ## Architecture
 
-Solution `EthernaSdk.sln`. Project folders are named `EthernaSdk.*` but root namespaces use `Etherna.Sdk.*`; under the root, namespace mirrors the folder path.
+Solution `EthernaSdk.sln`. Project folders are named `EthernaSdk.*` but root namespaces use `Etherna.Sdk.*`; under the root, namespace mirrors the folder path. The packages are published as `Etherna.Sdk.*` too: every packable `.csproj` pins its `PackageId`, the project name with `Etherna.Sdk.` in place of `EthernaSdk.` (`EthernaSdk.Users.Credit` ships as `Etherna.Sdk.Users.Credit`). Without it NuGet names the package after the project, outside the `Etherna.` prefix reserved on nuget.org for the `etherna` account. Assembly names stay the project names, which is what `[InternalsVisibleTo]` refers to.
 
 - **`src/EthernaSdk.{Credit,Gateway,Index,Sso}.Common`** (`Etherna.Sdk.<Service>`) — Each contains only the NSwag-generated client under `GenClients/` (namespace `Etherna.Sdk.<Service>.GenClients`, file `NSwagEtherna<Service>Client.cs`). Generated code: never edit by hand, regenerate instead (see below).
 - **`src/EthernaSdk.UsersCommon`** (`Etherna.Sdk.Users`) — The user-clients builder (`IEthernaUserClientsBuilder`/`EthernaUserClientsBuilder`) and the `ServiceCollectionExtensions` entry point `AddEthernaUserClients`. Authentication comes from `Etherna.Authentication.Native`, which registers both sign-in flows together ("oauth code" and "api key", with access-token expiration management); the flow is chosen only at sign-in time via the `IEthernaSignInService.SignInAsync()` / `SignInAsync(apiKey)` overloads, with no registration-time commitment.

@@ -1,13 +1,13 @@
 # Etherna SDK .Net
 
-[![EthernaSdk.Users.Credit on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Users.Credit?label=EthernaSdk.Users.Credit)](https://www.nuget.org/packages/EthernaSdk.Users.Credit/)
-[![EthernaSdk.Users.Gateway on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Users.Gateway?label=EthernaSdk.Users.Gateway)](https://www.nuget.org/packages/EthernaSdk.Users.Gateway/)
-[![EthernaSdk.Users.Index on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Users.Index?label=EthernaSdk.Users.Index)](https://www.nuget.org/packages/EthernaSdk.Users.Index/)
-[![EthernaSdk.Users.Sso on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Users.Sso?label=EthernaSdk.Users.Sso)](https://www.nuget.org/packages/EthernaSdk.Users.Sso/)
-[![EthernaSdk.Internal on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Internal?label=EthernaSdk.Internal)](https://www.nuget.org/packages/EthernaSdk.Internal/)
-[![EthernaSdk.Tools.Tokens on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Tools.Tokens?label=EthernaSdk.Tools.Tokens)](https://www.nuget.org/packages/EthernaSdk.Tools.Tokens/)
-[![EthernaSdk.Tools.UniversalFiles on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Tools.UniversalFiles?label=EthernaSdk.Tools.UniversalFiles)](https://www.nuget.org/packages/EthernaSdk.Tools.UniversalFiles/)
-[![EthernaSdk.Tools.Video on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Tools.Video?label=EthernaSdk.Tools.Video)](https://www.nuget.org/packages/EthernaSdk.Tools.Video/)
+[![Etherna.Sdk.Users.Credit on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Users.Credit?label=Etherna.Sdk.Users.Credit)](https://www.nuget.org/packages/Etherna.Sdk.Users.Credit/)
+[![Etherna.Sdk.Users.Gateway on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Users.Gateway?label=Etherna.Sdk.Users.Gateway)](https://www.nuget.org/packages/Etherna.Sdk.Users.Gateway/)
+[![Etherna.Sdk.Users.Index on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Users.Index?label=Etherna.Sdk.Users.Index)](https://www.nuget.org/packages/Etherna.Sdk.Users.Index/)
+[![Etherna.Sdk.Users.Sso on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Users.Sso?label=Etherna.Sdk.Users.Sso)](https://www.nuget.org/packages/Etherna.Sdk.Users.Sso/)
+[![Etherna.Sdk.Internal on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Internal?label=Etherna.Sdk.Internal)](https://www.nuget.org/packages/Etherna.Sdk.Internal/)
+[![Etherna.Sdk.Tools.Tokens on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Tools.Tokens?label=Etherna.Sdk.Tools.Tokens)](https://www.nuget.org/packages/Etherna.Sdk.Tools.Tokens/)
+[![Etherna.Sdk.Tools.UniversalFiles on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Tools.UniversalFiles?label=Etherna.Sdk.Tools.UniversalFiles)](https://www.nuget.org/packages/Etherna.Sdk.Tools.UniversalFiles/)
+[![Etherna.Sdk.Tools.Video on NuGet](https://img.shields.io/nuget/v/Etherna.Sdk.Tools.Video?label=Etherna.Sdk.Tools.Video)](https://www.nuget.org/packages/Etherna.Sdk.Tools.Video/)
 [![Target frameworks](https://img.shields.io/badge/.NET-9%20%7C%2010-512BD4)](#supported-frameworks)
 [![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING.LESSER)
 
@@ -80,24 +80,24 @@ does:
 
 | Package | Use it for | Depends on |
 | --- | --- | --- |
-| [**EthernaSdk.Users.Credit**](https://www.nuget.org/packages/EthernaSdk.Users.Credit/) | User API client of Etherna Credit: the credit balance of the signed-in user and its operation logs. | `EthernaSdk.UsersCommon`, `EthernaSdk.Credit.Common` |
-| [**EthernaSdk.Users.Gateway**](https://www.nuget.org/packages/EthernaSdk.Users.Gateway/) | User API client of the Etherna Gateway, the Swarm client over it and `GatewayService`: postage batches, uploads and downloads, pins, download funding, welcome pack. | `EthernaSdk.UsersCommon`, `EthernaSdk.Gateway.Common` |
-| [**EthernaSdk.Users.Index**](https://www.nuget.org/packages/EthernaSdk.Users.Index/) | User API client of Etherna Index: search and read videos, publish and update their manifests, comments, votes, reports and moderation. | `EthernaSdk.UsersCommon`, `EthernaSdk.Index.Common`, `EthernaSdk.Tools.Video` |
-| [**EthernaSdk.Users.Sso**](https://www.nuget.org/packages/EthernaSdk.Users.Sso/) | User API client of Etherna SSO: the account of the signed-in user, and the lookup of users by address or username. | `EthernaSdk.UsersCommon`, `EthernaSdk.Sso.Common` |
-| [**EthernaSdk.Internal**](https://www.nuget.org/packages/EthernaSdk.Internal/) | Service-to-service clients of Etherna Credit and Etherna SSO, authenticated with the client credentials flow. For the Etherna services themselves and their workers. | `EthernaSdk.Credit.Common`, `EthernaSdk.Sso.Common` |
-| [**EthernaSdk.Tools.Tokens**](https://www.nuget.org/packages/EthernaSdk.Tools.Tokens/) | Blockchain token utilities built on [Nethereum](https://nethereum.com/): the BZZ and Ether prices read from Uniswap. | — |
-| [**EthernaSdk.Tools.UniversalFiles**](https://www.nuget.org/packages/EthernaSdk.Tools.UniversalFiles/) | Universal files: one uri and one file abstraction over local, online and Swarm resources. | — |
-| [**EthernaSdk.Tools.Video**](https://www.nuget.org/packages/EthernaSdk.Tools.Video/) | Etherna video manifests: models, serialization, publishing as Swarm chunks, reading with validation, HLS playlists. | `EthernaSdk.Tools.UniversalFiles` |
+| [**Etherna.Sdk.Users.Credit**](https://www.nuget.org/packages/Etherna.Sdk.Users.Credit/) | User API client of Etherna Credit: the credit balance of the signed-in user and its operation logs. | `Etherna.Sdk.UsersCommon`, `Etherna.Sdk.Credit.Common` |
+| [**Etherna.Sdk.Users.Gateway**](https://www.nuget.org/packages/Etherna.Sdk.Users.Gateway/) | User API client of the Etherna Gateway, the Swarm client over it and `GatewayService`: postage batches, uploads and downloads, pins, download funding, welcome pack. | `Etherna.Sdk.UsersCommon`, `Etherna.Sdk.Gateway.Common` |
+| [**Etherna.Sdk.Users.Index**](https://www.nuget.org/packages/Etherna.Sdk.Users.Index/) | User API client of Etherna Index: search and read videos, publish and update their manifests, comments, votes, reports and moderation. | `Etherna.Sdk.UsersCommon`, `Etherna.Sdk.Index.Common`, `Etherna.Sdk.Tools.Video` |
+| [**Etherna.Sdk.Users.Sso**](https://www.nuget.org/packages/Etherna.Sdk.Users.Sso/) | User API client of Etherna SSO: the account of the signed-in user, and the lookup of users by address or username. | `Etherna.Sdk.UsersCommon`, `Etherna.Sdk.Sso.Common` |
+| [**Etherna.Sdk.Internal**](https://www.nuget.org/packages/Etherna.Sdk.Internal/) | Service-to-service clients of Etherna Credit and Etherna SSO, authenticated with the client credentials flow. For the Etherna services themselves and their workers. | `Etherna.Sdk.Credit.Common`, `Etherna.Sdk.Sso.Common` |
+| [**Etherna.Sdk.Tools.Tokens**](https://www.nuget.org/packages/Etherna.Sdk.Tools.Tokens/) | Blockchain token utilities built on [Nethereum](https://nethereum.com/): the BZZ and Ether prices read from Uniswap. | — |
+| [**Etherna.Sdk.Tools.UniversalFiles**](https://www.nuget.org/packages/Etherna.Sdk.Tools.UniversalFiles/) | Universal files: one uri and one file abstraction over local, online and Swarm resources. | — |
+| [**Etherna.Sdk.Tools.Video**](https://www.nuget.org/packages/Etherna.Sdk.Tools.Video/) | Etherna video manifests: models, serialization, publishing as Swarm chunks, reading with validation, HLS playlists. | `Etherna.Sdk.Tools.UniversalFiles` |
 
 The other five are support packages, brought in transitively by the ones above:
 
 | Package | Content |
 | --- | --- |
-| [**EthernaSdk.UsersCommon**](https://www.nuget.org/packages/EthernaSdk.UsersCommon/) | The `AddEthernaUserClients` entry point with its builder, shared by the user clients. |
-| [**EthernaSdk.Credit.Common**](https://www.nuget.org/packages/EthernaSdk.Credit.Common/) | The HTTP client generated from the OpenAPI definition of Etherna Credit, with its api exception. |
-| [**EthernaSdk.Gateway.Common**](https://www.nuget.org/packages/EthernaSdk.Gateway.Common/) | The HTTP client generated from the OpenAPI definition of the Etherna Gateway, with its api exception. |
-| [**EthernaSdk.Index.Common**](https://www.nuget.org/packages/EthernaSdk.Index.Common/) | The HTTP client generated from the OpenAPI definition of Etherna Index, with its api exception. |
-| [**EthernaSdk.Sso.Common**](https://www.nuget.org/packages/EthernaSdk.Sso.Common/) | The HTTP client generated from the OpenAPI definition of Etherna SSO, with its api exception. |
+| [**Etherna.Sdk.UsersCommon**](https://www.nuget.org/packages/Etherna.Sdk.UsersCommon/) | The `AddEthernaUserClients` entry point with its builder, shared by the user clients. |
+| [**Etherna.Sdk.Credit.Common**](https://www.nuget.org/packages/Etherna.Sdk.Credit.Common/) | The HTTP client generated from the OpenAPI definition of Etherna Credit, with its api exception. |
+| [**Etherna.Sdk.Gateway.Common**](https://www.nuget.org/packages/Etherna.Sdk.Gateway.Common/) | The HTTP client generated from the OpenAPI definition of the Etherna Gateway, with its api exception. |
+| [**Etherna.Sdk.Index.Common**](https://www.nuget.org/packages/Etherna.Sdk.Index.Common/) | The HTTP client generated from the OpenAPI definition of Etherna Index, with its api exception. |
+| [**Etherna.Sdk.Sso.Common**](https://www.nuget.org/packages/Etherna.Sdk.Sso.Common/) | The HTTP client generated from the OpenAPI definition of Etherna SSO, with its api exception. |
 
 The Swarm types of the public interfaces (`SwarmReference`, `PostageBatchId`, `BzzValue`, `XDaiValue`,
 `EthAddress`...) come from [SwarmSDK](https://github.com/Etherna/swarm-sdk-dotnet), and the sign-in
@@ -108,21 +108,21 @@ dependencies of the packages, there is nothing more to install.
 
 ```bash
 # User applications, one package for each service to call:
-dotnet add package EthernaSdk.Users.Credit
-dotnet add package EthernaSdk.Users.Gateway
-dotnet add package EthernaSdk.Users.Index
-dotnet add package EthernaSdk.Users.Sso
+dotnet add package Etherna.Sdk.Users.Credit
+dotnet add package Etherna.Sdk.Users.Gateway
+dotnet add package Etherna.Sdk.Users.Index
+dotnet add package Etherna.Sdk.Users.Sso
 
 # Etherna services calling each other:
-dotnet add package EthernaSdk.Internal
+dotnet add package Etherna.Sdk.Internal
 
 # Tools, usable on their own:
-dotnet add package EthernaSdk.Tools.Tokens
-dotnet add package EthernaSdk.Tools.UniversalFiles
-dotnet add package EthernaSdk.Tools.Video
+dotnet add package Etherna.Sdk.Tools.Tokens
+dotnet add package Etherna.Sdk.Tools.UniversalFiles
+dotnet add package Etherna.Sdk.Tools.Video
 ```
 
-`EthernaSdk.UsersCommon` and the four `EthernaSdk.*.Common` packages come in transitively: there is no
+`Etherna.Sdk.UsersCommon` and the four `Etherna.Sdk.*.Common` packages come in transitively: there is no
 reason to reference them directly.
 
 ## Usage examples
