@@ -188,7 +188,7 @@ namespace Etherna.Sdk.Users.Index.Clients
                         var thumbChunkRef = await SwarmAddressResolver.ResolveReferenceAsync(
                             thumbAddress,
                             chunkStore,
-                            cancellationToken).ConfigureAwait(false);
+                            cancellationToken: cancellationToken).ConfigureAwait(false);
                         
                         var thumbSource = new VideoManifestImageSource(
                             fileName,

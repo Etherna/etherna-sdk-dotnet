@@ -68,10 +68,12 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         {
             ArgumentNullException.ThrowIfNull(absoluteUri);
             
-            var size = await swarmClient.TryGetFileSizeAsync(SwarmAddress.FromString(absoluteUri.OriginalUri)).ConfigureAwait(false);
-            if (size is null)
-                throw new InvalidOperationException();
-            return (size.Value, null);
+            // The node answers no headers for a file it doesn't find, and headers without a length for one it can't size.
+            var headers = await swarmClient.TryGetFileHeadersAsync(SwarmAddress.FromString(absoluteUri.OriginalUri)).ConfigureAwait(false) ??
+                          throw new IOException($"Can't retrieve Swarm file at {absoluteUri.OriginalUri}");
+            if (headers.ContentLength is null)
+                throw new InvalidOperationException($"The node declares no length for Swarm file {absoluteUri.OriginalUri}");
+            return (headers.ContentLength.Value, null);
         }
 
         protected override async Task<(byte[] ByteArray, Encoding? Encoding)> ReadToByteArrayAsync(UUri absoluteUri)
@@ -97,9 +99,9 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             
             // Try to extract the encoding from the Content-Type header.
             Encoding? contentEncoding = null;
-            if (result.ContentHeaders?.ContentType?.CharSet != null)
+            if (result.Headers.ContentType?.CharSet != null)
             {
-                try { contentEncoding = Encoding.GetEncoding(result.ContentHeaders.ContentType.CharSet); }
+                try { contentEncoding = Encoding.GetEncoding(result.Headers.ContentType.CharSet); }
                 catch (ArgumentException) { }
             }
             

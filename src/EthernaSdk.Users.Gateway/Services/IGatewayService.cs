@@ -15,7 +15,6 @@
 using Etherna.SwarmSdk.Models;
 using System;
 using System.IO;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -115,9 +114,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// Requests the headers containing the content type and length for the reference
         /// </summary>
         /// <param name="reference">Swarm content reference</param>
-        /// <returns>Chunk exists</returns>
+        /// <returns>The headers the node answers about the content</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
-        Task<HttpContentHeaders?> GetBytesHeadersAsync(
+        Task<SwarmResponseHeaders> GetBytesHeadersAsync(
             SwarmReference reference,
             CancellationToken cancellationToken = default);
 
@@ -262,9 +261,9 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// Try to get file headers
         /// </summary>
         /// <param name="address">Swarm address of chunk</param>
-        /// <returns>Headers with values</returns>
+        /// <returns>The headers the node answers about the file, or null if the node doesn't find it</returns>
         /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
-        Task<HttpContentHeaders?> TryGetFileHeadersAsync(
+        Task<SwarmResponseHeaders?> TryGetFileHeadersAsync(
             SwarmAddress address,
             RedundancyLevel? redundancyLevel = null,
             RedundancyStrategy? redundancyStrategy = null, 
@@ -276,7 +275,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         /// </summary>
         /// <param name="address">Swarm address of chunk</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Byte size of file</returns>
+        /// <returns>The byte length the node declares for the file, or null if it doesn't find the file or declares no length</returns>
         Task<long?> TryGetFileSizeAsync(
             SwarmAddress address,
             RedundancyLevel? redundancyLevel = null,

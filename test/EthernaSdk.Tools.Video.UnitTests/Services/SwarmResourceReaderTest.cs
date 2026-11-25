@@ -148,8 +148,7 @@ namespace Etherna.Sdk.Tools.Video.Services
         private static async Task<FileResponse> GetFileResponseHelper(
             SwarmAddress address,
             IReadOnlyChunkStore chunkStore) =>
-            new(null,
-                new Dictionary<string, IEnumerable<string>>(),
+            new(new SwarmResponseHeaders(new Dictionary<string, IEnumerable<string>>()),
                 await new ChunkService().GetFileStreamFromAddressAsync(
                     address,
                     ManifestPathResolver.BrowserResolver,

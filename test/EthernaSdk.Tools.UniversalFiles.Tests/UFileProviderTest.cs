@@ -90,8 +90,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                     It.IsAny<string?>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new FileResponse(
-                    null,
-                    new Dictionary<string, IEnumerable<string>>(),
+                    new SwarmResponseHeaders(new Dictionary<string, IEnumerable<string>>()),
                     new MemoryStream([1, 2, 3])));
             var swarmFileAddress = SwarmAddress.FromString($"{new string('a', 64)}/video.mp4");
             var localFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
