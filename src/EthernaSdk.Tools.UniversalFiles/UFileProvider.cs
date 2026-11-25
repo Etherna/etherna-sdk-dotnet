@@ -12,6 +12,9 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.UniversalFiles.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,10 +28,20 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         // Fields.
         private readonly Dictionary<Type, Func<UUri, UFile>> uFileBuilders = new(); //<typeof(UUri), UFile builder>
 
-        public UFileProvider(IHttpClientFactory httpClientFactory)
+        // Constructor.
+        public UFileProvider(
+            IHttpClientFactory httpClientFactory,
+            ILogger<UFileProvider>? logger = null)
         {
-            uFileBuilders[typeof(BasicUUri)] = uuri => new BasicUFile((BasicUUri)uuri, httpClientFactory);
+            Logger = logger ?? NullLogger<UFileProvider>.Instance;
+            uFileBuilders[typeof(BasicUUri)] = uuri => new BasicUFile((BasicUUri)uuri, httpClientFactory, Logger);
         }
+
+        // Properties.
+        /// <summary>
+        /// The logger of the provider, shared with the files it builds
+        /// </summary>
+        internal ILogger Logger { get; }
         
         // Methods.
         public BasicUFile BuildNewUFile(BasicUUri uuri) =>
@@ -76,6 +89,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             using var inputFileStream = (await inputUFile.ReadToStreamAsync(allowedUriKinds, baseDirectory).ConfigureAwait(false)).Stream;
             using var outputFileStream = new FileStream(outputUUri.ToAbsoluteUri().OriginalUri, FileMode.Create);
             await inputFileStream.CopyToAsync(outputFileStream).ConfigureAwait(false);
+            Logger.UFileCopiedToLocalFile(inputUFile.FileUri.OriginalUri, outputFileStream.Name);
 
             return BuildNewUFile(outputUUri);
         }

@@ -18,6 +18,7 @@ using Etherna.Sdk.Users.Gateway.Clients;
 using Etherna.SwarmSdk;
 using Etherna.SwarmSdk.Exceptions;
 using Etherna.SwarmSdk.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -128,12 +129,14 @@ namespace Etherna.Sdk.Users.Gateway.Services
             // Setup.
             var ethernaGatewayClientMock = BuildEthernaGatewayClientMock();
             var swarmClientMock = BuildSwarmClientMock(apiCompatibility, isDryMode: true);
+            var logger = new RecordingLogger<GatewayService>();
             var notifications = new List<string>();
 
             var gatewayService = new GatewayService(
                 ethernaGatewayClientMock.Object,
                 swarmClientMock.Object,
-                new InstantTimeProvider());
+                new InstantTimeProvider(),
+                logger);
 
             // Action.
             var (boughtBatchId, txHash) = await gatewayService.BuyPostageBatchAsync(
@@ -150,6 +153,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
             Assert.Equal(
                 new[] { "waiting creation", $"created {PostageBatchId.Zero}", "waiting usable", "usable" },
                 notifications);
+            var logEvent = Assert.Single(logger.Events);
+            Assert.Equal((LogLevel.Information, "DryModeSkippedPostageBatchPurchase"), (logEvent.Level, logEvent.Name));
             ethernaGatewayClientMock.VerifyNoOtherCalls();
             swarmClientMock.Verify(
                 c => c.GetPostageBatchAsync(It.IsAny<PostageBatchId>(), It.IsAny<CancellationToken>()),
@@ -208,6 +213,93 @@ namespace Etherna.Sdk.Users.Gateway.Services
             Assert.Equal(BatchId, boughtBatchId);
             Assert.Equal(GatewayService.BatchCheckTimeSpan, Assert.Single(timeProvider.Delays));
             swarmClientMock.Verify(c => c.GetPostageBatchAsync(BatchId, It.IsAny<CancellationToken>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public async Task BuyPostageBatchAsync_LogsFailedBatchReadWhileWaitingForUsableBatch()
+        {
+            // Setup.
+            var logger = new RecordingLogger<GatewayService>();
+            var readFailure = new SwarmSdkApiException(
+                "Gateway Timeout",
+                504,
+                null,
+                new Dictionary<string, IEnumerable<string>>(),
+                null);
+            var swarmClientMock = BuildSwarmClientMock(SwarmClients.Bee);
+            swarmClientMock.SetupSequence(c => c.GetPostageBatchAsync(BatchId, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(readFailure)
+                .ReturnsAsync(BuildPostageBatchResponse(isUsable: true));
+
+            var gatewayService = new GatewayService(
+                BuildEthernaGatewayClientMock().Object,
+                swarmClientMock.Object,
+                new InstantTimeProvider(),
+                logger);
+
+            // Action.
+            await gatewayService.BuyPostageBatchAsync(BzzValue.FromInt32(1), PostageBatch.MinDepth);
+
+            // Assert.
+            Assert.Equal(
+                new[]
+                {
+                    (LogLevel.Information, "PostageBatchCreated"),
+                    (LogLevel.Debug, "PostageBatchReadFailed"),
+                    (LogLevel.Information, "PostageBatchUsable")
+                },
+                logger.Events.Select(e => (e.Level, e.Name!)));
+            Assert.Same(readFailure, logger.Events[1].Exception);
+            Assert.All(logger.Events, e => Assert.Contains(BatchId.ToString(), e.Message, StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task BuyPostageBatchAsync_LogsPurchaseStepsWithGateway()
+        {
+            // Setup.
+            var logger = new RecordingLogger<GatewayService>();
+            var referenceReadFailure = new EthernaGatewayApiException(
+                "Service Unavailable",
+                503,
+                null,
+                new Dictionary<string, IEnumerable<string>>(),
+                null);
+            var ethernaGatewayClientMock = BuildEthernaGatewayClientMock();
+            ethernaGatewayClientMock.SetupSequence(c => c.TryGetNewPostageBatchIdFromPostageRefAsync(
+                    BatchReferenceId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((PostageBatchId?)null)
+                .ThrowsAsync(referenceReadFailure)
+                .ReturnsAsync(BatchId);
+            var swarmClientMock = BuildSwarmClientMock(SwarmClients.Beehive);
+            swarmClientMock.SetupSequence(c => c.GetPostageBatchAsync(BatchId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(BuildPostageBatchResponse(isUsable: false))
+                .ReturnsAsync(BuildPostageBatchResponse(isUsable: true));
+
+            var gatewayService = new GatewayService(
+                ethernaGatewayClientMock.Object,
+                swarmClientMock.Object,
+                new InstantTimeProvider(),
+                logger);
+
+            // Action.
+            await gatewayService.BuyPostageBatchAsync(BzzValue.FromInt32(1), PostageBatch.MinDepth);
+
+            // Assert.
+            Assert.Equal(
+                new[]
+                {
+                    (LogLevel.Information, "PostageBatchPurchaseRequested"),
+                    (LogLevel.Debug, "PostageBatchNotCreatedYet"),
+                    (LogLevel.Warning, "PostageBatchReferenceReadFailed"),
+                    (LogLevel.Information, "PostageBatchCreated"),
+                    (LogLevel.Debug, "PostageBatchNotUsableYet"),
+                    (LogLevel.Information, "PostageBatchUsable")
+                },
+                logger.Events.Select(e => (e.Level, e.Name!)));
+            Assert.Same(referenceReadFailure, logger.Events[2].Exception);
+            Assert.All(logger.Events.Take(3), e => Assert.Contains(BatchReferenceId, e.Message, StringComparison.Ordinal));
+            Assert.All(logger.Events.Skip(3), e => Assert.Contains(BatchId.ToString(), e.Message, StringComparison.Ordinal));
         }
 
         [Fact]
@@ -364,16 +456,20 @@ namespace Etherna.Sdk.Users.Gateway.Services
         {
             // Setup.
             var ethernaGatewayClientMock = BuildEthernaGatewayClientMock();
+            var logger = new RecordingLogger<GatewayService>();
 
             var gatewayService = new GatewayService(
                 ethernaGatewayClientMock.Object,
-                BuildSwarmClientMock(SwarmClients.Beehive, isDryMode: true).Object);
+                BuildSwarmClientMock(SwarmClients.Beehive, isDryMode: true).Object,
+                logger: logger);
 
             // Action.
             var isDefunded = await gatewayService.DefundResourceDownloadAsync(SwarmReference.PlainZero);
 
             // Assert.
             Assert.False(isDefunded);
+            var logEvent = Assert.Single(logger.Events);
+            Assert.Equal((LogLevel.Information, "DryModeSkippedResourceDownloadDefunding"), (logEvent.Level, logEvent.Name));
             ethernaGatewayClientMock.VerifyNoOtherCalls();
         }
 
@@ -382,15 +478,19 @@ namespace Etherna.Sdk.Users.Gateway.Services
         {
             // Setup.
             var ethernaGatewayClientMock = BuildEthernaGatewayClientMock();
+            var logger = new RecordingLogger<GatewayService>();
 
             var gatewayService = new GatewayService(
                 ethernaGatewayClientMock.Object,
-                BuildSwarmClientMock(SwarmClients.Beehive, isDryMode: true).Object);
+                BuildSwarmClientMock(SwarmClients.Beehive, isDryMode: true).Object,
+                logger: logger);
 
             // Action.
             await gatewayService.FundResourceDownloadAsync(SwarmReference.PlainZero);
 
             // Assert.
+            var logEvent = Assert.Single(logger.Events);
+            Assert.Equal((LogLevel.Information, "DryModeSkippedResourceDownloadFunding"), (logEvent.Level, logEvent.Name));
             ethernaGatewayClientMock.VerifyNoOtherCalls();
         }
 

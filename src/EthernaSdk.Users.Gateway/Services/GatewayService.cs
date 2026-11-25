@@ -14,9 +14,12 @@
 
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Clients;
+using Etherna.Sdk.Users.Gateway.Extensions;
 using Etherna.SwarmSdk;
 using Etherna.SwarmSdk.Models;
 using Etherna.SwarmSdk.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.IO;
 using System.Net.Http.Headers;
@@ -31,7 +34,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
     public sealed class GatewayService(
         IEthernaUserGatewayClient ethernaGatewayClient,
         ISwarmClient swarmClient,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        ILogger<GatewayService>? logger = null)
         : IGatewayService
     {
         // Consts.
@@ -40,6 +44,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
         public static readonly TimeSpan BatchUsableTimeout = new(0, 0, 15, 0);
 
         // Fields.
+        private readonly ILogger<GatewayService> logger = logger ?? NullLogger<GatewayService>.Instance;
         private readonly TimeProvider timeProvider = timeProvider ?? TimeProvider.System;
 
         // Methods.
@@ -64,6 +69,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
             // In dry mode no batch is bought, and there is none to wait for.
             if (swarmClient.IsDryMode)
             {
+                logger.DryModeSkippedPostageBatchPurchase(depth, amount);
+
                 onWaitingBatchCreation?.Invoke();
                 onBatchCreated?.Invoke(PostageBatchId.Zero);
                 onWaitingBatchUsable?.Invoke();
@@ -95,6 +102,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
                     depth,
                     label,
                     cancellationToken).ConfigureAwait(false);
+                logger.PostageBatchPurchaseRequested(batchReferenceId, depth, amount);
 
                 // Wait until created batch is available.
                 onWaitingBatchCreation?.Invoke();
@@ -110,9 +118,13 @@ namespace Etherna.Sdk.Users.Gateway.Services
                     {
                         createdBatchId = await ethernaGatewayClient.TryGetNewPostageBatchIdFromPostageRefAsync(
                             batchReferenceId, cancellationToken).ConfigureAwait(false);
+                        if (createdBatchId is null)
+                            logger.PostageBatchNotCreatedYet(batchReferenceId);
                     }
                     catch (EthernaGatewayApiException e) when (e.StatusCode != 410)
-                    { }
+                    {
+                        logger.PostageBatchReferenceReadFailed(batchReferenceId, e.StatusCode, e);
+                    }
 
                     if (createdBatchId is not null)
                         break;
@@ -125,18 +137,35 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 }
                 batchId = createdBatchId.Value;
             }
+            logger.PostageBatchCreated(batchId, depth, amount);
             onBatchCreated?.Invoke(batchId);
 
             // Wait until created batch is usable.
+            //the poller decides which failed reads to tolerate: each one is logged, whatever it decides
             onWaitingBatchUsable?.Invoke();
             await PostageBatchUsablePoller.WaitUntilUsableAsync(
                 batchId,
                 async (id, token) =>
-                    (await swarmClient.GetPostageBatchAsync(id, token).ConfigureAwait(false)).PostageBatch,
+                {
+                    try
+                    {
+                        var batch = (await swarmClient.GetPostageBatchAsync(id, token).ConfigureAwait(false)).PostageBatch;
+                        if (!batch.IsUsable)
+                            logger.PostageBatchNotUsableYet(id);
+
+                        return batch;
+                    }
+                    catch (Exception e) when (e is not OperationCanceledException)
+                    {
+                        logger.PostageBatchReadFailed(id, e);
+                        throw;
+                    }
+                },
                 timeout: BatchUsableTimeout,
                 pollInterval: BatchCheckTimeSpan,
                 timeProvider: timeProvider,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
+            logger.PostageBatchUsable(batchId);
             onBatchUsable?.Invoke();
 
             return (batchId, txHash);
@@ -164,7 +193,10 @@ namespace Etherna.Sdk.Users.Gateway.Services
             if (swarmClient.ApiCompatibility == SwarmClients.Bee)
                 throw new NotSupportedException();
             if (swarmClient.IsDryMode)
+            {
+                logger.DryModeSkippedResourceDownloadDefunding(reference);
                 return Task.FromResult(false);
+            }
             return ethernaGatewayClient.DefundResourceDownloadAsync(reference, cancellationToken);
         }
 
@@ -189,7 +221,10 @@ namespace Etherna.Sdk.Users.Gateway.Services
             if (swarmClient.ApiCompatibility == SwarmClients.Bee)
                 throw new NotSupportedException();
             if (swarmClient.IsDryMode)
+            {
+                logger.DryModeSkippedResourceDownloadFunding(reference);
                 return Task.CompletedTask;
+            }
             return ethernaGatewayClient.FundResourceDownloadAsync(reference, cancellationToken);
         }
 

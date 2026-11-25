@@ -16,6 +16,7 @@ using Etherna.Sdk.Tools.Video.Services;
 using Etherna.Sdk.Users.Index.Clients;
 using Etherna.SwarmSdk;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
@@ -42,7 +43,8 @@ namespace Etherna.Sdk.Users
                 return new EthernaUserIndexClient(
                     new Uri(indexBaseUrl, UriKind.Absolute),
                     swarmClient,
-                    clientFactory.CreateClient(builder.HttpClientName));
+                    clientFactory.CreateClient(builder.HttpClientName),
+                    serviceProvider.GetService<ILogger<EthernaUserIndexClient>>());
             });
 
             return builder;

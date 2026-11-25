@@ -14,12 +14,15 @@
 
 using Etherna.Sdk.Index.GenClients;
 using Etherna.Sdk.Tools.Video.Models;
+using Etherna.Sdk.Users.Index.Extensions;
 using Etherna.Sdk.Users.Index.Models;
 using Etherna.SwarmSdk;
 using Etherna.SwarmSdk.Exceptions;
 using Etherna.SwarmSdk.Manifest;
 using Etherna.SwarmSdk.Models;
 using Etherna.SwarmSdk.Stores;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +37,8 @@ namespace Etherna.Sdk.Users.Index.Clients
     public class EthernaUserIndexClient(
         Uri baseUrl,
         ISwarmClient swarmClient,
-        HttpClient httpClient)
+        HttpClient httpClient,
+        ILogger<EthernaUserIndexClient>? logger = null)
         : IEthernaUserIndexClient
     {
         // Fields.
@@ -44,6 +48,7 @@ namespace Etherna.Sdk.Users.Index.Clients
         private readonly SystemClient generatedSystemClient = new(baseUrl.AbsoluteUri, httpClient);
         private readonly UsersClient generatedUsersClient = new(baseUrl.AbsoluteUri, httpClient);
         private readonly VideosClient generatedVideosClient = new(baseUrl.AbsoluteUri, httpClient);
+        private readonly ILogger<EthernaUserIndexClient> logger = logger ?? NullLogger<EthernaUserIndexClient>.Instance;
 
         // Methods.
         public Task AdminForceNewValidationByManifestReferenceAsync(
@@ -208,8 +213,9 @@ namespace Etherna.Sdk.Users.Index.Clients
                         title: v.Title,
                         updatedAt: v.UpdatedAt));
                 }
-                catch (NullReferenceException)
+                catch (NullReferenceException e)
                 {
+                    logger.VideoPreviewSkipped(v.Id, e);
                 }
             }
             

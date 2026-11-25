@@ -12,6 +12,9 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.UniversalFiles.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -24,9 +27,13 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 {
     public class BasicUFile(
         BasicUUri fileUri,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        ILogger? logger = null)
         : UFile(fileUri)
     {
+        // Fields.
+        private readonly ILogger logger = logger ?? NullLogger.Instance;
+
         // Protected methods.
         protected override async Task<(bool Result, (byte[] ByteArray, Encoding? Encoding)? ContentCache)> ExistsAsync(
             UUri absoluteUri)
@@ -158,7 +165,10 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                 using var httpClient = httpClientFactory.CreateClient();
                 using var response = await httpClient.GetAsync(onlineAbsoluteUri).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
+                {
+                    logger.OnlineFileRequestRefused(onlineAbsoluteUri, response.StatusCode);
                     return null;
+                }
 
                 // Get content with encoding.
                 var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -173,8 +183,9 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
                 return (contentStream, contentEncoding);
             }
-            catch
+            catch (Exception e)
             {
+                logger.OnlineFileRequestFailed(onlineAbsoluteUri, e);
                 return null;
             }
         }
@@ -195,7 +206,10 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                         return byteSize;
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                logger.OnlineFileHeadRequestFailed(absoluteUri, e);
+            }
 
             return null;
         }
