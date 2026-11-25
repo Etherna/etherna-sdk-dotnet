@@ -9,7 +9,7 @@
 [![EthernaSdk.Tools.UniversalFiles on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Tools.UniversalFiles?label=EthernaSdk.Tools.UniversalFiles)](https://www.nuget.org/packages/EthernaSdk.Tools.UniversalFiles/)
 [![EthernaSdk.Tools.Video on NuGet](https://img.shields.io/nuget/v/EthernaSdk.Tools.Video?label=EthernaSdk.Tools.Video)](https://www.nuget.org/packages/EthernaSdk.Tools.Video/)
 [![Target frameworks](https://img.shields.io/badge/.NET-9%20%7C%2010-512BD4)](#supported-frameworks)
-[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING-LESSER)
+[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING.LESSER)
 
 **Etherna SDK .Net** provides the .NET client libraries to consume the APIs of the
 [Etherna](https://etherna.io) services: Credit, Gateway, Index and SSO. Typed clients cover the user
@@ -522,5 +522,5 @@ For questions or problems please write an email to [info@etherna.io](mailto:info
 ![LGPL Logo](https://raw.githubusercontent.com/Etherna/etherna-sdk-dotnet/main/doc/lgplv3-with-text-154x68.png)
 
 We use the GNU Lesser General Public License v3 or later (SPDX `LGPL-3.0-or-later`) for this project:
-[COPYING-LESSER](COPYING-LESSER) adds the lesser terms to the GNU GPL v3 of [COPYING](COPYING).
+[COPYING.LESSER](COPYING.LESSER) adds the lesser terms to the GNU GPL v3 of [COPYING](COPYING).
 If you require a custom license, you can contact us at [license@etherna.io](mailto:license@etherna.io).
