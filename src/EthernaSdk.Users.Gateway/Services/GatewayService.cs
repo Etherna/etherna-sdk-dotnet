@@ -22,7 +22,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.IO;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using RedundancyLevel = Etherna.SwarmSdk.Models.RedundancyLevel;
@@ -244,7 +243,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 redundancyFallbackMode: redundancyFallbackMode,
                 cancellationToken: cancellationToken);
 
-        public Task<HttpContentHeaders?> GetBytesHeadersAsync(
+        public Task<SwarmResponseHeaders> GetBytesHeadersAsync(
             SwarmReference reference,
             CancellationToken cancellationToken = default) =>
             swarmClient.GetBytesHeadersAsync(reference, cancellationToken: cancellationToken);
@@ -351,7 +350,7 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 redundancyFallbackMode: redundancyFallbackMode,
                 cancellationToken: cancellationToken);
 
-        public Task<HttpContentHeaders?> TryGetFileHeadersAsync(
+        public Task<SwarmResponseHeaders?> TryGetFileHeadersAsync(
             SwarmAddress address,
             RedundancyLevel? redundancyLevel = null,
             RedundancyStrategy? redundancyStrategy = null,
