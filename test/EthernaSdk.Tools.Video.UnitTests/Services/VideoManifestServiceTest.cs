@@ -23,6 +23,7 @@ using Etherna.SwarmSdk.Manifest;
 using Etherna.SwarmSdk.Models;
 using Etherna.SwarmSdk.Services;
 using Etherna.SwarmSdk.Stores;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -424,7 +425,8 @@ namespace Etherna.Sdk.Tools.Video.Services
         public async Task CreateVideoManifestChunksAsync()
         {
             // Setup.
-            var videoManifestService = new VideoManifestService(new ChunkService());
+            var logger = new RecordingLogger<VideoManifestService>();
+            var videoManifestService = new VideoManifestService(new ChunkService(), logger);
             
             var videoManifest = new VideoManifest(
                 aspectRatio: 0.123f,
@@ -495,6 +497,10 @@ namespace Etherna.Sdk.Tools.Video.Services
                     "e250fc8865894b98b21a28002decf162874f00a81f44c8af96c1249bef84c3fc.cac"
                 ],
                 Directory.GetFiles(chunkDirectory.FullName).Select(Path.GetFileName).Order());
+            var logEvent = Assert.Single(logger.Events);
+            Assert.Equal((LogLevel.Debug, "VideoManifestChunksCreated"), (logEvent.Level, logEvent.Name));
+            Assert.Contains(result.ToString(), logEvent.Message, StringComparison.Ordinal);
+            Assert.Contains(chunkDirectory.FullName, logEvent.Message, StringComparison.Ordinal);
             
             // Cleanup.
             Directory.Delete(chunkDirectory.FullName, true);
@@ -508,13 +514,21 @@ namespace Etherna.Sdk.Tools.Video.Services
             // Setup.
             var chunkStore = new MemoryChunkStore();
             var rootHash = await test.UploadContentsAsync(chunkStore);
-            VideoManifestService videoManifestService = new(new ChunkService());
+            var logger = new RecordingLogger<VideoManifestService>();
+            VideoManifestService videoManifestService = new(new ChunkService(), logger);
         
             // Action.
             var videoManifest = await videoManifestService.GetPublishedVideoManifestAsync(rootHash, chunkStore);
         
             // Assert.
             Assert.Equal(test.ExpectedManifest, videoManifest);
+            var logEvent = Assert.Single(logger.Events);
+            Assert.Equal((LogLevel.Debug, "PublishedVideoManifestRead"), (logEvent.Level, logEvent.Name));
+            Assert.Contains(rootHash.ToString(), logEvent.Message, StringComparison.Ordinal);
+            Assert.Contains(
+                $"{test.ExpectedManifest.ValidationErrors.Count} validation errors",
+                logEvent.Message,
+                StringComparison.Ordinal);
         }
 
         [Theory, MemberData(nameof(ParseManifestTests))]

@@ -12,10 +12,13 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.UniversalFiles.Extensions;
 using Etherna.SwarmSdk;
 using Etherna.SwarmSdk.Manifest;
 using Etherna.SwarmSdk.Models;
 using Etherna.SwarmSdk.Stores;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -26,9 +29,14 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 {
     public class SwarmUFile(
         ISwarmClient swarmClient,
-        UUri fileUri)
+        UUri fileUri,
+        ILogger? logger = null)
         : UFile(fileUri)
     {
+        // Fields.
+        private readonly ILogger logger = logger ?? NullLogger.Instance;
+
+        // Protected methods.
         [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         protected override async Task<(bool Result, (byte[] ByteArray, Encoding? Encoding)? ContentCache)> ExistsAsync(
             UUri absoluteUri)
@@ -46,7 +54,11 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                 if (headers is null)
                     return (false, null);
             }
-            catch { return (false, null); }
+            catch (Exception e)
+            {
+                logger.SwarmFileHeadersRequestFailed(absoluteUri.OriginalUri, e);
+                return (false, null);
+            }
             
             return (true, null);
         }

@@ -33,7 +33,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles.Extensions
         {
             ArgumentNullException.ThrowIfNull(fileProvider);
             
-            fileProvider.RegisterUUriType<SwarmUUri>(uuri => new SwarmUFile(swarmClient, uuri));
+            fileProvider.RegisterUUriType<SwarmUUri>(uuri => new SwarmUFile(swarmClient, uuri, fileProvider.Logger));
             return fileProvider;
         }
     }

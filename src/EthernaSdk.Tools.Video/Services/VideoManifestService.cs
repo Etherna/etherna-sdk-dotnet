@@ -13,6 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Etherna.Sdk.Tools.UniversalFiles;
+using Etherna.Sdk.Tools.Video.Extensions;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.Sdk.Tools.Video.Serialization;
 using Etherna.SwarmSdk.Hashing;
@@ -22,6 +23,8 @@ using Etherna.SwarmSdk.Manifest;
 using Etherna.SwarmSdk.Models;
 using Etherna.SwarmSdk.Services;
 using Etherna.SwarmSdk.Stores;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,13 +34,18 @@ using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Tools.Video.Services
 {
-    public class VideoManifestService(IChunkService chunkService)
+    public class VideoManifestService(
+        IChunkService chunkService,
+        ILogger<VideoManifestService>? logger = null)
         : IVideoManifestService
     {
         // Consts.
         private const string DetailsManifestFileName = "details";
         private const string ManifestContentType = "application/json";
         private const string PreviewManifestFileName = "preview";
+
+        // Fields.
+        private readonly ILogger<VideoManifestService> logger = logger ?? NullLogger<VideoManifestService>.Instance;
 
         // Methods.
         public async Task<SwarmReference> CreateVideoManifestChunksAsync(
@@ -176,7 +184,10 @@ namespace Etherna.Sdk.Tools.Video.Services
                         }));
             }
 
-            return await mantarayManifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false);
+            var manifestReference = await mantarayManifest.GetReferenceAsync(new Hasher()).ConfigureAwait(false);
+            logger.VideoManifestChunksCreated(manifestReference, chunksDirectory);
+
+            return manifestReference;
         }
 
         public Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
@@ -199,7 +210,7 @@ namespace Etherna.Sdk.Tools.Video.Services
         }
 
         // Helpers.
-        private static async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
+        private async Task<PublishedVideoManifest> GetPublishedVideoManifestAsync(
             SwarmReference manifestReference,
             SwarmResourceReader resourceReader)
         {
@@ -215,10 +226,15 @@ namespace Etherna.Sdk.Tools.Video.Services
                 (jsonVersion.ValueKind == JsonValueKind.String ? jsonVersion.GetString() : null) :
                 "1.0"; //first version didn't have an identifier
             if (!Version.TryParse(versionStr, out var version))
-                return new PublishedVideoManifest(
+            {
+                var invalidManifest = new PublishedVideoManifest(
                     manifestReference,
                     null,
                     [new ValidationError(ValidationErrorType.JsonConvert, $"Invalid manifest version: {versionStr}")]);
+                logger.PublishedVideoManifestRead(manifestReference, null, invalidManifest.ValidationErrors.Count);
+
+                return invalidManifest;
+            }
 
             // Deserialize document.
             var (videoManifest, errors) = version.Major switch
@@ -228,7 +244,10 @@ namespace Etherna.Sdk.Tools.Video.Services
                 _ => (null, [new ValidationError(ValidationErrorType.UnsupportedManifestVersion, $"Unsupported manifest version: {version}")])
             };
 
-            return new PublishedVideoManifest(manifestReference, videoManifest, errors, version);
+            var publishedManifest = new PublishedVideoManifest(manifestReference, videoManifest, errors, version);
+            logger.PublishedVideoManifestRead(manifestReference, version, publishedManifest.ValidationErrors.Count);
+
+            return publishedManifest;
         }
     }
 }
