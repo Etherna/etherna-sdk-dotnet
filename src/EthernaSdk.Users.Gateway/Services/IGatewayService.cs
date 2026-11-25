@@ -24,13 +24,16 @@ namespace Etherna.Sdk.Users.Gateway.Services
     public interface IGatewayService
     {
         // Methods.
-        /// <summary>Buy a new postage batch.</summary>
+        /// <summary>Buy a new postage batch, and wait until it is usable.</summary>
+        /// <remarks>In dry mode no batch is bought: the callbacks are invoked, and the zero batch ID is returned.</remarks>
         /// <param name="amount">Amount of BZZ added that the postage batch will have.</param>
         /// <param name="depth">Batch depth which specifies how many chunks can be signed with the batch. It is a logarithm. Must be higher than default bucket depth (16)</param>
         /// <param name="label">An optional label for this batch</param>
         /// <param name="gasPrice">Gas price for transaction</param>
         /// <returns>Returns the newly created postage batch ID</returns>
-        /// <exception cref="BeeNetApiException">A server side error occurred.</exception>
+        /// <exception cref="Etherna.Sdk.Gateway.GenClients.EthernaGatewayApiException">The gateway refused the purchase, or gave it up (status 410).</exception>
+        /// <exception cref="Etherna.SwarmSdk.Exceptions.SwarmSdkApiException">A server side error occurred.</exception>
+        /// <exception cref="TimeoutException">The batch was not created within <see cref="GatewayService.BatchCreationTimeout"/>, or did not become usable within <see cref="GatewayService.BatchUsableTimeout"/>.</exception>
         Task<(PostageBatchId BatchId, EthTxHash TxHash)> BuyPostageBatchAsync(
             BzzValue amount,
             int depth,

@@ -87,8 +87,8 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         /// <param name="postageReferenceId">Postage batch reference Id</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>New postage batch Id</returns>
-        /// <exception cref="EthernaGatewayApiException">A server side error occurred.</exception>
+        /// <returns>New postage batch Id, or null when the gateway has none for the reference: the purchase is still pending, or the reference is unknown</returns>
+        /// <exception cref="EthernaGatewayApiException">A server side error occurred, or the gateway gave up the purchase (status 410).</exception>
         Task<PostageBatchId?> TryGetNewPostageBatchIdFromPostageRefAsync(
             string postageReferenceId,
             CancellationToken cancellationToken = default);
