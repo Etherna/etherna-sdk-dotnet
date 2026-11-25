@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\EthernaSdk.Internal.AspNetCore\EthernaSdk.Internal.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Internal\EthernaSdk.Internal.csproj" />
   </ItemGroup>
 
 </Project>

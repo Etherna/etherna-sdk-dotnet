@@ -16,10 +16,8 @@ Etherna SDK .Net offers different NuGet packages with different scopes:
   * **EthernaSdk.Users.Sso** - Sso dedicated client
 
 * **EthernaSdk.Internal** exposes clients dedicated to internal "service to service" api requests.  
-  These clients are specific to internal use, consumed only by worker applications.
-
-* **EthernaSdk.Internal.AspNetCore** implements a registration adapter for Asp.Net Core projects, dedicated to internal Api clients.  
-  Offers "client credentials" flow authentication, and manages access token expiration.
+  These clients are specific to internal use, consumed only by worker applications.  
+  Authenticates with "client credentials" flow, and manages access token expiration.
 
 * **EthernaSdk.Tools.Video** implement tools to work with etherna videos
 

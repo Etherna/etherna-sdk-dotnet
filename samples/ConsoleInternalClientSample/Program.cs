@@ -12,10 +12,10 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Duende.IdentityModel.Client;
+using Etherna.Sdk.Internal;
 using Etherna.Sdk.Internal.Clients;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ConsoleInternalClientSample
@@ -81,45 +81,16 @@ namespace ConsoleInternalClientSample
 
             Console.WriteLine();
 
-            // Create a client.
-            var httpClient = await CreateHttpClientAsync(new Uri(ssoBaseUrl!), ssoClientId!, ssoClientSecret!);
-            var client = new EthernaInternalCreditClient(new Uri(creditBaseUrl!), httpClient);
+            // Register the client with its token management.
+            var services = new ServiceCollection();
+            services.AddEthernaInternalClients(new Uri(ssoBaseUrl!))
+                .AddEthernaCreditClient(new Uri(creditBaseUrl!), ssoClientId!, ssoClientSecret!);
+            await using var serviceProvider = services.BuildServiceProvider();
+            var client = serviceProvider.GetRequiredService<IEthernaInternalCreditClient>();
 
             // Consume service api.
             var credit = await client.GetUserCreditAsync(address!);
             Console.WriteLine($"Current balance: {credit.Balance} xDai");
-        }
-
-        static async Task<HttpClient> CreateHttpClientAsync(
-            Uri ssoBaseUrl,
-            string ssoClientId,
-            string ssoClientSecret)
-        {
-            // Discover endpoints from metadata.
-            using var httpClient = new HttpClient();
-            var discoveryDoc = await httpClient.GetDiscoveryDocumentAsync(ssoBaseUrl.AbsoluteUri).ConfigureAwait(false);
-            if (discoveryDoc.IsError)
-                throw discoveryDoc.Exception ?? new InvalidOperationException();
-
-            // Request token.
-            using var tokenRequest = new ClientCredentialsTokenRequest
-            {
-                Address = discoveryDoc.TokenEndpoint,
-
-                ClientId = ssoClientId,
-                ClientSecret = ssoClientSecret,
-                Scope = "ethernaCredit_serviceInteract_api"
-            };
-            var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(tokenRequest).ConfigureAwait(false);
-
-            if (tokenResponse.IsError)
-                throw tokenResponse.Exception ?? new InvalidOperationException();
-
-            // Create client and set api bearer token.
-            var apiClient = new HttpClient();
-            apiClient.SetBearerToken(tokenResponse.AccessToken!);
-
-            return apiClient;
         }
     }
 }
