@@ -105,7 +105,9 @@ namespace Etherna.Sdk.Users.Gateway.Clients
                     postageReferenceId,
                     cancellationToken).ConfigureAwait(false);
             }
-            catch (EthernaGatewayApiException e) when(e.StatusCode == 404)
+            // While the purchase is pending the gateway answers without a batch id, and the generated client
+            // reports that empty answer as an error carrying a success status.
+            catch (EthernaGatewayApiException e) when (e.StatusCode is 200 or 204 or 404)
             {
                 return null;
             }

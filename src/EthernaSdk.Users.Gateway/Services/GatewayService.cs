@@ -15,8 +15,8 @@
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Clients;
 using Etherna.SwarmSdk;
-using Etherna.SwarmSdk.Exceptions;
 using Etherna.SwarmSdk.Models;
+using Etherna.SwarmSdk.Services;
 using System;
 using System.IO;
 using System.Net.Http.Headers;
@@ -30,13 +30,17 @@ namespace Etherna.Sdk.Users.Gateway.Services
 {
     public sealed class GatewayService(
         IEthernaUserGatewayClient ethernaGatewayClient,
-        ISwarmClient swarmClient)
+        ISwarmClient swarmClient,
+        TimeProvider? timeProvider = null)
         : IGatewayService
     {
         // Consts.
         public static readonly TimeSpan BatchCheckTimeSpan = new(0, 0, 0, 5);
         public static readonly TimeSpan BatchCreationTimeout = new(0, 0, 15, 0);
         public static readonly TimeSpan BatchUsableTimeout = new(0, 0, 15, 0);
+
+        // Fields.
+        private readonly TimeProvider timeProvider = timeProvider ?? TimeProvider.System;
 
         // Methods.
         public async Task<(PostageBatchId BatchId, EthTxHash TxHash)> BuyPostageBatchAsync(
@@ -57,11 +61,24 @@ namespace Etherna.Sdk.Users.Gateway.Services
             if (depth < PostageBatch.MinDepth)
                 throw new ArgumentException($"Postage depth must be at least {PostageBatch.MinDepth}");
 
+            // In dry mode no batch is bought, and there is none to wait for.
+            if (swarmClient.IsDryMode)
+            {
+                onWaitingBatchCreation?.Invoke();
+                onBatchCreated?.Invoke(PostageBatchId.Zero);
+                onWaitingBatchUsable?.Invoke();
+                onBatchUsable?.Invoke();
+
+                return (PostageBatchId.Zero, EthTxHash.Zero);
+            }
+
+            // Create batch.
+            PostageBatchId batchId;
+            var txHash = EthTxHash.Zero;
             if (swarmClient.ApiCompatibility == SwarmClients.Bee)
             {
-                // Create batch.
                 onWaitingBatchCreation?.Invoke();
-                var (batchId, txHash) = await swarmClient.BuyPostageBatchAsync(
+                (batchId, txHash) = await swarmClient.BuyPostageBatchAsync(
                     amount,
                     depth,
                     label,
@@ -69,17 +86,10 @@ namespace Etherna.Sdk.Users.Gateway.Services
                     gasLimit,
                     gasPrice,
                     cancellationToken).ConfigureAwait(false);
-                onBatchCreated?.Invoke(batchId);
-
-                // Wait until created batch is usable.
-                onWaitingBatchUsable?.Invoke();
-                await WaitForBatchUsableAsync(batchId).ConfigureAwait(false);
-                onBatchUsable?.Invoke();
-
-                return (batchId, txHash);
             }
             else
             {
+                //the gateway buys the batch with a background job, and answers with a reference to its result
                 var batchReferenceId = await ethernaGatewayClient.BuyPostageBatchAsync(
                     amount,
                     depth,
@@ -89,39 +99,47 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 // Wait until created batch is available.
                 onWaitingBatchCreation?.Invoke();
 
-                var batchStartWait = DateTime.UtcNow;
-                PostageBatchId? batchId = null;
-                do
+                var creationStartTimestamp = timeProvider.GetTimestamp();
+                PostageBatchId? createdBatchId = null;
+                while (true)
                 {
-                    //timeout throw exception
-                    if (DateTime.UtcNow - batchStartWait >= BatchCreationTimeout)
-                    {
-                        var ex = new InvalidOperationException("Batch not available after timeout");
-                        ex.Data.Add("BatchReferenceId", batchReferenceId);
-                        throw ex;
-                    }
-
+                    // Until the gateway answers with the batch id, the batch is taken as not created yet, even
+                    // when the gateway fails to answer. Only a 410 is final: with it the gateway reports the
+                    // purchase it gave up, whose credit it gives back.
                     try
                     {
-                        batchId = await ethernaGatewayClient.TryGetNewPostageBatchIdFromPostageRefAsync(
+                        createdBatchId = await ethernaGatewayClient.TryGetNewPostageBatchIdFromPostageRefAsync(
                             batchReferenceId, cancellationToken).ConfigureAwait(false);
                     }
-                    catch (EthernaGatewayApiException)
-                    {
-                        //waiting for batchId available
-                        await Task.Delay(BatchCheckTimeSpan, cancellationToken).ConfigureAwait(false);
-                    }
-                } while (batchId is null);
+                    catch (EthernaGatewayApiException e) when (e.StatusCode != 410)
+                    { }
 
-                onBatchCreated?.Invoke(batchId.Value);
+                    if (createdBatchId is not null)
+                        break;
 
-                // Wait until created batch is usable.
-                onWaitingBatchUsable?.Invoke();
-                await WaitForBatchUsableAsync(batchId.Value).ConfigureAwait(false);
-                onBatchUsable?.Invoke();
+                    if (timeProvider.GetElapsedTime(creationStartTimestamp) >= BatchCreationTimeout)
+                        throw new TimeoutException(
+                            $"Postage batch with reference {batchReferenceId} was not created within {BatchCreationTimeout}");
 
-                return (batchId.Value, EthTxHash.Zero);
+                    await Task.Delay(BatchCheckTimeSpan, timeProvider, cancellationToken).ConfigureAwait(false);
+                }
+                batchId = createdBatchId.Value;
             }
+            onBatchCreated?.Invoke(batchId);
+
+            // Wait until created batch is usable.
+            onWaitingBatchUsable?.Invoke();
+            await PostageBatchUsablePoller.WaitUntilUsableAsync(
+                batchId,
+                async (id, token) =>
+                    (await swarmClient.GetPostageBatchAsync(id, token).ConfigureAwait(false)).PostageBatch,
+                timeout: BatchUsableTimeout,
+                pollInterval: BatchCheckTimeSpan,
+                timeProvider: timeProvider,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+            onBatchUsable?.Invoke();
+
+            return (batchId, txHash);
         }
         
         public Task ChunksBulkUploadAsync(
@@ -145,6 +163,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
         {
             if (swarmClient.ApiCompatibility == SwarmClients.Bee)
                 throw new NotSupportedException();
+            if (swarmClient.IsDryMode)
+                return Task.FromResult(false);
             return ethernaGatewayClient.DefundResourceDownloadAsync(reference, cancellationToken);
         }
 
@@ -168,6 +188,8 @@ namespace Etherna.Sdk.Users.Gateway.Services
         {
             if (swarmClient.ApiCompatibility == SwarmClients.Bee)
                 throw new NotSupportedException();
+            if (swarmClient.IsDryMode)
+                return Task.CompletedTask;
             return ethernaGatewayClient.FundResourceDownloadAsync(reference, cancellationToken);
         }
 
@@ -432,37 +454,5 @@ namespace Etherna.Sdk.Users.Gateway.Services
                 presignedPostageStamp: presignedPostageStamp,
                 pin: pin,
                 cancellationToken: cancellationToken);
-
-        // Helpers.
-        private async Task WaitForBatchUsableAsync(PostageBatchId batchId)
-        {
-            var batchStartWait = DateTime.UtcNow;
-            var batchIsUsable = false;
-            do
-            {
-                //timeout throw exception
-                if (DateTime.UtcNow - batchStartWait >= BatchUsableTimeout)
-                {
-                    var ex = new InvalidOperationException("Batch not usable after timeout");
-                    ex.Data.Add("BatchId", batchId);
-                    throw ex;
-                }
-
-                try
-                {
-                    var batchInfo = await swarmClient.GetPostageBatchAsync(batchId).ConfigureAwait(false);
-                    batchIsUsable = batchInfo.PostageBatch.IsUsable;
-                }
-                catch (EthernaGatewayApiException e) when
-                    (e.StatusCode == 504) //single request timeout
-                { }
-                catch (SwarmClientTimeoutException) //single read not answered within its bound
-                { }
-
-                //waiting for batch usable
-                if (!batchIsUsable) 
-                    await Task.Delay(BatchCheckTimeSpan).ConfigureAwait(false);
-            } while (!batchIsUsable);
-        }
     }
 }
