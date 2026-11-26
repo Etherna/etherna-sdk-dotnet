@@ -12,7 +12,6 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using Etherna.Authentication;
 using Etherna.Sdk.Internal;
 using Etherna.Sdk.Internal.Clients;
 using Etherna.Sdk.Tools.UniversalFiles;
@@ -272,7 +271,6 @@ namespace Etherna.Sdk.AotCompatibility
                     "probeClientId",
                     null,
                     11420,
-                    [EthernaScopes.UserApiCredit, EthernaScopes.UserApiGateway, EthernaScopes.UserApiIndex, EthernaScopes.UserApiSso],
                     authority: "https://sso.example.com/")
                 .AddEthernaCreditClient()
                 .AddEthernaGatewayClient()

@@ -132,12 +132,11 @@ reason to reference them directly.
 ### User application — sign in and call a service
 
 `AddEthernaUserClients` registers the sign-in against the Etherna SSO server and returns a builder: each
-service package adds its own client on it. The client id must match a client registered on the Etherna
-SSO server, whose redirect url is on the loopback port passed here, and the requested scopes must
-include the one of each service to call.
+service package adds its own client on it, and the api scope of its service to the scopes the sign-in
+requests. The client id must match a client registered on the Etherna SSO server, whose redirect url is
+on the loopback port passed here, and which is allowed to request the scopes of the registered clients.
 
 ```csharp
-using Etherna.Authentication;
 using Etherna.Authentication.Native;
 using Etherna.Sdk.Users;
 using Etherna.Sdk.Users.Credit.Clients;
@@ -148,9 +147,8 @@ var services = new ServiceCollection();
 services.AddEthernaUserClients(
         clientId: "yourClientId",                 // used by the interactive sign-in
         clientSecret: null,                       // public native clients have no secret
-        returnUrlPort: 11420,                     // must match the client's redirect url on the SSO server
-        scopes: [EthernaScopes.UserApiCredit])    // one scope for each service to call
-    .AddEthernaCreditClient();
+        returnUrlPort: 11420)                     // must match the client's redirect url on the SSO server
+    .AddEthernaCreditClient();                    // also requests the scope of the credit api at sign-in
 
 await using var serviceProvider = services.BuildServiceProvider();
 
@@ -169,12 +167,16 @@ Console.WriteLine($"Current balance: {credit.Balance} xDai");
 
 Every service follows the same pattern:
 
-| Service | Registration | Scope | Client |
+| Service | Registration | Scope requested | Client |
 | --- | --- | --- | --- |
 | Credit | `AddEthernaCreditClient` | `EthernaScopes.UserApiCredit` | `IEthernaUserCreditClient` |
 | Gateway | `AddEthernaGatewayClient` | `EthernaScopes.UserApiGateway` | `IEthernaUserGatewayClient`, `ISwarmClient` |
 | Index | `AddEthernaIndexClient` | `EthernaScopes.UserApiIndex` | `IEthernaUserIndexClient` |
 | SSO | `AddEthernaSsoClient` | `EthernaScopes.UserApiSso` | `IEthernaUserSsoClient` |
+
+The sign-in requests the scopes of the registered clients. To request other ones, `AddEthernaUserClients`
+takes an optional `scopes`: when given, the sign-in requests exactly those instead, which must then
+include the scope of each service to call.
 
 The clients are singletons. By default they call the public Etherna deployment
 (`https://credit.etherna.io/`, `https://gateway.etherna.io/`, `https://index.etherna.io/`, and
@@ -198,13 +200,12 @@ API the gateway exposes. `GatewayService` combines them, and is the one to use f
 It is not registered by the builder: add it to the container with the lifetime you need.
 
 ```csharp
-using Etherna.Authentication;
 using Etherna.Sdk.Users;
 using Etherna.Sdk.Users.Gateway.Services;
 using Etherna.SwarmSdk.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-services.AddEthernaUserClients("yourClientId", null, 11420, [EthernaScopes.UserApiGateway])
+services.AddEthernaUserClients("yourClientId", null, 11420)
     .AddEthernaGatewayClient();
 services.AddTransient<IGatewayService, GatewayService>();
 
@@ -259,17 +260,12 @@ The index client resolves the thumbnails of the videos it lists on Swarm: it nee
 in the container, the one `AddEthernaGatewayClient` registers.
 
 ```csharp
-using Etherna.Authentication;
 using Etherna.Sdk.Users;
 using Etherna.Sdk.Users.Index.Clients;
 using Etherna.Sdk.Users.Index.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-services.AddEthernaUserClients(
-        "yourClientId",
-        null,
-        11420,
-        [EthernaScopes.UserApiGateway, EthernaScopes.UserApiIndex])
+services.AddEthernaUserClients("yourClientId", null, 11420)
     .AddEthernaGatewayClient()
     .AddEthernaIndexClient();
 
