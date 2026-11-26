@@ -481,7 +481,7 @@ namespace Etherna.Sdk.Sso.GenClients
                 var responseText = await ReadAsStringAsync(response.Content, cancellationToken).ConfigureAwait(false);
                 try
                 {
-                    var typedBody = System.Text.Json.JsonSerializer.Deserialize<T>(responseText, JsonSerializerSettings);
+                    var typedBody = (T)System.Text.Json.JsonSerializer.Deserialize(responseText, JsonSerializerSettings.GetTypeInfo(typeof(T)))!;
                     return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (System.Text.Json.JsonException exception)
@@ -496,7 +496,7 @@ namespace Etherna.Sdk.Sso.GenClients
                 {
                     using (var responseStream = await ReadAsStreamAsync(response.Content, cancellationToken).ConfigureAwait(false))
                     {
-                        var typedBody = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerSettings, cancellationToken).ConfigureAwait(false);
+                        var typedBody = (T)(await System.Text.Json.JsonSerializer.DeserializeAsync(responseStream, JsonSerializerSettings.GetTypeInfo(typeof(T)), cancellationToken).ConfigureAwait(false))!;
                         return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
@@ -508,6 +508,8 @@ namespace Etherna.Sdk.Sso.GenClients
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "Reads [EnumMember] on enum fields for query values. Enum types reached here are referenced by API signatures, and Native AOT preserves enum field metadata and attributes, so the reflection resolves correctly.")]
         private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
@@ -756,7 +758,7 @@ namespace Etherna.Sdk.Sso.GenClients
                 var responseText = await ReadAsStringAsync(response.Content, cancellationToken).ConfigureAwait(false);
                 try
                 {
-                    var typedBody = System.Text.Json.JsonSerializer.Deserialize<T>(responseText, JsonSerializerSettings);
+                    var typedBody = (T)System.Text.Json.JsonSerializer.Deserialize(responseText, JsonSerializerSettings.GetTypeInfo(typeof(T)))!;
                     return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (System.Text.Json.JsonException exception)
@@ -771,7 +773,7 @@ namespace Etherna.Sdk.Sso.GenClients
                 {
                     using (var responseStream = await ReadAsStreamAsync(response.Content, cancellationToken).ConfigureAwait(false))
                     {
-                        var typedBody = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerSettings, cancellationToken).ConfigureAwait(false);
+                        var typedBody = (T)(await System.Text.Json.JsonSerializer.DeserializeAsync(responseStream, JsonSerializerSettings.GetTypeInfo(typeof(T)), cancellationToken).ConfigureAwait(false))!;
                         return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
@@ -783,6 +785,8 @@ namespace Etherna.Sdk.Sso.GenClients
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2075",
+            Justification = "Reads [EnumMember] on enum fields for query values. Enum types reached here are referenced by API signatures, and Native AOT preserves enum field metadata and attributes, so the reflection resolves correctly.")]
         private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)

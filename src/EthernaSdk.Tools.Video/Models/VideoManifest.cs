@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.Video.Serialization;
 using Etherna.Sdk.Tools.Video.Serialization.Dtos.Manifest2;
 using Etherna.SwarmSdk.Models;
 using System;
@@ -19,7 +20,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Etherna.Sdk.Tools.Video.Models
 {
@@ -40,13 +40,6 @@ namespace Etherna.Sdk.Tools.Video.Models
         IEnumerable<VideoManifestCaptionSource> captionSources,
         DateTimeOffset? updatedAt = null)
     {
-        // Fields.
-        private readonly JsonSerializerOptions jsonSerializerOptions = new()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
         // Properties.
         public float AspectRatio { get; } = aspectRatio;
         public IEnumerable<(SwarmUri Uri, VideoManifestCaptionSource Source)> CaptionSources { get; }
@@ -113,7 +106,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                     quality: s.Metadata.Quality,
                     path: s.Uri,
                     size: s.Metadata.TotalSourceSize)));
-            return JsonSerializer.Serialize(manifestDetails, jsonSerializerOptions);
+            return JsonSerializer.Serialize(manifestDetails, ManifestJsonSerializerContext.Default.Manifest2DetailsDto);
         }
 
         public string SerializePreviewManifest()
@@ -137,7 +130,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                 ownerEthAddress: OwnerEthAddress,
                 duration: (long)Duration.TotalSeconds,
                 thumbnail: thumbnailDto);
-            return JsonSerializer.Serialize(manifestPreview, jsonSerializerOptions);
+            return JsonSerializer.Serialize(manifestPreview, ManifestJsonSerializerContext.Default.Manifest2PreviewDto);
         }
         
         // Helpers.

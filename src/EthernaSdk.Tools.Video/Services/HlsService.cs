@@ -30,6 +30,9 @@ namespace Etherna.Sdk.Tools.Video.Services
         IUFileProvider uFileProvider)
         : IHlsService
     {
+        // Consts.
+        private const string MasterPlaylistStreamTag = "#EXT-X-STREAM-INF";
+
         public async Task<HlsVideoEncoding> ParseVideoEncodingFromHlsMasterPlaylistFileAsync(
             TimeSpan duration,
             FileBase masterFile,
@@ -53,8 +56,8 @@ namespace Etherna.Sdk.Tools.Video.Services
                 var streamAbsoluteUri = Path.Combine(masterFileDirectory, streamInfo.Uri);
                 UUri streamUUri = masterFile.UUri switch
                 {
-                    BasicUUri _ => new BasicUUri(streamAbsoluteUri),
-                    SwarmUUri _ => new SwarmUUri(streamAbsoluteUri),
+                    BasicUUri _ => new BasicUUri(streamAbsoluteUri, UUriKind.LocalAbsolute),
+                    SwarmUUri _ => new SwarmUUri(streamAbsoluteUri, UUriKind.OnlineAbsolute),
                     _ => throw new InvalidOperationException()
                 };
 
@@ -146,17 +149,13 @@ namespace Etherna.Sdk.Tools.Video.Services
             
             var hlsPlaylistText = await hlsPlaylist.ReadToStringAsync().ConfigureAwait(false);
             
-            // We need to exclude at first that this is a stream playlist.
-            // In fact, parsing a stream playlist as a master playlist gives false positive,
-            // but parsing a master playlist as a stream playlist throws exception.
-            try
-            {
-                MediaPlaylist.LoadFromText(hlsPlaylistText); //must throw exception.
-                return null;
-            }
-            catch (NullReferenceException) { }
+            // A master playlist lists its variant streams with EXT-X-STREAM-INF tags, which a media playlist can't carry
+            // (RFC 8216, 4.3.4). The parser can't tell them apart: it reads either kind as the other without failing.
+            var isMasterPlaylist = hlsPlaylistText
+                .Split('\n')
+                .Any(line => line.TrimStart().StartsWith(MasterPlaylistStreamTag, StringComparison.Ordinal));
 
-            return MasterPlaylist.LoadFromText(hlsPlaylistText);
+            return isMasterPlaylist ? MasterPlaylist.LoadFromText(hlsPlaylistText) : null;
         }
     }
 }

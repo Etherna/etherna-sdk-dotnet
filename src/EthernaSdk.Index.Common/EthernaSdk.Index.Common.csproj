@@ -11,6 +11,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsAotCompatible>true</IsAotCompatible>
 
     <PackageId>Etherna.Sdk.Index.Common</PackageId>
     <RepositoryUrl>https://github.com/Etherna/etherna-sdk-dotnet</RepositoryUrl>
