@@ -20,12 +20,18 @@ namespace Etherna.Sdk.Tools.UniversalFiles.Extensions
 {
     /*
      * Always group similar log delegates by type, always use incremental event ids.
-     * Last event id is: 4
+     * Last event id is: 5
      */
     internal static class LoggerExtensions
     {
         // Fields.
         //*** DEBUG LOGS ***
+        private static readonly Action<ILogger, string, HttpStatusCode, Exception> _onlineFileHeadRequestRefused =
+            LoggerMessage.Define<string, HttpStatusCode>(
+                LogLevel.Debug,
+                new EventId(5, nameof(OnlineFileHeadRequestRefused)),
+                "Head request of online file {FileUri} was answered with status {StatusCode}: the file is downloaded instead");
+
         private static readonly Action<ILogger, string, HttpStatusCode, Exception> _onlineFileRequestRefused =
             LoggerMessage.Define<string, HttpStatusCode>(
                 LogLevel.Debug,
@@ -43,7 +49,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles.Extensions
             LoggerMessage.Define<string>(
                 LogLevel.Warning,
                 new EventId(2, nameof(OnlineFileHeadRequestFailed)),
-                "Head request of online file {FileUri} failed: its byte size is taken as unknown");
+                "Head request of online file {FileUri} failed: the file is downloaded instead");
 
         private static readonly Action<ILogger, string, Exception> _onlineFileRequestFailed =
             LoggerMessage.Define<string>(
@@ -60,6 +66,9 @@ namespace Etherna.Sdk.Tools.UniversalFiles.Extensions
         // Methods.
         public static void OnlineFileHeadRequestFailed(this ILogger logger, string fileUri, Exception exception) =>
             _onlineFileHeadRequestFailed(logger, fileUri.RemoveUriSecrets(), exception);
+
+        public static void OnlineFileHeadRequestRefused(this ILogger logger, string fileUri, HttpStatusCode statusCode) =>
+            _onlineFileHeadRequestRefused(logger, fileUri.RemoveUriSecrets(), statusCode, null!);
 
         public static void OnlineFileRequestFailed(this ILogger logger, string fileUri, Exception exception) =>
             _onlineFileRequestFailed(logger, fileUri.RemoveUriSecrets(), exception);

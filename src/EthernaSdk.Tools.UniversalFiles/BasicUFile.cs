@@ -46,9 +46,9 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                     return (File.Exists(absoluteUri.OriginalUri) || Directory.Exists(absoluteUri.OriginalUri), null);
 
                 case UUriKind.OnlineAbsolute:
-                    // Try to get resource byte size with an HEAD request.
-                    var byteSyze = await TryGetOnlineByteSizeWithHeadRequestAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
-                    if (byteSyze.HasValue)
+                    // A successful HEAD request finds the resource, with or without its byte size.
+                    var (isHeadSuccessful, _) = await TryGetOnlineHeadAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
+                    if (isHeadSuccessful)
                         return (true, null);
 
                     // Otherwise, try to download it.
@@ -71,10 +71,10 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                     return (new FileInfo(absoluteUri.OriginalUri).Length, null);
 
                 case UUriKind.OnlineAbsolute:
-                    // Try to get resource byte size with an HEAD request.
-                    var byteSyze = await TryGetOnlineByteSizeWithHeadRequestAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
-                    if (byteSyze.HasValue)
-                        return (byteSyze.Value, null);
+                    // Try to get resource byte size with a HEAD request.
+                    var (_, byteSize) = await TryGetOnlineHeadAsync(absoluteUri.OriginalUri).ConfigureAwait(false);
+                    if (byteSize.HasValue)
+                        return (byteSize.Value, null);
 
                     // Otherwise, try to download it.
                     var onlineContent = await TryGetOnlineAsByteArrayAsync(absoluteUri.OriginalUri).ConfigureAwait(false) ??
@@ -175,28 +175,31 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             return (new HttpResponseStream(contentStream, response), TryGetContentEncoding(response));
         }
 
+        /// <summary>
+        /// Send a HEAD request of the online file
+        /// </summary>
+        /// <returns>If the response is successful, and the byte size it declares</returns>
         [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
-        private async Task<long?> TryGetOnlineByteSizeWithHeadRequestAsync(string absoluteUri)
+        private async Task<(bool IsSuccessful, long? ByteSize)> TryGetOnlineHeadAsync(string onlineAbsoluteUri)
         {
             try
             {
                 using var httpClient = httpClientFactory.CreateClient();
-                using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Head, absoluteUri);
+                using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Head, onlineAbsoluteUri);
                 using var response = await httpClient.SendAsync(httpRequestMessage).ConfigureAwait(false);
 
-                if (response.Headers.TryGetValues("Content-Length", out var values))
-                {
-                    using var enumerator = values.GetEnumerator();
-                    if (long.TryParse(enumerator.Current, out var byteSize))
-                        return byteSize;
-                }
+                // A refused response declares the length of its error page, not the one of the file.
+                if (response.IsSuccessStatusCode)
+                    return (true, response.Content.Headers.ContentLength);
+
+                logger.OnlineFileHeadRequestRefused(onlineAbsoluteUri, response.StatusCode);
             }
             catch (Exception e)
             {
-                logger.OnlineFileHeadRequestFailed(absoluteUri, e);
+                logger.OnlineFileHeadRequestFailed(onlineAbsoluteUri, e);
             }
 
-            return null;
+            return (false, null);
         }
 
         /// <summary>

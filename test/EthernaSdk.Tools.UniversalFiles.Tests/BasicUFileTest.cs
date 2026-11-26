@@ -15,6 +15,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -64,32 +65,79 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             }
         }
 
-        private sealed class StubHttpMessageHandler(Func<HttpResponseMessage> respond) : HttpMessageHandler
+        private sealed class StubHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> respond)
+            : HttpMessageHandler
         {
             protected override Task<HttpResponseMessage> SendAsync(
                 HttpRequestMessage request,
                 CancellationToken cancellationToken)
             {
-                var response = respond();
+                var response = respond(request);
                 response.RequestMessage = request;
                 return Task.FromResult(response);
             }
         }
 
+        /// <summary>
+        /// A content with no declared length, as the one of a response without Content-Length
+        /// </summary>
+        private sealed class UnsizedContent : HttpContent
+        {
+            protected override Task SerializeToStreamAsync(Stream stream, TransportContext? context) =>
+                Task.CompletedTask;
+
+            protected override bool TryComputeLength(out long length)
+            {
+                length = 0;
+                return false;
+            }
+        }
+
         // Tests.
         [Fact]
-        public async Task ExistsAsync_FindsAServedOnlineFile()
+        public async Task ExistsAsync_DownloadsAnOnlineFileWhoseHeadIsRefused()
         {
             // Setup.
+            var requestMethods = new List<HttpMethod>();
             var uFile = new BasicUFile(
                 new BasicUUri(OnlineFileUri),
-                BuildHttpClientFactory(BuildOnlineFileResponse));
+                BuildHttpClientFactory(request =>
+                {
+                    requestMethods.Add(request.Method);
+                    return request.Method == HttpMethod.Head ?
+                        new HttpResponseMessage(HttpStatusCode.MethodNotAllowed) :
+                        BuildOnlineFileResponse();
+                }));
 
             // Action.
             var exists = await uFile.ExistsAsync();
 
             // Assert.
             Assert.True(exists);
+            Assert.Equal([HttpMethod.Head, HttpMethod.Get], requestMethods);
+        }
+
+        [Fact]
+        public async Task ExistsAsync_FindsAServedOnlineFileWithAHeadRequest()
+        {
+            // Setup.
+            var requestMethods = new List<HttpMethod>();
+            var uFile = new BasicUFile(
+                new BasicUUri(OnlineFileUri),
+                BuildHttpClientFactory(request =>
+                {
+                    requestMethods.Add(request.Method);
+                    return request.Method == HttpMethod.Head ?
+                        new HttpResponseMessage(HttpStatusCode.OK) { Content = new UnsizedContent() } :
+                        BuildOnlineFileResponse();
+                }));
+
+            // Action.
+            var exists = await uFile.ExistsAsync();
+
+            // Assert.
+            Assert.True(exists);
+            Assert.Equal([HttpMethod.Head], requestMethods);
         }
 
         [Fact]
@@ -124,26 +172,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         }
 
         [Fact]
-        public async Task ExistsAsync_LogsInterruptedOnlineDownload()
-        {
-            // Setup.
-            var logger = new RecordingLogger<BasicUFile>();
-            var uFile = new BasicUFile(
-                new BasicUUri(OnlineFileUri),
-                BuildHttpClientFactory(() => new HttpResponseMessage(HttpStatusCode.OK) { Content = new InterruptedContent() }),
-                logger);
-
-            // Action.
-            var exists = await uFile.ExistsAsync();
-
-            // Assert.
-            Assert.False(exists);
-            var logEvent = Assert.Single(logger.Events);
-            Assert.Equal((LogLevel.Warning, "OnlineFileRequestFailed"), (logEvent.Level, logEvent.Name));
-        }
-
-        [Fact]
-        public async Task ExistsAsync_LogsRefusedOnlineRequest()
+        public async Task ExistsAsync_LogsRefusedOnlineRequests()
         {
             // Setup.
             var logger = new RecordingLogger<BasicUFile>();
@@ -157,26 +186,86 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
             // Assert.
             Assert.False(exists);
-            var logEvent = Assert.Single(logger.Events);
-            Assert.Equal((LogLevel.Debug, "OnlineFileRequestRefused"), (logEvent.Level, logEvent.Name));
-            Assert.Contains(OnlineFileUriWithoutSecrets, logEvent.Message, StringComparison.Ordinal);
-            Assert.Contains("NotFound", logEvent.Message, StringComparison.Ordinal);
-            Assert.DoesNotContain("secret", logEvent.Message, StringComparison.Ordinal);
+            Assert.Equal(
+                new[]
+                {
+                    (LogLevel.Debug, "OnlineFileHeadRequestRefused"),
+                    (LogLevel.Debug, "OnlineFileRequestRefused")
+                },
+                logger.Events.Select(e => (e.Level, e.Name!)));
+            Assert.All(logger.Events, e =>
+            {
+                Assert.Contains(OnlineFileUriWithoutSecrets, e.Message, StringComparison.Ordinal);
+                Assert.Contains("NotFound", e.Message, StringComparison.Ordinal);
+                Assert.DoesNotContain("secret", e.Message, StringComparison.Ordinal);
+            });
         }
 
         [Fact]
-        public async Task GetByteSizeAsync_SizesAServedOnlineFile()
+        public async Task GetByteSizeAsync_DownloadsAnOnlineFileWhoseHeadDeclaresNoSize()
         {
             // Setup.
+            var requestMethods = new List<HttpMethod>();
             var uFile = new BasicUFile(
                 new BasicUUri(OnlineFileUri),
-                BuildHttpClientFactory(BuildOnlineFileResponse));
+                BuildHttpClientFactory(request =>
+                {
+                    requestMethods.Add(request.Method);
+                    return request.Method == HttpMethod.Head ?
+                        new HttpResponseMessage(HttpStatusCode.OK) { Content = new UnsizedContent() } :
+                        BuildOnlineFileResponse();
+                }));
 
             // Action.
             var byteSize = await uFile.GetByteSizeAsync();
 
             // Assert.
             Assert.Equal(OnlineFileContent.Length, byteSize);
+            Assert.Equal([HttpMethod.Head, HttpMethod.Get], requestMethods);
+        }
+
+        [Fact]
+        public async Task GetByteSizeAsync_DownloadsAnOnlineFileWhoseHeadIsRefused()
+        {
+            // Setup.
+            var requestMethods = new List<HttpMethod>();
+            var uFile = new BasicUFile(
+                new BasicUUri(OnlineFileUri),
+                BuildHttpClientFactory(request =>
+                {
+                    requestMethods.Add(request.Method);
+                    return request.Method == HttpMethod.Head ?
+                        new HttpResponseMessage(HttpStatusCode.Forbidden) { Content = new ByteArrayContent(new byte[243]) } :
+                        BuildOnlineFileResponse();
+                }));
+
+            // Action.
+            var byteSize = await uFile.GetByteSizeAsync();
+
+            // Assert.
+            Assert.Equal(OnlineFileContent.Length, byteSize);
+            Assert.Equal([HttpMethod.Head, HttpMethod.Get], requestMethods);
+        }
+
+        [Fact]
+        public async Task GetByteSizeAsync_SizesAServedOnlineFileWithAHeadRequest()
+        {
+            // Setup.
+            var requestMethods = new List<HttpMethod>();
+            var uFile = new BasicUFile(
+                new BasicUUri(OnlineFileUri),
+                BuildHttpClientFactory(request =>
+                {
+                    requestMethods.Add(request.Method);
+                    return BuildOnlineFileResponse();
+                }));
+
+            // Action.
+            var byteSize = await uFile.GetByteSizeAsync();
+
+            // Assert.
+            Assert.Equal(OnlineFileContent.Length, byteSize);
+            Assert.Equal([HttpMethod.Head], requestMethods);
         }
 
         [Theory]
@@ -202,6 +291,24 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             // Assert.
             Assert.Contains(OnlineFileUriWithoutSecrets, exception.Message, StringComparison.Ordinal);
             Assert.DoesNotContain("secret", exception.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public async Task ReadToByteArrayAsync_LogsInterruptedOnlineDownload()
+        {
+            // Setup.
+            var logger = new RecordingLogger<BasicUFile>();
+            var uFile = new BasicUFile(
+                new BasicUUri(OnlineFileUri),
+                BuildHttpClientFactory(() => new HttpResponseMessage(HttpStatusCode.OK) { Content = new InterruptedContent() }),
+                logger);
+
+            // Action.
+            await Assert.ThrowsAsync<IOException>(() => uFile.ReadToByteArrayAsync());
+
+            // Assert.
+            var logEvent = Assert.Single(logger.Events);
+            Assert.Equal((LogLevel.Warning, "OnlineFileRequestFailed"), (logEvent.Level, logEvent.Name));
         }
 
         [Fact]
@@ -262,7 +369,10 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         }
 
         // Helpers.
-        private static IHttpClientFactory BuildHttpClientFactory(Func<HttpResponseMessage> respond)
+        private static IHttpClientFactory BuildHttpClientFactory(Func<HttpResponseMessage> respond) =>
+            BuildHttpClientFactory(_ => respond());
+
+        private static IHttpClientFactory BuildHttpClientFactory(Func<HttpRequestMessage, HttpResponseMessage> respond)
         {
             var httpClientFactoryMock = new Mock<IHttpClientFactory>();
             httpClientFactoryMock.Setup(f => f.CreateClient(It.IsAny<string>()))
