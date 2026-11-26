@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Embedded in the assembly, read by the trimmer and by the Native AOT compiler of every application referencing it.
+
+  M3U8Parser, the HLS playlist parser of HlsService and ManifestSerializer, reads the tags and the attributes of a
+  playlist by reflection over its own types (their non-public fields, their parameterless constructors), with no
+  trimming annotation. Trimmed, those members are gone, and the parsing of the first attribute throws
+  MissingMethodException. Preserving the whole assembly keeps them: the parser runs in a Native AOT binary as it
+  does on the JIT runtime. It doesn't silence its trim warnings: an AOT publish still reports IL2104 for M3U8Parser.
+-->
+<linker>
+  <assembly fullname="M3U8Parser" preserve="all" />
+</linker>

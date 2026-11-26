@@ -72,6 +72,8 @@ need, and call it from your .NET application with sign-in and access tokens mana
   `IHttpClientFactory`.
 - **Structured logging** — the relevant actions (a postage batch purchase, a manifest written or read,
   a tolerated failure) are logged as typed events on the `ILogger` of the container.
+- **Native AOT compatible** — every package but the token tools can be trimmed and compiled ahead-of-time:
+  the JSON goes through source-generated contexts, and CI verifies it with an AOT publish.
 
 ## Packages
 
@@ -438,6 +440,11 @@ The user clients bring in the ASP.NET Core shared framework, through the sign-in
 Authentication: an application using them needs the ASP.NET Core runtime where it runs, a console one
 included. The internal clients and the tools need the .NET runtime alone.
 
+Every package but `Etherna.Sdk.Tools.Tokens`, built on Nethereum, is **Native AOT and trim compatible**. An
+application publishing with AOT sees one `IL2104` warning for `M3U8Parser`, the HLS playlist parser of the video
+tools: it works by reflection, and the video tools keep the members it needs. The constraints are documented in
+[doc/NativeAot.md](doc/NativeAot.md).
+
 ## Building and testing
 
 Etherna SDK .Net builds with the standard .NET SDK:
@@ -451,6 +458,14 @@ dotnet test    EthernaSdk.sln -c Release   # runs the xUnit test projects
 `TreatWarningsAsErrors=true` and `AnalysisMode=AllEnabledByDefault` are enabled on every project, so
 warnings break the build on every target framework.
 
+Native AOT compatibility is verified by publishing the probe of `test/EthernaSdk.AotCompatibility` with AOT, which
+fails on any trim or AOT warning, and by running the native binary, a smoke test of the AOT-sensitive paths:
+
+```bash
+dotnet publish test/EthernaSdk.AotCompatibility -c Release -r linux-x64   # needs clang and zlib1g-dev on Linux
+./test/EthernaSdk.AotCompatibility/bin/Release/net10.0/linux-x64/publish/EthernaSdk.AotCompatibility
+```
+
 The restore needs the Etherna NuGet feed beside NuGet.org, for the prerelease dependencies: the root
 `nuget.config` declares both.
 
@@ -459,7 +474,8 @@ manual version bumps.
 
 The HTTP clients under `GenClients/` are generated with [NSwag](https://github.com/RicoSuter/NSwag)
 from the OpenAPI definitions of the services, and are not hand-maintained: see
-[tools/README.md](tools/README.md) for how to regenerate them.
+[tools/README.md](tools/README.md) for how to regenerate them, and [doc/NativeAot.md](doc/NativeAot.md) for the
+Native AOT fixes to re-apply after a regeneration.
 
 Coding conventions and architecture notes live in [AGENTS.md](AGENTS.md).
 
@@ -485,6 +501,7 @@ test/
   EthernaSdk.Tools.UniversalFiles.Tests  xUnit + Moq tests of the universal files
   EthernaSdk.Tools.Video.UnitTests       xUnit + Moq tests of the video tools
   EthernaSdk.Users.Gateway.Tests         xUnit + Moq tests of the gateway client and service
+  EthernaSdk.AotCompatibility            Native AOT probe: published with AOT by CI, then run as a smoke test
 samples/
   AspNetCoreInternalClientSample   web app using the internal client of Etherna Credit
   ConsoleInternalClientSample      console app using the internal client of Etherna Credit

@@ -34,6 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaSdk.Internal", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{0E5080C1-2D28-481C-99EB-7F0EB0EE60B0}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\aot-compatibility.yml = .github\workflows\aot-compatibility.yml
 		.github\workflows\nuget-unstable-deploy.yml = .github\workflows\nuget-unstable-deploy.yml
 		.github\workflows\nuget-stable-deploy.yml = .github\workflows\nuget-stable-deploy.yml
 	EndProjectSection
@@ -81,6 +82,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaSdk.Users.Gateway.Tests", "test\EthernaSdk.Users.Gateway.Tests\EthernaSdk.Users.Gateway.Tests.csproj", "{FA223A6C-B6D8-4170-9427-ACA4A0D7C6FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaSdk.Internal.Tests", "test\EthernaSdk.Internal.Tests\EthernaSdk.Internal.Tests.csproj", "{8C09F7CF-8372-4C91-910F-8AB79D052542}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaSdk.AotCompatibility", "test\EthernaSdk.AotCompatibility\EthernaSdk.AotCompatibility.csproj", "{6F019D74-5209-432D-86A4-74F3CCB775FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -168,6 +171,10 @@ Global
 		{8C09F7CF-8372-4C91-910F-8AB79D052542}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C09F7CF-8372-4C91-910F-8AB79D052542}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C09F7CF-8372-4C91-910F-8AB79D052542}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F019D74-5209-432D-86A4-74F3CCB775FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F019D74-5209-432D-86A4-74F3CCB775FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F019D74-5209-432D-86A4-74F3CCB775FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F019D74-5209-432D-86A4-74F3CCB775FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -199,6 +206,7 @@ Global
 		{CD54BDBB-A50D-48A2-AA9C-C5D99C62271B} = {228D4E59-1F63-4BC5-A27B-37E10FE8009C}
 		{FA223A6C-B6D8-4170-9427-ACA4A0D7C6FE} = {94FF9CC3-F00A-421C-867A-680E121BC6ED}
 		{8C09F7CF-8372-4C91-910F-8AB79D052542} = {94FF9CC3-F00A-421C-867A-680E121BC6ED}
+		{6F019D74-5209-432D-86A4-74F3CCB775FB} = {94FF9CC3-F00A-421C-867A-680E121BC6ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7539252-E55D-43C2-B2C5-C9A77D191087}

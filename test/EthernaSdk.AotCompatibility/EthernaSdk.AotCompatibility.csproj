@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Native AOT compatibility probe for the Etherna SDK libraries.
+
+    Publishing this app with `dotnet publish -r <rid> -c Release` runs the ILC compiler over the compiled libraries
+    and their dependencies, so it reports every trim/AOT warning of the whole graph, the third-party code included,
+    which the Roslyn analyzers of the build never see.
+
+    The libraries are added as TrimmerRootAssembly so ILC analyzes every operation, not only what Main reaches.
+    EthernaSdk.Tools.Tokens is left out: it is built on Nethereum, which is not AOT compatible.
+
+    Any IL2026/IL3050/etc. warning fails the publish (warnings-as-errors).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Etherna.Sdk.AotCompatibility</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>true</IsPublishable>
+
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <MSBuildTreatWarningsAsErrors>true</MSBuildTreatWarningsAsErrors>
+
+    <!-- Warnings of the exempted assemblies below collapse into IL2104/IL3053: with TrimmerSingleWarn=false no
+         other assembly can produce these codes, so suppressing them keeps the detailed gate everywhere else.
+         Three IL2026 of Microsoft.Extensions.Caching.Hybrid escape that collapse in ILC, so IL2026 is excluded
+         globally to exempt the same assembly, as in Etherna.Authentication: the libraries stay guarded against it
+         by the Roslyn trim analyzers (IsAotCompatible + warnings-as-errors), which analyze the generated clients
+         too, so a reflection-based call fails their build before reaching this publish. -->
+    <NoWarn>$(NoWarn);IL2104;IL3053;IL2026</NoWarn>
+  </PropertyGroup>
+
+  <!-- Third-party assemblies with trim/AOT warnings that can't be fixed from here.
+       Microsoft.Extensions.Caching.Hybrid: its default reflection-based JSON serializer factory, registered by the
+       token management of Etherna.Authentication.Native, warns even on the latest version. The tokens are cached
+       through Duende's own serializers: Etherna.Authentication, which exempts it the same way, documents the
+       reflection fallback as never exercised.
+       M3U8Parser: the HLS parser reads playlists by reflection over its own types. EthernaSdk.Tools.Video embeds an
+       ILLink descriptor preserving the whole assembly, so the parsing works: the smoke test of Program.cs runs it. -->
+  <Target Name="ExemptKnownDirtyAssemblies" BeforeTargets="WriteIlcRspFileForCompilation;PrepareForILLink">
+    <ItemGroup>
+      <ManagedAssemblyToLink Condition="'%(Filename)' == 'M3U8Parser' Or '%(Filename)' == 'Microsoft.Extensions.Caching.Hybrid'">
+        <TrimmerSingleWarn>true</TrimmerSingleWarn>
+      </ManagedAssemblyToLink>
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EthernaSdk.Internal\EthernaSdk.Internal.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Tools.UniversalFiles\EthernaSdk.Tools.UniversalFiles.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Tools.Video\EthernaSdk.Tools.Video.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Users.Credit\EthernaSdk.Users.Credit.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Users.Gateway\EthernaSdk.Users.Gateway.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Users.Index\EthernaSdk.Users.Index.csproj" />
+    <ProjectReference Include="..\..\src\EthernaSdk.Users.Sso\EthernaSdk.Users.Sso.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="EthernaSdk.Credit.Common" />
+    <TrimmerRootAssembly Include="EthernaSdk.Gateway.Common" />
+    <TrimmerRootAssembly Include="EthernaSdk.Index.Common" />
+    <TrimmerRootAssembly Include="EthernaSdk.Internal" />
+    <TrimmerRootAssembly Include="EthernaSdk.Sso.Common" />
+    <TrimmerRootAssembly Include="EthernaSdk.Tools.UniversalFiles" />
+    <TrimmerRootAssembly Include="EthernaSdk.Tools.Video" />
+    <TrimmerRootAssembly Include="EthernaSdk.Users.Credit" />
+    <TrimmerRootAssembly Include="EthernaSdk.Users.Gateway" />
+    <TrimmerRootAssembly Include="EthernaSdk.Users.Index" />
+    <TrimmerRootAssembly Include="EthernaSdk.Users.Sso" />
+    <TrimmerRootAssembly Include="EthernaSdk.UsersCommon" />
+  </ItemGroup>
+
+</Project>

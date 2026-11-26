@@ -12,9 +12,9 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Sdk.Tools.Video.Serialization;
 using System;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Etherna.Sdk.Tools.Video.Models
 {
@@ -24,13 +24,6 @@ namespace Etherna.Sdk.Tools.Video.Models
         string sourceProviderName,
         string sourceVideoId)
     {
-        // Fields.
-        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
         // Properties.
         public string ClientName { get; } = clientName;
         public string ClientVersion { get; } = clientVersion;
@@ -62,7 +55,7 @@ namespace Etherna.Sdk.Tools.Video.Models
                 ClientVersion,
                 SourceProviderName,
                 SourceVideoId);
-            return JsonSerializer.Serialize(dto, JsonSerializerOptions);
+            return JsonSerializer.Serialize(dto, ManifestJsonSerializerContext.Default.ManifestPersonalDataDto);
         }
         
         // Static methods.
@@ -75,7 +68,7 @@ namespace Etherna.Sdk.Tools.Video.Models
             
             try
             {
-                var dto = JsonSerializer.Deserialize<Serialization.Dtos.PersonalData1.ManifestPersonalDataDto>(rawPersonalData, JsonSerializerOptions);
+                var dto = JsonSerializer.Deserialize(rawPersonalData, ManifestJsonSerializerContext.Default.ManifestPersonalDataDto);
                 if (dto is null)
                     return false;
                 

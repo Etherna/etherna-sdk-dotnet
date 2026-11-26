@@ -218,7 +218,9 @@ namespace Etherna.Sdk.Tools.Video.Services
             var rootManifestStream = await resourceReader.GetFileStreamAsync(manifestReference).ConfigureAwait(false);
             await using (rootManifestStream.ConfigureAwait(false))
             {
-                rootManifestJsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(rootManifestStream).ConfigureAwait(false);
+                rootManifestJsonElement = await JsonSerializer.DeserializeAsync(
+                    rootManifestStream,
+                    PublishedManifestJsonSerializerContext.Default.JsonElement).ConfigureAwait(false);
             }
 
             // Find version.

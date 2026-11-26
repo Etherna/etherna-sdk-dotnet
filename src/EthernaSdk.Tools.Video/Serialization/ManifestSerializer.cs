@@ -25,20 +25,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Tools.Video.Serialization
 {
     public static class ManifestSerializer
     {
-        // Fields.
-        private static readonly JsonSerializerOptions jsonSerializerOptions = new()
-        {
-            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-            PropertyNameCaseInsensitive = true,
-        };
-        
         // Static methods.
         public static async Task<(VideoManifest?, ValidationError[])> TryDeserializeManifest1Async(
             JsonElement manifestJsonElement,
@@ -47,7 +39,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             ArgumentNullException.ThrowIfNull(resourceReader);
             
             // Get manifest.
-            var manifestDto = manifestJsonElement.Deserialize<Manifest1Dto>(jsonSerializerOptions);
+            var manifestDto = manifestJsonElement.Deserialize(PublishedManifestJsonSerializerContext.Default.Manifest1Dto);
             if (manifestDto is null)
                 return (null, [new ValidationError(ValidationErrorType.JsonConvert, "Empty json")]);
             
@@ -119,7 +111,7 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             ArgumentNullException.ThrowIfNull(resourceReader);
             
             // Get preview manifest.
-            var previewManifestDto = previewManifestJsonElement.Deserialize<Manifest2PreviewDto>(jsonSerializerOptions);
+            var previewManifestDto = previewManifestJsonElement.Deserialize(PublishedManifestJsonSerializerContext.Default.Manifest2PreviewDto);
             if (previewManifestDto is null)
                 return (null, [new ValidationError(ValidationErrorType.JsonConvert, "Empty json preview manifest")]);
 
@@ -128,8 +120,9 @@ namespace Etherna.Sdk.Tools.Video.Serialization
             var detailsManifestStream = await resourceReader.GetFileStreamAsync($"{manifestReference}/details").ConfigureAwait(false);
             await using (detailsManifestStream.ConfigureAwait(false))
             {
-                detailsManifestDto = await JsonSerializer.DeserializeAsync<Manifest2DetailsDto>(
-                    detailsManifestStream, jsonSerializerOptions).ConfigureAwait(false);
+                detailsManifestDto = await JsonSerializer.DeserializeAsync(
+                    detailsManifestStream,
+                    PublishedManifestJsonSerializerContext.Default.Manifest2DetailsDto).ConfigureAwait(false);
             }
             if (detailsManifestDto is null)
                 return (null, [new ValidationError(ValidationErrorType.JsonConvert, "Empty json details manifest")]);
