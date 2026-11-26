@@ -78,7 +78,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
                     // Otherwise, try to download it.
                     var onlineContent = await TryGetOnlineAsByteArrayAsync(absoluteUri.OriginalUri).ConfigureAwait(false) ??
-                                        throw new IOException($"Can't retrieve online resource at {absoluteUri}");
+                                        throw new IOException($"Can't retrieve online resource at {absoluteUri.OriginalUri.RemoveUriSecrets()}");
                     return (onlineContent.ByteArray.LongLength, onlineContent);
 
                 default: throw new InvalidOperationException(
@@ -98,7 +98,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
 
                 case UUriKind.OnlineAbsolute:
                     return await TryGetOnlineAsByteArrayAsync(absoluteUri.OriginalUri).ConfigureAwait(false) ??
-                           throw new IOException($"Can't retrieve online resource at {absoluteUri}");
+                           throw new IOException($"Can't retrieve online resource at {absoluteUri.OriginalUri.RemoveUriSecrets()}");
 
                 default: throw new InvalidOperationException(
                     "Invalid absolute uri kind. It should be well defined and absolute");
@@ -117,7 +117,7 @@ namespace Etherna.Sdk.Tools.UniversalFiles
                 
                 case UUriKind.OnlineAbsolute:
                     return await TryGetOnlineAsStreamAsync(absoluteUri.OriginalUri).ConfigureAwait(false) ??
-                           throw new IOException($"Can't retrieve online resource at {absoluteUri}");
+                           throw new IOException($"Can't retrieve online resource at {absoluteUri.OriginalUri.RemoveUriSecrets()}");
                 
                 default: throw new InvalidOperationException(
                     "Invalid absolute uri kind. It should be well defined and absolute");
@@ -135,61 +135,46 @@ namespace Etherna.Sdk.Tools.UniversalFiles
         }
 
         // Helpers.
+        private static Encoding? TryGetContentEncoding(HttpResponseMessage response)
+        {
+            // Try to extract the encoding from the Content-Type header.
+            var charSet = response.Content.Headers.ContentType?.CharSet;
+            if (charSet is null)
+                return null;
+
+            try { return Encoding.GetEncoding(charSet); }
+            catch (ArgumentException) { return null; }
+        }
+
         private async Task<(byte[] ByteArray, Encoding? Encoding)?> TryGetOnlineAsByteArrayAsync(
             string onlineAbsoluteUri)
         {
-            var result = await TryGetOnlineAsStreamAsync(onlineAbsoluteUri).ConfigureAwait(false);
-            if (result is null)
+            // The whole content is read with the response, so a download failed midway is a failed request.
+            using var response = await TryGetOnlineResponseAsync(
+                onlineAbsoluteUri,
+                HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
+            if (response is null)
                 return null;
 
-            var (contentStream, encoding) = result.Value;
-            
-            // Copy stream to memory stream.
-            using var memoryStream = new MemoryStream();
-            await contentStream.CopyToAsync(memoryStream).ConfigureAwait(false);
-            memoryStream.Position = 0;
-            
-            var byteArrayContent = memoryStream.ToArray();
-            await contentStream.DisposeAsync().ConfigureAwait(false);
-
-            return (byteArrayContent, encoding);
+            return (await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false),
+                TryGetContentEncoding(response));
         }
-        
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
-        [SuppressMessage("Usage", "CA2234:Pass system uri objects instead of strings")]
+
         private async Task<(Stream Stream, Encoding? Encoding)?> TryGetOnlineAsStreamAsync(
             string onlineAbsoluteUri)
         {
-            try
-            {
-                using var httpClient = httpClientFactory.CreateClient();
-                using var response = await httpClient.GetAsync(onlineAbsoluteUri).ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
-                {
-                    logger.OnlineFileRequestRefused(onlineAbsoluteUri, response.StatusCode);
-                    return null;
-                }
-
-                // Get content with encoding.
-                var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                Encoding? contentEncoding = null;
-
-                // Try to extract the encoding from the Content-Type header.
-                if (response.Content.Headers.ContentType?.CharSet != null)
-                {
-                    try { contentEncoding = Encoding.GetEncoding(response.Content.Headers.ContentType.CharSet); }
-                    catch (ArgumentException) { }
-                }
-
-                return (contentStream, contentEncoding);
-            }
-            catch (Exception e)
-            {
-                logger.OnlineFileRequestFailed(onlineAbsoluteUri, e);
+            // Only the headers are read with the response: the content is read by the caller, as it arrives,
+            // through a stream that disposes the response with itself.
+            var response = await TryGetOnlineResponseAsync(
+                onlineAbsoluteUri,
+                HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            if (response is null)
                 return null;
-            }
+
+            var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            return (new HttpResponseStream(contentStream, response), TryGetContentEncoding(response));
         }
-        
+
         [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         private async Task<long?> TryGetOnlineByteSizeWithHeadRequestAsync(string absoluteUri)
         {
@@ -212,6 +197,36 @@ namespace Etherna.Sdk.Tools.UniversalFiles
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Send a GET request of the online file
+        /// </summary>
+        /// <returns>The response when successful, null when the request is refused or fails</returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
+        [SuppressMessage("Usage", "CA2234:Pass system uri objects instead of strings")]
+        private async Task<HttpResponseMessage?> TryGetOnlineResponseAsync(
+            string onlineAbsoluteUri,
+            HttpCompletionOption completionOption)
+        {
+            try
+            {
+                // Disposing the client doesn't end the reading of a response content: the handler and its
+                // connections belong to the factory.
+                using var httpClient = httpClientFactory.CreateClient();
+                var response = await httpClient.GetAsync(onlineAbsoluteUri, completionOption).ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
+                    return response;
+
+                logger.OnlineFileRequestRefused(onlineAbsoluteUri, response.StatusCode);
+                response.Dispose();
+                return null;
+            }
+            catch (Exception e)
+            {
+                logger.OnlineFileRequestFailed(onlineAbsoluteUri, e);
+                return null;
+            }
         }
     }
 }

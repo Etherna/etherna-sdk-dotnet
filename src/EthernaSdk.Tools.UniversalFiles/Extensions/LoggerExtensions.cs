@@ -59,27 +59,18 @@ namespace Etherna.Sdk.Tools.UniversalFiles.Extensions
 
         // Methods.
         public static void OnlineFileHeadRequestFailed(this ILogger logger, string fileUri, Exception exception) =>
-            _onlineFileHeadRequestFailed(logger, RemoveUriSecrets(fileUri), exception);
+            _onlineFileHeadRequestFailed(logger, fileUri.RemoveUriSecrets(), exception);
 
         public static void OnlineFileRequestFailed(this ILogger logger, string fileUri, Exception exception) =>
-            _onlineFileRequestFailed(logger, RemoveUriSecrets(fileUri), exception);
+            _onlineFileRequestFailed(logger, fileUri.RemoveUriSecrets(), exception);
 
         public static void OnlineFileRequestRefused(this ILogger logger, string fileUri, HttpStatusCode statusCode) =>
-            _onlineFileRequestRefused(logger, RemoveUriSecrets(fileUri), statusCode, null!);
+            _onlineFileRequestRefused(logger, fileUri.RemoveUriSecrets(), statusCode, null!);
 
         public static void SwarmFileHeadersRequestFailed(this ILogger logger, string fileUri, Exception exception) =>
-            _swarmFileHeadersRequestFailed(logger, RemoveUriSecrets(fileUri), exception);
+            _swarmFileHeadersRequestFailed(logger, fileUri.RemoveUriSecrets(), exception);
 
         public static void UFileCopiedToLocalFile(this ILogger logger, string fileUri, string localFilePath) =>
-            _uFileCopiedToLocalFile(logger, RemoveUriSecrets(fileUri), localFilePath, null!);
-
-        // Helpers.
-        /// <summary>
-        /// An online uri can carry credentials, as user info or in its query: neither must reach the logs.
-        /// </summary>
-        private static string RemoveUriSecrets(string fileUri) =>
-            Uri.TryCreate(fileUri, UriKind.Absolute, out var uri) && !uri.IsFile ?
-                uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.UriEscaped) :
-                fileUri;
+            _uFileCopiedToLocalFile(logger, fileUri.RemoveUriSecrets(), localFilePath, null!);
     }
 }
