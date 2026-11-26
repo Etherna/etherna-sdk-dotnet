@@ -104,7 +104,6 @@ namespace ConsoleUserClientSample
                 ssoClientId!,
                 ssoClientSecret,
                 3000,
-                ["userApi.credit"],
                 authority: ssoBaseUrl!);
             ethernaClientsBuilder.AddEthernaCreditClient(creditBaseUrl!);
             

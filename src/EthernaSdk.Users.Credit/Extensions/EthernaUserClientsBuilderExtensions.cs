@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Users.Credit.Clients;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -38,6 +39,9 @@ namespace Etherna.Sdk.Users
                     new Uri(creditServiceBaseUrl, UriKind.Absolute),
                     clientFactory.CreateClient(builder.HttpClientName));
             });
+
+            // Request the default api scope of the service at sign in, unless the sign in has custom scopes.
+            builder.TryAddEthernaUserDefaultApiScope(EthernaScopes.UserApiCredit);
 
             return builder;
         }

@@ -17,28 +17,28 @@ using System;
 
 namespace Etherna.Sdk.Users
 {
-    public class EthernaUserClientsBuilder : IEthernaUserClientsBuilder
+    public class EthernaUserClientsBuilder(
+        IServiceCollection services,
+        string httpClientName,
+        Uri ssoBaseUrl)
+        : IEthernaUserClientsBuilder
     {
         // Consts.
         public const string DefaultCreditUrl = "https://credit.etherna.io/";
         public const string DefaultGatewayUrl = "https://gateway.etherna.io/";
         public const string DefaultIndexUrl = "https://index.etherna.io/";
         public const string DefaultSsoUrl = "https://sso.etherna.io/";
-        
-        // Constructor.
-        public EthernaUserClientsBuilder(
-            IServiceCollection services,
-            string httpClientName,
-            Uri ssoBaseUrl)
-        {
-            HttpClientName = httpClientName;
-            Services = services;
-            SsoBaseUrl = ssoBaseUrl;
-        }
-        
+
         // Properties.
-        public string HttpClientName { get; }
-        public IServiceCollection Services { get; }
-        public Uri SsoBaseUrl { get; }
+        public string HttpClientName { get; } = httpClientName;
+        public IServiceCollection Services { get; } = services;
+        public Uri SsoBaseUrl { get; } = ssoBaseUrl;
+
+        // Internal properties.
+        /// <summary>
+        /// True when the sign in requests the custom scopes passed to AddEthernaUserClients, as they are: the
+        /// client registrations then add no default scope
+        /// </summary>
+        internal bool HasCustomScopes { get; init; }
     }
 }

@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Tools.Video.Services;
 using Etherna.Sdk.Users.Index.Clients;
 using Etherna.SwarmSdk;
@@ -46,6 +47,9 @@ namespace Etherna.Sdk.Users
                     clientFactory.CreateClient(builder.HttpClientName),
                     serviceProvider.GetService<ILogger<EthernaUserIndexClient>>());
             });
+
+            // Request the default api scope of the service at sign in, unless the sign in has custom scopes.
+            builder.TryAddEthernaUserDefaultApiScope(EthernaScopes.UserApiIndex);
 
             return builder;
         }
