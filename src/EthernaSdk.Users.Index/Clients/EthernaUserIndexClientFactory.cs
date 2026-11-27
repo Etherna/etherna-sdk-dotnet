@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.SwarmSdk;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,6 +23,7 @@ namespace Etherna.Sdk.Users.Index.Clients
 {
     [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
     internal sealed class EthernaUserIndexClientFactory(
+        IEthernaOpenIdConnectClient authenticatedUser,
         string httpClientName,
         IHttpClientFactory httpClientFactory,
         ISwarmClient swarmClient,
@@ -36,6 +38,7 @@ namespace Etherna.Sdk.Users.Index.Clients
                 throw new ArgumentException("The index base url must be absolute", nameof(indexBaseUrl));
 
             return new EthernaUserIndexClient(
+                authenticatedUser,
                 indexBaseUrl,
                 swarmClient,
                 httpClientFactory.CreateClient(httpClientName),

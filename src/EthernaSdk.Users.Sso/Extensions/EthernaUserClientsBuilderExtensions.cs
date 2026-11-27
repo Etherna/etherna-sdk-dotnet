@@ -33,6 +33,7 @@ namespace Etherna.Sdk.Users
             {
                 var clientFactory = serviceProvider.GetService<IHttpClientFactory>()!;
                 return new EthernaUserSsoClient(
+                    serviceProvider.GetRequiredService<IEthernaOpenIdConnectClient>(),
                     builder.SsoBaseUrl,
                     clientFactory.CreateClient(builder.HttpClientName));
             });

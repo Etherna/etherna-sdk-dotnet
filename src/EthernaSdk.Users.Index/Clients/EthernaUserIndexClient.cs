@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Index.GenClients;
 using Etherna.Sdk.Tools.Video.Models;
 using Etherna.Sdk.Users.Index.Extensions;
@@ -35,6 +36,7 @@ using VoteValue = Etherna.Sdk.Users.Index.Models.VoteValue;
 namespace Etherna.Sdk.Users.Index.Clients
 {
     public class EthernaUserIndexClient(
+        IEthernaOpenIdConnectClient authenticatedUser,
         Uri baseUrl,
         ISwarmClient swarmClient,
         HttpClient httpClient,
@@ -49,6 +51,10 @@ namespace Etherna.Sdk.Users.Index.Clients
         private readonly UsersClient generatedUsersClient = new(baseUrl.AbsoluteUri, httpClient);
         private readonly VideosClient generatedVideosClient = new(baseUrl.AbsoluteUri, httpClient);
         private readonly ILogger<EthernaUserIndexClient> logger = logger ?? NullLogger<EthernaUserIndexClient>.Instance;
+
+        // Properties.
+        public IEthernaOpenIdConnectClient AuthenticatedUser { get; } =
+            authenticatedUser ?? throw new ArgumentNullException(nameof(authenticatedUser));
 
         // Methods.
         public Task AdminForceNewValidationByManifestReferenceAsync(

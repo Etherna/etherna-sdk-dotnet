@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Credit.GenClients;
 using Etherna.Sdk.Users.Credit.Models;
 using System;
@@ -29,12 +30,20 @@ namespace Etherna.Sdk.Users.Credit.Clients
         private readonly UserClient generatedClient;
 
         // Constructor.
-        public EthernaUserCreditClient(Uri baseUrl, HttpClient httpClient)
+        public EthernaUserCreditClient(
+            IEthernaOpenIdConnectClient authenticatedUser,
+            Uri baseUrl,
+            HttpClient httpClient)
         {
+            ArgumentNullException.ThrowIfNull(authenticatedUser);
             ArgumentNullException.ThrowIfNull(baseUrl);
 
+            AuthenticatedUser = authenticatedUser;
             generatedClient = new UserClient(baseUrl.ToString(), httpClient);
         }
+
+        // Properties.
+        public IEthernaOpenIdConnectClient AuthenticatedUser { get; }
 
         // Methods.
         public async Task<UserCredit> GetUserCreditAsync(CancellationToken cancellationToken = default) =>

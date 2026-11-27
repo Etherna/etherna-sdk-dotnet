@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Users.Gateway.Clients
 {
-    public interface IEthernaUserGatewayClient
+    public interface IEthernaUserGatewayClient : IEthernaUserClient
     {
         // Methods.
         /// <param name="resourceHashes">The swarm resource hashes list</param>

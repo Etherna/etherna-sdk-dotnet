@@ -36,6 +36,7 @@ namespace Etherna.Sdk.Users
             {
                 var clientFactory = serviceProvider.GetService<IHttpClientFactory>()!;
                 return new EthernaUserCreditClient(
+                    serviceProvider.GetRequiredService<IEthernaOpenIdConnectClient>(),
                     new Uri(creditServiceBaseUrl, UriKind.Absolute),
                     clientFactory.CreateClient(builder.HttpClientName));
             });

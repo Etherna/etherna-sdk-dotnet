@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.Sdk.Users.Gateway.Models;
 using Etherna.SwarmSdk.Models;
@@ -33,15 +34,21 @@ namespace Etherna.Sdk.Users.Gateway.Clients
 
         // Constructor.
         public EthernaUserGatewayClient(
+            IEthernaOpenIdConnectClient authenticatedUser,
             Uri baseUrl,
             HttpClient httpClient)
         {
+            ArgumentNullException.ThrowIfNull(authenticatedUser);
             ArgumentNullException.ThrowIfNull(baseUrl);
 
+            AuthenticatedUser = authenticatedUser;
             generatedResourcesClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedSystemClient = new(baseUrl.AbsoluteUri, httpClient);
             generatedUsersClient = new(baseUrl.AbsoluteUri, httpClient);
         }
+
+        // Properties.
+        public IEthernaOpenIdConnectClient AuthenticatedUser { get; }
 
         // Methods.
         public async Task<IDictionary<SwarmHash, bool>> AreResourcesDownloadFundedAsync(

@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Sso.GenClients;
 using Etherna.Sdk.Users.Sso.Models;
 using System;
@@ -27,12 +28,20 @@ namespace Etherna.Sdk.Users.Sso.Clients
         private readonly IdentityClient generatedClient;
 
         // Constructor.
-        public EthernaUserSsoClient(Uri baseUrl, HttpClient httpClient)
+        public EthernaUserSsoClient(
+            IEthernaOpenIdConnectClient authenticatedUser,
+            Uri baseUrl,
+            HttpClient httpClient)
         {
+            ArgumentNullException.ThrowIfNull(authenticatedUser);
             ArgumentNullException.ThrowIfNull(baseUrl);
 
+            AuthenticatedUser = authenticatedUser;
             generatedClient = new IdentityClient(baseUrl.ToString(), httpClient);
         }
+
+        // Properties.
+        public IEthernaOpenIdConnectClient AuthenticatedUser { get; }
 
         // Methods.
         public async Task<PrivateUserInfo> GetPrivateUserInfoAsync(CancellationToken cancellationToken = default) =>

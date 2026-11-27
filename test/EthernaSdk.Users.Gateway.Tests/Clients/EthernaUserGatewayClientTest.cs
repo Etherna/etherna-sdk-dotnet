@@ -12,8 +12,10 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Gateway.GenClients;
 using Etherna.SwarmSdk.Models;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +90,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
         {
             // Setup.
             using var httpClient = new HttpClient(new StubHttpMessageHandler(test.StatusCode, test.Body));
-            var client = new EthernaUserGatewayClient(GatewayUrl, httpClient);
+            var client = new EthernaUserGatewayClient(Mock.Of<IEthernaOpenIdConnectClient>(), GatewayUrl, httpClient);
 
             // Action.
             var batchId = await client.TryGetNewPostageBatchIdFromPostageRefAsync("batch-reference");
@@ -104,7 +106,7 @@ namespace Etherna.Sdk.Users.Gateway.Clients
             using var httpClient = new HttpClient(new StubHttpMessageHandler(
                 HttpStatusCode.Gone,
                 "\"The node refused the purchase with status 402\""));
-            var client = new EthernaUserGatewayClient(GatewayUrl, httpClient);
+            var client = new EthernaUserGatewayClient(Mock.Of<IEthernaOpenIdConnectClient>(), GatewayUrl, httpClient);
 
             // Action.
             var exception = await Assert.ThrowsAsync<EthernaGatewayApiException>(

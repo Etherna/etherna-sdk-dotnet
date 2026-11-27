@@ -190,6 +190,12 @@ A request the service refuses throws the api exception of that service (`Etherna
 `EthernaGatewayApiException`, `EthernaIndexApiException`, `EthernaSsoApiException`), with the status
 code and the response body.
 
+Every user client also tells which user it calls its service as: `AuthenticatedUser`, from the
+`IEthernaUserClient` interface they all implement, is the `IEthernaOpenIdConnectClient` of Etherna
+Authentication, which reads the claims of the signed-in user (ether address, username, roles...). A
+component that receives only a client gets the user from it, also when the client was built before the
+sign-in.
+
 The two sign-in flows, and how to read the identity of the signed-in user, are documented by
 [Etherna Authentication](https://github.com/Etherna/etherna-authentication#native-app--sign-in-choosing-the-flow-at-runtime).
 
@@ -289,6 +295,10 @@ var videoId = await indexClient.PublishNewVideoAsync(manifestReference, batchId)
 // Comment and vote it.
 await indexClient.CreateCommentAsync(videoId, "First!");
 await indexClient.VotesVideoAsync(videoId, VoteValue.Up);
+
+// List the videos of the user the client calls the index as.
+var userAddress = await indexClient.AuthenticatedUser.GetEtherAddressAsync();
+var userVideos = await indexClient.GetVideosByOwnerAsync(userAddress, page: 0, take: 20);
 
 // Search the videos of another index, at the same time.
 var otherIndexClient = indexClientFactory.Create(new Uri("https://index.example.com/"));
