@@ -279,7 +279,8 @@ namespace Etherna.Sdk.AotCompatibility
             await using var userProvider = userServices.BuildServiceProvider();
             _ = userProvider.GetRequiredService<IEthernaUserCreditClient>();
             _ = userProvider.GetRequiredService<IEthernaUserGatewayClient>();
-            _ = userProvider.GetRequiredService<IEthernaUserIndexClient>();
+            _ = userProvider.GetRequiredService<IEthernaUserIndexClientFactory>()
+                .Create(new Uri("https://index.example.com/"));
             _ = userProvider.GetRequiredService<IEthernaUserSsoClient>();
             _ = userProvider.GetRequiredService<ISwarmClient>();
 
@@ -292,7 +293,7 @@ namespace Etherna.Sdk.AotCompatibility
             _ = internalProvider.GetRequiredService<IEthernaInternalCreditClient>();
             _ = internalProvider.GetRequiredService<IEthernaInternalSsoClient>();
 
-            return "resolved the four user clients, the swarm client and the two internal clients";
+            return "resolved the three user clients, the index client factory, the swarm client and the two internal clients, and created an index client";
         }
     }
 }
