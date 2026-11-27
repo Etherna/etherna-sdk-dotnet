@@ -17,9 +17,9 @@ using Etherna.Sdk.Tools.Video.Services;
 using Etherna.Sdk.Users.Index.Clients;
 using Etherna.SwarmSdk;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 
 // ReSharper disable CheckNamespace
@@ -27,26 +27,21 @@ namespace Etherna.Sdk.Users
 {
     public static class EthernaUserClientsBuilderExtensions
     {
-        [SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
         public static IEthernaUserClientsBuilder AddEthernaIndexClient(
-            this IEthernaUserClientsBuilder builder,
-            string indexBaseUrl = EthernaUserClientsBuilder.DefaultIndexUrl)
+            this IEthernaUserClientsBuilder builder)
         {
             ArgumentNullException.ThrowIfNull(builder);
             
             builder.Services.AddScoped<IVideoManifestService, VideoManifestService>();
             
-            // Register client.
-            builder.Services.AddSingleton<IEthernaUserIndexClient>(serviceProvider =>
-            {
-                var swarmClient = serviceProvider.GetRequiredService<ISwarmClient>();
-                var clientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-                return new EthernaUserIndexClient(
-                    new Uri(indexBaseUrl, UriKind.Absolute),
-                    swarmClient,
-                    clientFactory.CreateClient(builder.HttpClientName),
-                    serviceProvider.GetService<ILogger<EthernaUserIndexClient>>());
-            });
+            // Register the factory of the index clients: there is no default index, each client is created on
+            // the base url of its own index.
+            builder.Services.TryAddSingleton<IEthernaUserIndexClientFactory>(serviceProvider =>
+                new EthernaUserIndexClientFactory(
+                    builder.HttpClientName,
+                    serviceProvider.GetRequiredService<IHttpClientFactory>(),
+                    serviceProvider.GetRequiredService<ISwarmClient>(),
+                    serviceProvider.GetService<ILogger<EthernaUserIndexClient>>()));
 
             // Request the default api scope of the service at sign in, unless the sign in has custom scopes.
             builder.TryAddEthernaUserDefaultApiScope(EthernaScopes.UserApiIndex);

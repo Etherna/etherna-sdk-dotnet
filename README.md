@@ -171,7 +171,7 @@ Every service follows the same pattern:
 | --- | --- | --- | --- |
 | Credit | `AddEthernaCreditClient` | `EthernaScopes.UserApiCredit` | `IEthernaUserCreditClient` |
 | Gateway | `AddEthernaGatewayClient` | `EthernaScopes.UserApiGateway` | `IEthernaUserGatewayClient`, `ISwarmClient` |
-| Index | `AddEthernaIndexClient` | `EthernaScopes.UserApiIndex` | `IEthernaUserIndexClient` |
+| Index | `AddEthernaIndexClient` | `EthernaScopes.UserApiIndex` | `IEthernaUserIndexClientFactory` |
 | SSO | `AddEthernaSsoClient` | `EthernaScopes.UserApiSso` | `IEthernaUserSsoClient` |
 
 The sign-in requests the scopes of the registered clients. To request other ones, `AddEthernaUserClients`
@@ -179,11 +179,12 @@ takes an optional `scopes`: when given, the sign-in requests exactly those inste
 include the scope of each service to call.
 
 The clients are singletons. By default they call the public Etherna deployment
-(`https://credit.etherna.io/`, `https://gateway.etherna.io/`, `https://index.etherna.io/`, and
-`https://sso.etherna.io/` as the authority). To call another deployment, each registration takes the
-base url of its service as an optional parameter, and `AddEthernaUserClients` takes the `authority`,
-which must be an HTTPS url. All of them send their requests on one named `HttpClient`, that
-`configureHttpClient` customizes.
+(`https://credit.etherna.io/`, `https://gateway.etherna.io/`, and `https://sso.etherna.io/` as the
+authority). To call another deployment, each registration takes the base url of its service as an
+optional parameter, and `AddEthernaUserClients` takes the `authority`, which must be an HTTPS url. The
+index is the exception: there is no default one, and every index client is created on the base url of
+its own index (see [below](#search-and-publish-videos-on-the-index)). All of them send their requests on
+one named `HttpClient`, that `configureHttpClient` customizes.
 
 A request the service refuses throws the api exception of that service (`EthernaCreditApiException`,
 `EthernaGatewayApiException`, `EthernaIndexApiException`, `EthernaSsoApiException`), with the status
@@ -256,8 +257,11 @@ throws `TimeoutException`. The optional callbacks report the progress of the two
 
 ### Search and publish videos on the Index
 
-The index client resolves the thumbnails of the videos it lists on Swarm: it needs an `ISwarmClient`
-in the container, the one `AddEthernaGatewayClient` registers.
+There is no default index: an application can use several indexes at the same time, each one on its
+own url. `AddEthernaIndexClient` registers an `IEthernaUserIndexClientFactory`, which creates the
+`IEthernaUserIndexClient` of an index from its base url, also chosen at runtime. The index client resolves
+the thumbnails of the videos it lists on Swarm: it needs an `ISwarmClient` in the container, the one
+`AddEthernaGatewayClient` registers.
 
 ```csharp
 using Etherna.Sdk.Users;
@@ -271,7 +275,8 @@ services.AddEthernaUserClients("yourClientId", null, 11420)
 
 // ...build the service provider and sign in, as above.
 
-var indexClient = serviceProvider.GetRequiredService<IEthernaUserIndexClient>();
+var indexClientFactory = serviceProvider.GetRequiredService<IEthernaUserIndexClientFactory>();
+var indexClient = indexClientFactory.Create(new Uri("https://index.etherna.io/"));
 
 // Search the published videos.
 var videos = await indexClient.SearchVideosAsync("swarm", page: 0, take: 20);
@@ -284,7 +289,15 @@ var videoId = await indexClient.PublishNewVideoAsync(manifestReference, batchId)
 // Comment and vote it.
 await indexClient.CreateCommentAsync(videoId, "First!");
 await indexClient.VotesVideoAsync(videoId, VoteValue.Up);
+
+// Search the videos of another index, at the same time.
+var otherIndexClient = indexClientFactory.Create(new Uri("https://index.example.com/"));
+var otherVideos = await otherIndexClient.SearchVideosAsync("swarm", page: 0, take: 20);
 ```
+
+Each call creates a new client: keep it for as long as you use that index. The clients it creates send
+their requests on the same named `HttpClient` as the other user clients, and with them the access token
+of the signed-in user: create them only for the indexes you trust with that token.
 
 ### Service-to-service — internal clients
 
