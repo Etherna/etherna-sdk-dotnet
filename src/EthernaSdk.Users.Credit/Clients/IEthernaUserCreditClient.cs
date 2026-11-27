@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Users.Credit.Clients
 {
-    public interface IEthernaUserCreditClient
+    public interface IEthernaUserCreditClient : IEthernaUserClient
     {
         /// <summary>
         /// Get credit status for current user

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Sdk.Users.Sso.Clients
 {
-    public interface IEthernaUserSsoClient
+    public interface IEthernaUserSsoClient : IEthernaUserClient
     {
         /// <summary>
         /// Get current user private information.

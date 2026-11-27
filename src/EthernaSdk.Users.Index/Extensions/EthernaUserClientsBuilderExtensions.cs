@@ -38,6 +38,7 @@ namespace Etherna.Sdk.Users
             // the base url of its own index.
             builder.Services.TryAddSingleton<IEthernaUserIndexClientFactory>(serviceProvider =>
                 new EthernaUserIndexClientFactory(
+                    serviceProvider.GetRequiredService<IEthernaOpenIdConnectClient>(),
                     builder.HttpClientName,
                     serviceProvider.GetRequiredService<IHttpClientFactory>(),
                     serviceProvider.GetRequiredService<ISwarmClient>(),

@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with Etherna SDK .Net.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Etherna.Authentication;
 using Etherna.Sdk.Internal;
 using Etherna.Sdk.Internal.Clients;
 using Etherna.Sdk.Tools.UniversalFiles;
@@ -54,11 +55,21 @@ namespace Etherna.Sdk.AotCompatibility
         // Methods.
         public static async Task<int> Main()
         {
+            // The user clients built by hand expose the user of a container where nobody signs in.
+            var userServices = new ServiceCollection();
+            userServices.AddEthernaUserClients(
+                "probeClientId",
+                null,
+                11420,
+                authority: "https://sso.example.com/");
+            await using var userProvider = userServices.BuildServiceProvider();
+            var authenticatedUser = userProvider.GetRequiredService<IEthernaOpenIdConnectClient>();
+
             var failures =
-                await RunAsync("credit", VerifyCreditClientsAsync).ConfigureAwait(false) +
-                await RunAsync("gateway", VerifyGatewayClientAsync).ConfigureAwait(false) +
-                await RunAsync("index", VerifyIndexClientAsync).ConfigureAwait(false) +
-                await RunAsync("sso", VerifySsoClientsAsync).ConfigureAwait(false) +
+                await RunAsync("credit", () => VerifyCreditClientsAsync(authenticatedUser)).ConfigureAwait(false) +
+                await RunAsync("gateway", () => VerifyGatewayClientAsync(authenticatedUser)).ConfigureAwait(false) +
+                await RunAsync("index", () => VerifyIndexClientAsync(authenticatedUser)).ConfigureAwait(false) +
+                await RunAsync("sso", () => VerifySsoClientsAsync(authenticatedUser)).ConfigureAwait(false) +
                 await RunAsync("video manifest", VerifyVideoManifestAsync).ConfigureAwait(false) +
                 await RunAsync("hls", VerifyHlsParsingAsync).ConfigureAwait(false) +
                 await RunAsync("registration", VerifyRegistrationAsync).ConfigureAwait(false);
@@ -89,11 +100,11 @@ namespace Etherna.Sdk.AotCompatibility
             }
         }
 
-        private static async Task<string> VerifyCreditClientsAsync()
+        private static async Task<string> VerifyCreditClientsAsync(IEthernaOpenIdConnectClient authenticatedUser)
         {
             // User client: an object response.
             var userHandler = new CannedJsonHandler("""{"balance":12.5,"isUnlimited":false}""");
-            var credit = await new EthernaUserCreditClient(ServiceUrl, new HttpClient(userHandler))
+            var credit = await new EthernaUserCreditClient(authenticatedUser, ServiceUrl, new HttpClient(userHandler))
                 .GetUserCreditAsync().ConfigureAwait(false);
             Expect(credit.Balance == XDaiValue.FromDecimal(12.5m) && !credit.IsUnlimited, "Unexpected user credit.");
 
@@ -107,18 +118,18 @@ namespace Etherna.Sdk.AotCompatibility
             return $"balance {credit.Balance}, {opLogs.Length} operation log, amount {opLogs[0].Amount}";
         }
 
-        private static async Task<string> VerifyGatewayClientAsync()
+        private static async Task<string> VerifyGatewayClientAsync(IEthernaOpenIdConnectClient authenticatedUser)
         {
             // A collection request body, and a dictionary response.
             var handler = new CannedJsonHandler($$"""{"{{Hash}}":true}""");
-            var funded = await new EthernaUserGatewayClient(ServiceUrl, new HttpClient(handler))
+            var funded = await new EthernaUserGatewayClient(authenticatedUser, ServiceUrl, new HttpClient(handler))
                 .AreResourcesDownloadFundedAsync([SwarmHash.FromString(Hash)]).ConfigureAwait(false);
             Expect(funded.Count == 1 && funded[SwarmHash.FromString(Hash)], "Unexpected funded resources.");
 
             return $"request body {handler.Requests.Single().Body}, {funded.Count} funded resource";
         }
 
-        private static async Task<string> VerifyIndexClientAsync()
+        private static async Task<string> VerifyIndexClientAsync(IEthernaOpenIdConnectClient authenticatedUser)
         {
             using var swarmClient = new SwarmClient(
                 ServiceUrl,
@@ -127,13 +138,13 @@ namespace Etherna.Sdk.AotCompatibility
 
             // An object request body, and a string response.
             var publishHandler = new CannedJsonHandler("\"probeVideoId\"");
-            var videoId = await new EthernaUserIndexClient(ServiceUrl, swarmClient, new HttpClient(publishHandler))
+            var videoId = await new EthernaUserIndexClient(authenticatedUser, ServiceUrl, swarmClient, new HttpClient(publishHandler))
                 .PublishNewVideoAsync(SwarmReference.FromString(Hash), PostageBatchId.FromString(Hash)).ConfigureAwait(false);
             Expect(videoId == "probeVideoId", "Unexpected video id.");
 
             // An enum query value, read through its [EnumMember] attribute.
             var voteHandler = new CannedJsonHandler("{}");
-            await new EthernaUserIndexClient(ServiceUrl, swarmClient, new HttpClient(voteHandler))
+            await new EthernaUserIndexClient(authenticatedUser, ServiceUrl, swarmClient, new HttpClient(voteHandler))
                 .VotesVideoAsync("probeVideoId", VoteValue.Down).ConfigureAwait(false);
             var voteUri = voteHandler.Requests.Single().Uri;
             Expect(voteUri.EndsWith("?value=Down", StringComparison.Ordinal), "Unexpected vote query.");
@@ -141,14 +152,14 @@ namespace Etherna.Sdk.AotCompatibility
             // A collection of objects as request body, serialized by the runtime type of its items, and a collection response.
             var validationHandler = new CannedJsonHandler(
                 $$"""[{"errorDetails":[],"hash":"{{Hash}}","isValid":true,"validationTime":"2026-01-01T00:00:00+00:00","videoId":"probeVideoId"}]""");
-            var validations = (await new EthernaUserIndexClient(ServiceUrl, swarmClient, new HttpClient(validationHandler))
+            var validations = (await new EthernaUserIndexClient(authenticatedUser, ServiceUrl, swarmClient, new HttpClient(validationHandler))
                 .GetBulkVideoValidationStatusByManifestsAsync([SwarmReference.FromString(Hash)]).ConfigureAwait(false)).ToArray();
             Expect(validations.Length == 1 && validations[0].IsValid == true, "Unexpected validation status.");
 
             // An object response.
             var parametersHandler = new CannedJsonHandler(
                 """{"commentMaxLength":1,"videoDescriptionMaxLength":2,"videoPersonalDataMaxLength":3,"videoTitleMaxLength":4}""");
-            var parameters = await new EthernaUserIndexClient(ServiceUrl, swarmClient, new HttpClient(parametersHandler))
+            var parameters = await new EthernaUserIndexClient(authenticatedUser, ServiceUrl, swarmClient, new HttpClient(parametersHandler))
                 .GetIndexParametersAsync().ConfigureAwait(false);
             Expect(parameters.VideoTitleMaxLength == 4, "Unexpected index parameters.");
 
@@ -156,12 +167,12 @@ namespace Etherna.Sdk.AotCompatibility
                    $"vote {voteUri}, {validations.Length} validation status, title max length {parameters.VideoTitleMaxLength}";
         }
 
-        private static async Task<string> VerifySsoClientsAsync()
+        private static async Task<string> VerifySsoClientsAsync(IEthernaOpenIdConnectClient authenticatedUser)
         {
             // User client: an object response with a collection member.
             var userHandler = new CannedJsonHandler(
                 $$"""{"accountType":"web3","email":null,"etherAddress":"{{Address}}","etherManagedPrivateKey":null,"etherPreviousAddresses":["{{Address}}"],"etherLoginAddress":null,"phoneNumber":null,"username":"probe"}""");
-            var user = await new EthernaUserSsoClient(ServiceUrl, new HttpClient(userHandler))
+            var user = await new EthernaUserSsoClient(authenticatedUser, ServiceUrl, new HttpClient(userHandler))
                 .GetPrivateUserInfoAsync().ConfigureAwait(false);
             Expect(user.Username == "probe" && user.EtherPreviousAddresses.Count() == 1, "Unexpected user info.");
 
@@ -277,12 +288,19 @@ namespace Etherna.Sdk.AotCompatibility
                 .AddEthernaIndexClient()
                 .AddEthernaSsoClient();
             await using var userProvider = userServices.BuildServiceProvider();
-            _ = userProvider.GetRequiredService<IEthernaUserCreditClient>();
-            _ = userProvider.GetRequiredService<IEthernaUserGatewayClient>();
-            _ = userProvider.GetRequiredService<IEthernaUserIndexClientFactory>()
-                .Create(new Uri("https://index.example.com/"));
-            _ = userProvider.GetRequiredService<IEthernaUserSsoClient>();
+            IEthernaUserClient[] userClients =
+            [
+                userProvider.GetRequiredService<IEthernaUserCreditClient>(),
+                userProvider.GetRequiredService<IEthernaUserGatewayClient>(),
+                userProvider.GetRequiredService<IEthernaUserIndexClientFactory>()
+                    .Create(new Uri("https://index.example.com/")),
+                userProvider.GetRequiredService<IEthernaUserSsoClient>()
+            ];
             _ = userProvider.GetRequiredService<ISwarmClient>();
+
+            //every user client exposes the user of the container's sign in
+            var authenticatedUser = userProvider.GetRequiredService<IEthernaOpenIdConnectClient>();
+            Expect(userClients.All(c => c.AuthenticatedUser == authenticatedUser), "A user client exposes another user.");
 
             // Internal clients.
             var internalServices = new ServiceCollection();
@@ -293,7 +311,8 @@ namespace Etherna.Sdk.AotCompatibility
             _ = internalProvider.GetRequiredService<IEthernaInternalCreditClient>();
             _ = internalProvider.GetRequiredService<IEthernaInternalSsoClient>();
 
-            return "resolved the three user clients, the index client factory, the swarm client and the two internal clients, and created an index client";
+            return "resolved the three user clients, the index client factory, the swarm client and the two internal clients, and created an index client, " +
+                   "every user client exposing the user of the container";
         }
     }
 }

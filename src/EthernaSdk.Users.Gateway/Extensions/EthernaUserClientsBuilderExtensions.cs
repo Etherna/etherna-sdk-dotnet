@@ -61,6 +61,7 @@ namespace Etherna.Sdk.Users
                 var httpClient = httpClientFactory.CreateClient(builder.HttpClientName);
                 
                 return new EthernaUserGatewayClient(
+                    serviceProvider.GetRequiredService<IEthernaOpenIdConnectClient>(),
                     gatewayBaseUri,
                     httpClient);
             });

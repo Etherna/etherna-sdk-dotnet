@@ -14,6 +14,7 @@
 
 using Etherna.Authentication;
 using Etherna.Authentication.Native;
+using Etherna.Sdk.Users.Gateway.Clients;
 using Etherna.SwarmSdk;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +28,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -39,6 +43,38 @@ namespace Etherna.Sdk.Users.Gateway.Extensions
         /// An unsigned access token of the user "user": the sign in reads its claims without validating it
         /// </summary>
         private const string AccessToken = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJ1c2VyIn0.";
+
+        /// <summary>
+        /// The ether address of the user "user": the access token doesn't carry it, the userinfo endpoint answers it
+        /// </summary>
+        private const string UserEtherAddress = "0x0000000000000000000000000000000000000001";
+
+        // Classes.
+        /// <summary>
+        /// The primary handler of the http client shared by the user clients, the one with the access token of the
+        /// user: it records the authorization of each request, and answers the credit of the current user
+        /// </summary>
+        private sealed class GatewayHandler : HttpMessageHandler
+        {
+            // Properties.
+            public List<AuthenticationHeaderValue?> Authorizations { get; } = [];
+
+            // Protected methods.
+            protected override Task<HttpResponseMessage> SendAsync(
+                HttpRequestMessage request,
+                CancellationToken cancellationToken)
+            {
+                Authorizations.Add(request.Headers.Authorization);
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(
+                        """{ "balance": "0", "isUnlimited": false }""",
+                        Encoding.UTF8,
+                        "application/json"),
+                    RequestMessage = request
+                });
+            }
+        }
 
         // Tests.
         [Fact]
@@ -99,6 +135,38 @@ namespace Etherna.Sdk.Users.Gateway.Extensions
         }
 
         [Fact]
+        public async Task AddEthernaGatewayClient_RegistersAClientExposingTheUserOfItsAccessToken()
+        {
+            // Setup.
+            await using var ssoServer = await StartSsoServerAsync([]);
+            var gatewayHandler = new GatewayHandler();
+            var services = new ServiceCollection();
+            services.AddEthernaUserClients(
+                    clientId: "clientId",
+                    clientSecret: null,
+                    returnUrlPort: 3000,
+                    authority: ssoServer.Urls.Single() + "/")
+                .AddEthernaGatewayClient();
+            services.ConfigureAll<OpenIdConnectOptions>(options => options.RequireHttpsMetadata = false); //the SSO server is plain http
+            services.AddHttpClient(ServiceCollectionExtensions.DefaultEthernaUserHttpClientName)
+                .ConfigurePrimaryHttpMessageHandler(() => gatewayHandler);
+            await using var serviceProvider = services.BuildServiceProvider();
+
+            //a singleton consumer gets the client before the user signs in
+            var gatewayClient = serviceProvider.GetRequiredService<IEthernaUserGatewayClient>();
+
+            // Action.
+            await serviceProvider.GetRequiredService<IEthernaSignInService>().SignInAsync("user.secret");
+            await gatewayClient.GetCurrentUserCreditAsync();
+            var etherAddress = await gatewayClient.AuthenticatedUser.GetEtherAddressAsync();
+
+            // Assert.
+            //the client calls the gateway with the access token of the user it exposes
+            Assert.Equal($"Bearer {AccessToken}", Assert.Single(gatewayHandler.Authorizations)?.ToString());
+            Assert.Equal(UserEtherAddress, etherAddress);
+        }
+
+        [Fact]
         public async Task AddEthernaGatewayClient_RequestsTheGatewayScopeAtSignIn()
         {
             // Setup.
@@ -130,8 +198,8 @@ namespace Etherna.Sdk.Users.Gateway.Extensions
 
         // Helpers.
         /// <summary>
-        /// Start an SSO server on loopback, answering the discovery and the token requests, and recording the
-        /// scope of each token request
+        /// Start an SSO server on loopback, answering the discovery, the token and the userinfo requests, and
+        /// recording the scope of each token request
         /// </summary>
         private static async Task<WebApplication> StartSsoServerAsync(List<string> requestedScopes)
         {
@@ -149,11 +217,18 @@ namespace Etherna.Sdk.Users.Gateway.Extensions
                       "issuer": "{{authority}}",
                       "authorization_endpoint": "{{authority}}/connect/authorize",
                       "token_endpoint": "{{authority}}/connect/token",
+                      "userinfo_endpoint": "{{authority}}/connect/userinfo",
                       "jwks_uri": "{{authority}}/.well-known/jwks"
                     }
                     """,
                     "application/json");
             });
+            ssoServer.MapGet("/connect/userinfo", (HttpRequest request) =>
+                request.Headers.Authorization == $"Bearer {AccessToken}" ?
+                    Results.Text(
+                        $$"""{ "sub": "user", "ether_address": "{{UserEtherAddress}}" }""",
+                        "application/json") :
+                    Results.Unauthorized());
             ssoServer.MapGet("/.well-known/jwks", () => Results.Text("""{ "keys": [] }""", "application/json"));
             ssoServer.MapPost("/connect/token", async (HttpRequest request) =>
             {

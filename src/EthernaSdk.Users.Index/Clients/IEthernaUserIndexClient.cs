@@ -23,7 +23,7 @@ using VoteValue = Etherna.Sdk.Users.Index.Models.VoteValue;
 
 namespace Etherna.Sdk.Users.Index.Clients
 {
-    public interface IEthernaUserIndexClient
+    public interface IEthernaUserIndexClient : IEthernaUserClient
     {
         /// <summary>
         /// Force new validation of video manifest.
